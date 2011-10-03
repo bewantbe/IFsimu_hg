@@ -1,0 +1,283 @@
+更改日志
+
+2011-10-03
+发现 2011-09-06 的修改的 Bug: GUI 时参数的即时改变无效.
+
+2011-09-07
+  解决 firing rate 超过 500次/s 的 Bug.
+现在只剩下 spike_list 和 tempneu2 是动态生成的了.
+
+2011-09-06
+增加功能:
+  可以用微秒极的系统时间作为随机种子(--seed-on), 并且这成为默认选项. (--verbose 时会显示其值)
+  手动设置随机种子时, 允许用 0~2^31-1 的整数 或 0~1 之间的浮点数.
+  可以通过文件读取每个神经的poisson输入率(相对值).
+  可以从命令行直接读取相对poisson输入率和输入相度, 并且允许不完整指定. (--pr-mul, --ps-mul, --psi-mul)
+优化:
+  tempneu 变量预分配内存.
+
+2011-09-05
+对所有动态内存分配失败进行检测.
+Xstream 系列 C++ 头文件限制在 datainput.cpp 和 myopengl.cpp 中使用.
+
+2011-09-04
+增加功能:
+  命令行设置随机数种子.
+  可以通过文件读取每个神经的poisson输入强度(相对值)(命令行参数给文件路径).
+
+2011-08-10
+修正保存数据的一个 bug: 现在可随意设定保存数据间隔.
+增加 RC 滤波选项.
+
+2011-07-11
+修正命令行参数解析的一个 bug, 但未完全修正, 请完全按照指定格式使用.
+添加对一些编译器的识别宏.
+对程序在不同平台的运行效率进行了一个较完整的测试.
+
+2011-05-29
+基本把 poisson_input.cpp 的每个细节都弄清楚了.
+去除了一些没用到的变量(数组).
+把存放 Poisson input 的数组改成程序开头分配.
+strobeupdate 改成只更新要用到的部分
+一些代码改成更适于打印的形式
+速度有约 10% 的提升
+
+2011-05-20
+添加参数 --save-spike-interval FILE
+
+2011-05-11
+添加参数 --save-spike FILE, --bin-save, --quiet
+
+2011-05-06
+总测试:
+内存泄漏.
+计算正确性.
+异常的性能下降.
+
+特例测试(时长=10000, 完全图)
+编号  神经元数   输入强度  输入频率
+1    1 + 0     弱        弱
+2    1 + 0     弱        高
+3    1 + 0     强        低
+4    1 + 0     强        高
+
+5    2 + 0     弱        弱
+6    2 + 0     弱        高
+7    2 + 0     强        低
+8    2 + 0     强        高
+
+9    20 + 0    中        中
+
+1000 + 0  中        中    连接强度 中高
+
+
+2011-05-05
+在添加了一些命令行功能, 接口基本完整了. 取消原来想设的二进制格式输出.
+把打开/关闭文件操作放在了开头/末尾, 效率问题大大改善.
+
+2011-05-04
+添加程序命令行参数功能(14 个, 部分未完成)
+神经元个数已可参数输入
+
+存在的问题
+程序有过于频繁的内存申请, 释放. 导致效率显著下降.
+把 tempneu, tmp_tempneu 的内存申请/分配提到开头和结尾,
+速度提高约 21% (Linux, 29.2s -> 24.1s) 和 28% (WinXP, 78.6s -> 61.4s)
+仍有一些变量有巨量的申请/释放.
+
+2011-05-02, xyy
+更改函数 void voltage_dt(..), 用宏区分是否使用 poisson 输入(明显提高计算速度).
+去除 RYangle, RXangle 等变量
+glColor3f(rcolor,gcolor,bcolor);
+移出  glBegin(GL_QUADS);
+删除函数
+	glpolygon(..)  // 画多边形
+	glring(..)  // 画环
+	glarrow(..)  // 画箭头
+
+变量名更改
+GLUTWINDOWNUMBER  GLUT_WINDOW_ID
+glut 回调函数的参数引用传递改为直接传递
+按 Esc 的退出码改为 0 (原是 1)
+貌似内存泄漏更严重了(18887040 bytes in 1 blocks are possibly lost).
+但进程查看器中并未观察到内存使用的异常增长.
+另外, 在纯计算模式时完全没有观察到内存泄漏.
+
+2011-05-01, xyy
+总计算时间改成可以从命令行读入(原来的宏成为默认值) (-t)
+可以从命令行读入参数设置不显示图形界面. (-ng)
+这两个功能的命令格式是:
+raster_tuning -t TIME -ng
+TIME 以毫秒为单位
+在命令行窗口显示基本信息
+
+
+2011-04-10, xyy
+
+改成只有计算而没分析的程序.
+
+改动:
+文件名:
+opengl.cpp, opengl.h -> myopengl.cpp, myopengl.h
+
+更改:
+vector 容量增长模式改为倍增(而不是线性增加, 见 void vector_reallocate(vector &a) @ loop.cpp, void raster_reallocate(raster &a) @ raster.cpp), 并增加简易的分配失败检查.
+#define ENTER_KEY 13  // 而不是 10
+
+去除的项(未能尽数列入)
+FFTW_USE
+FFT_TIME_LENGTH
+MUL_LYAPUNOV_EVOLUTION
+MUL_LYAPUNOV_COMP
+MUL_EIG_TIME_INTERVAL
+MUL_NUM_LYA
+OPENGL_NOTUSE
+#define SMALL_DISPLACE (1.0e-8)
+#define FFTW_POWER_RECORD 1
+#define CORTICAL_STRENGTH_ADJUST 1                                                      //   ------------1--->0
+#define READ_DATA_CHECK 0
+#define WRITE_DATA_CHECK 0
+#define BIN_RECORD_USE 1
+#define CORITCAL_INTERACTION_USE 1
+LYA_STEP
+#define MUL_LYAPUNOV_DEBUG 0
+#define DEBUG_OUTPUT_ALL 0
+#define VOT_DEBUG 0
+#define FIRE_DEBUG 0
+#define HEAD_NEXT_DEBUG 0
+#define NO_SPIKE_DEBUG 0
+#define ROOT_FIND_DEBUG 0
+ROOT_FIND_DEBUG
+
+void powerspectrum_vot_BINrecord();
+void mul_lya_data_dump()
+void mul_GramSchmit()
+所有分析混沌的部分
+
+去除所有未用到的变量
+
+(It is safe to deallocate a NULL pointer)
+if (a.vect_value != NULL) {
+  free(a.vect_value);
+}
+改为 free()
+
+// compute several lyapunov exponents **********************
+long MUL_INI_SEED = 0;
+struct neuron **mul_lya_neu = NULL;
+struct raster *mul_lya_spike_list = NULL;
+double ***mul_lya_perturb = NULL;
+int MUL_VAR_NUM = 0;
+int *mul_eig_num = NULL;
+double *mul_eig_value = NULL;
+double *mul_eig_value_square = NULL;
+double *mul_norm_awaken_traject = NULL;
+// this checks whether the reference and perturbed trajectories are at the same state
+extern int num_equal_traject;
+
+// compute several lyapunov exponents **********************
+/* this part of program currently is designed for group neurons instead
+of a single neuron, also it is for full lyapunov exponent in non-smooth
+conductance case! */
+// ramdom seed for generating random numbers
+extern long MUL_INI_SEED;
+// this saves the neurons's information for perturbed trajectories
+extern struct neuron **mul_lya_neu;
+// this saves the spike list for perturbed trajectories in each time step
+extern struct raster *mul_lya_spike_list;
+// this saves the perturbed vectors for computing Lyapunov exponents
+extern double ***mul_lya_perturb;
+/* number of perturbed variables, the order is: voltage, (exconductance),
+(inconductance), (refractory residence time). */
+extern int MUL_VAR_NUM;
+// this saves the number of computing mulitiple local Lyapunov exponents
+extern int *mul_eig_num;
+// this saves the sum of multiple local Lyapuonv exponents
+extern double *mul_eig_value;
+// this saves the variance of multiple Lyapunov exponents
+extern double *mul_eig_value_square;
+// this saves the norm of perturbation for neurons outside refractory period
+// after evolving the initial \epsilon different outside refractory period
+extern double *mul_norm_awaken_traject;
+
+
+周期记录
+#if PERIOD_TRACE
+VOT_TRACE
+INPUT_RATE_ADJUST
+/* whether or not traject the neuron's information(voltage,conductance,threshold)
+periodically, like V(0), V(T), V(2T), V(3T), ...   This is usually for current based case!*/
+#define PERIOD_TRACE 0
+#define VOT_TRACE 0
+#define EXCON_TRACE 0
+#define INCON_TRACE 0
+voltage_period
+exconductance_period
+inconductance_period
+// this save periodically traced data (only PERIOD_TRACE is 1)
+extern struct vector* voltage_period;
+#if CORITCAL_INTERACTION_USE || POISSON_INPUT_USE
+extern struct vector* exconductance_period;
+extern struct vector* inconductance_period;
+#endif
+struct vector* voltage_period = NULL;
+#if CORITCAL_INTERACTION_USE || POISSON_INPUT_USE
+struct vector* exconductance_period = NULL;
+struct vector* inconductance_period = NULL;
+#endif
+// The following functions are used to save the periodically traced
+// data with binary format
+// voltage data
+void Vot_trace_BINrecord();
+// excitatory conductance
+void Econ_trace_BINrecord();
+// inhibitory conductance
+void Icon_trace_BINrecord();
+// save voltage data with binary format
+void vot_BINrecord();
+
+// save excitatory conductance data with binary format
+void Econ_BINrecord();
+
+// save inhibitory conductance data with binary format
+void Icon_BINrecord();
+
+// save raster data with binary format
+void ras_BINrecord();
+
+// save all data with binary format
+void data_BINrecord();
+// these determine whether write the periodically traced voltage, excitatory
+// conductance, inhibitory conductance data into files
+#define VOT_TRACE_WRITE 0
+#define EXCON_TRACE_WRITE 0
+#define INCON_TRACE_WRITE 0
+
+// These determine whether write the saved voltage, excitatory conductance,
+// inhibitory conductance, raster data into files
+#define VOT_WRITE 1
+#define EX_WRITE 0
+#define IN_WRITE 0
+#define RASTER_WRITE 1
+
+// this determines whether just save raster data or also save some other
+// information about neuronal network into files
+#define ONLY_RASTER_RECORD 0
+
+// this is used to draw the trajectory of neurons when using open GL
+#define REFERENCE_DRAW 1
+
+// this saves the data in loop structure, normally these are used for testing
+// the numerical convergence of Runge-Kutta algorithm
+//extern struct loop* voltage;
+//extern struct loop* Econductance;
+//extern struct loop* Iconductance;
+//#if SMOOTH_CONDUCTANCE_USE
+//extern struct loop* Econductance_H;
+//extern struct loop* Iconductance_H;
+//#endif
+//struct loop* voltage = NULL;
+//struct loop* Econductance = NULL;
+//struct loop* Iconductance = NULL;
+//struct loop* Econductance_H = NULL;
+//struct loop* Iconductance_H = NULL;

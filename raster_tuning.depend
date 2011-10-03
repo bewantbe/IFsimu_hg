@@ -1,0 +1,1994 @@
+# depslib dependency file v1.0
+1289731363 source:g:\users\zhangyy\desktop\clean if code\datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1290528982 ing.h"
+
+1290436185 g:\users\zhangyy\desktop\clean if code\stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<float.h>
+	<math.h>
+	<assert.h>
+	<iostream>
+	<fstream>
+	<time.h>
+	<string.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+	<windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"fftw3.h"
+
+1290769392 
+
+1289646507 g:\users\zhangyy\desktop\clean if code\raster.h
+
+1289649201 g:\users\zhangyy\desktop\clean if code\neuron.h
+
+1289649728 g:\users\zhangyy\desktop\clean if code\loop.h
+
+1247872152 g:\users\zhangyy\desktop\clean if code\fftw3.h
+	<stdio.h>
+	<stddef.h>
+
+1289731092 g:\users\zhangyy\desktop\clean if code\datahandling.h
+
+1290416596 source:g:\users\zhangyy\desktop\clean if code\datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+
+1289645354 g:\users\zhangyy\desktop\clean if code\random.h
+
+1289712826 g:\users\zhangyy\desktop\clean if code\datainput.h
+
+1289732057 g:\users\zhangyy\desktop\clean if code\poisson_input.h
+
+1213704310 source:g:\users\zhangyy\desktop\clean if code\loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1289147378 source:g:\users\zhangyy\desktop\clean if code\neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1289646686 source:g:\users\zhangyy\desktop\clean if code\node.cpp
+	"stdafx.h"
+	"node.h"
+
+1289646957 g:\users\zhangyy\desktop\clean if code\node.h
+
+1290416653 source:g:\users\zhangyy\desktop\clean if code\opengl.cpp
+	"stdafx.h"
+	"opengl.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1290445750 nput.h"
+
+1290416643 g:\users\zhangyy\desktop\clean if code\opengl.h
+
+1290434865 source:g:\users\zhangyy\desktop\clean if code\poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1218492402 source:g:\users\zhangyy\desktop\clean if code\random.cpp
+	"stdafx.h"
+	"random.h"
+
+1289748528 source:g:\users\zhangyy\desktop\clean if code\raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1290434236 source:g:\users\zhangyy\desktop\clean if code\raster_tuning.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+	"opengl.h"
+
+1290791902 source:/mass/Cpp/sci/clean IF code/datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+	"stdafx.h"
+	"datahandling.h"
+	"stdafx.h"
+	"datahandling.h"
+
+1290791837 /mass/Cpp/sci/clean IF code/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<float.h>
+	<math.h>
+	<assert.h>
+	<iostream>
+	<fstream>
+	<time.h>
+	<string.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"fftw3.h"
+	<stdio.h>
+	<stdlib.h>
+	<float.h>
+	<math.h>
+	<assert.h>
+	<iostream>
+	<fstream>
+	<time.h>
+	<string.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"fftw3.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<time.h>
+	<float.h>
+	<string.h>
+	<assert.h>
+	<iostream>
+	<fstream>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"fftw3.h"
+
+1287710267 /usr/include/stdio.h
+	<features.h>
+	<stddef.h>
+	<bits/types.h>
+	<libio.h>
+	<stdarg.h>
+	<bits/stdio_lim.h>
+	<bits/sys_errlist.h>
+	<getopt.h>
+	<bits/stdio.h>
+	<bits/stdio2.h>
+	<bits/stdio-ldbl.h>
+	<features.h>
+	<stddef.h>
+	<bits/types.h>
+	<libio.h>
+	<stdarg.h>
+	<bits/stdio_lim.h>
+	<bits/sys_errlist.h>
+	<getopt.h>
+	<bits/stdio.h>
+	<bits/stdio2.h>
+	<bits/stdio-ldbl.h>
+	<features.h>
+	<stddef.h>
+	<bits/types.h>
+	<libio.h>
+	<stdarg.h>
+	<bits/stdio_lim.h>
+	<bits/sys_errlist.h>
+	<getopt.h>
+	<bits/stdio.h>
+	<bits/stdio2.h>
+	<bits/stdio-ldbl.h>
+
+1287710267 o-ldbl.h>
+
+1287710253 /usr/include/features.h
+	<bits/predefs.h>
+	<sys/cdefs.h>
+	<gnu/stubs.h>
+	<bits/predefs.h>
+	<sys/cdefs.h>
+	<gnu/stubs.h>
+	<bits/predefs.h>
+	<sys/cdefs.h>
+	<gnu/stubs.h>
+
+1287710273 .h>
+
+1287710253 /usr/include/bits/predefs.h
+
+1287710273 /usr/include/sys/cdefs.h
+	<features.h>
+	<bits/wordsize.h>
+	<features.h>
+	<bits/wordsize.h>
+	<features.h>
+	<bits/wordsize.h>
+
+1287710266 size.h>
+
+1287710266 /usr/include/bits/wordsize.h
+
+1287710253 /usr/include/gnu/stubs.h
+	<bits/wordsize.h>
+	<gnu/stubs-32.h>
+	<gnu/stubs-64.h>
+	<bits/wordsize.h>
+	<gnu/stubs-32.h>
+	<gnu/stubs-64.h>
+	<bits/wordsize.h>
+	<gnu/stubs-32.h>
+	<gnu/stubs-64.h>
+
+1287710253 -64.h>
+
+1287710290 /usr/include/gnu/stubs-64.h
+
+1287710271 /usr/include/bits/types.h
+	<features.h>
+	<bits/wordsize.h>
+	<bits/typesizes.h>
+	<features.h>
+	<bits/wordsize.h>
+	<bits/typesizes.h>
+	<features.h>
+	<bits/wordsize.h>
+	<bits/typesizes.h>
+
+1287710271 sizes.h>
+
+1287710271 /usr/include/bits/typesizes.h
+
+1287710267 /usr/include/libio.h
+	<_G_config.h>
+	<stdarg.h>
+	<sys/cdefs.h>
+	<bits/stdio-lock.h>
+	<shlib-compat.h>
+	<bits/libio-ldbl.h>
+	<_G_config.h>
+	<stdarg.h>
+	<sys/cdefs.h>
+	<bits/stdio-lock.h>
+	<shlib-compat.h>
+	<bits/libio-ldbl.h>
+	<_G_config.h>
+	<stdarg.h>
+	<sys/cdefs.h>
+	<bits/stdio-lock.h>
+	<shlib-compat.h>
+	<bits/libio-ldbl.h>
+
+1287710267 /usr/include/_G_config.h
+	<bits/types.h>
+	<stddef.h>
+	<wchar.h>
+	<gconv.h>
+	<bits/types.h>
+	<stddef.h>
+	<wchar.h>
+	<gconv.h>
+	<bits/types.h>
+	<stddef.h>
+	<wchar.h>
+	<gconv.h>
+
+1287710269 /usr/include/wchar.h
+	<features.h>
+	<stdio.h>
+	<stdarg.h>
+	<bits/wchar.h>
+	<stddef.h>
+	<wctype.h>
+	<xlocale.h>
+	<xlocale.h>
+	<xlocale.h>
+	<wctype.h>
+	<bits/wchar2.h>
+	<bits/wchar-ldbl.h>
+	<features.h>
+	<stdio.h>
+	<stdarg.h>
+	<bits/wchar.h>
+	<stddef.h>
+	<wctype.h>
+	<xlocale.h>
+	<xlocale.h>
+	<xlocale.h>
+	<wctype.h>
+	<bits/wchar2.h>
+	<bits/wchar-ldbl.h>
+	<features.h>
+	<stdio.h>
+	<stdarg.h>
+	<bits/wchar.h>
+	<stddef.h>
+	<wctype.h>
+	<xlocale.h>
+	<xlocale.h>
+	<xlocale.h>
+	<wctype.h>
+	<bits/wchar2.h>
+	<bits/wchar-ldbl.h>
+
+1287710269 r-ldbl.h>
+
+1287710269 /usr/include/bits/wchar.h
+
+1287710274 /usr/include/wctype.h
+	<features.h>
+	<bits/types.h>
+	<stddef.h>
+	<endian.h>
+	<xlocale.h>
+	<features.h>
+	<bits/types.h>
+	<stddef.h>
+	<endian.h>
+	<xlocale.h>
+	<features.h>
+	<bits/types.h>
+	<stddef.h>
+	<endian.h>
+	<xlocale.h>
+
+1287710263 >
+
+1287710269 /usr/include/endian.h
+	<features.h>
+	<bits/endian.h>
+	<bits/byteswap.h>
+	<features.h>
+	<bits/endian.h>
+	<bits/byteswap.h>
+	<features.h>
+	<bits/endian.h>
+	<bits/byteswap.h>
+
+1287710269 swap.h>
+
+1287710269 /usr/include/bits/endian.h
+
+1287710269 /usr/include/bits/byteswap.h
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+
+1287710254 /usr/include/xlocale.h
+
+1287710269 /usr/include/bits/wchar2.h
+
+1287710269 /usr/include/bits/wchar-ldbl.h
+
+1287710253 /usr/include/gconv.h
+	<features.h>
+	<wchar.h>
+	<stddef.h>
+	<features.h>
+	<wchar.h>
+	<stddef.h>
+	<features.h>
+	<wchar.h>
+	<stddef.h>
+
+1287710267 /usr/include/bits/stdio-lock.h
+	<bits/libc-lock.h>
+	<lowlevellock.h>
+	<bits/libc-lock.h>
+	<lowlevellock.h>
+	<bits/libc-lock.h>
+	<lowlevellock.h>
+
+1287710267 ock.h>
+
+1287710253 /usr/include/bits/libc-lock.h
+	<pthread.h>
+	<stddef.h>
+	<lowlevellock.h>
+	<tls.h>
+	<pthread-functions.h>
+	<errno.h>
+	<gnu/option-groups.h>
+	<bp-sym.h>
+	<pthread.h>
+	<stddef.h>
+	<lowlevellock.h>
+	<tls.h>
+	<pthread-functions.h>
+	<errno.h>
+	<gnu/option-groups.h>
+	<bp-sym.h>
+	<pthread.h>
+	<stddef.h>
+	<lowlevellock.h>
+	<tls.h>
+	<pthread-functions.h>
+	<errno.h>
+	<gnu/option-groups.h>
+	<bp-sym.h>
+
+1287710280 /usr/include/pthread.h
+	<features.h>
+	<endian.h>
+	<sched.h>
+	<time.h>
+	<signal.h>
+	<bits/pthreadtypes.h>
+	<bits/setjmp.h>
+	<bits/wordsize.h>
+	<features.h>
+	<endian.h>
+	<sched.h>
+	<time.h>
+	<signal.h>
+	<bits/pthreadtypes.h>
+	<bits/setjmp.h>
+	<bits/wordsize.h>
+	<features.h>
+	<endian.h>
+	<sched.h>
+	<time.h>
+	<signal.h>
+	<bits/pthreadtypes.h>
+	<bits/setjmp.h>
+	<bits/wordsize.h>
+
+1287710271 /usr/include/sched.h
+	<features.h>
+	<bits/types.h>
+	<stddef.h>
+	<time.h>
+	<bits/sched.h>
+	<features.h>
+	<bits/types.h>
+	<stddef.h>
+	<time.h>
+	<bits/sched.h>
+	<features.h>
+	<bits/types.h>
+	<stddef.h>
+	<time.h>
+	<bits/sched.h>
+
+1287710271 d.h>
+
+1287710270 /usr/include/time.h
+	<features.h>
+	<stddef.h>
+	<bits/time.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<xlocale.h>
+	<features.h>
+	<stddef.h>
+	<bits/time.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<xlocale.h>
+	<features.h>
+	<stddef.h>
+	<bits/time.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<xlocale.h>
+
+1287710270 /usr/include/bits/time.h
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+
+1287710270 s.h>
+
+1287710271 /usr/include/bits/sched.h
+
+1287710266 /usr/include/signal.h
+	<features.h>
+	<bits/sigset.h>
+	<bits/types.h>
+	<bits/signum.h>
+	<time.h>
+	<bits/siginfo.h>
+	<bits/sigaction.h>
+	<bits/sigcontext.h>
+	<stddef.h>
+	<bits/sigstack.h>
+	<sys/ucontext.h>
+	<bits/pthreadtypes.h>
+	<bits/sigthread.h>
+	<features.h>
+	<bits/sigset.h>
+	<bits/types.h>
+	<bits/signum.h>
+	<time.h>
+	<bits/siginfo.h>
+	<bits/sigaction.h>
+	<bits/sigcontext.h>
+	<stddef.h>
+	<bits/sigstack.h>
+	<sys/ucontext.h>
+	<bits/pthreadtypes.h>
+	<bits/sigthread.h>
+	<features.h>
+	<bits/sigset.h>
+	<bits/types.h>
+	<bits/signum.h>
+	<time.h>
+	<bits/siginfo.h>
+	<bits/sigaction.h>
+	<bits/sigcontext.h>
+	<stddef.h>
+	<bits/sigstack.h>
+	<sys/ucontext.h>
+	<bits/pthreadtypes.h>
+	<bits/sigthread.h>
+
+1287710266 hread.h>
+
+1287710266 /usr/include/bits/sigset.h
+
+1287710266 /usr/include/bits/signum.h
+
+1287710266 /usr/include/bits/siginfo.h
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+
+1287710266 /usr/include/bits/sigaction.h
+
+1287710266 /usr/include/bits/sigcontext.h
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+
+1287710266 /usr/include/bits/sigstack.h
+
+1287710266 /usr/include/sys/ucontext.h
+	<features.h>
+	<signal.h>
+	<bits/wordsize.h>
+	<bits/sigcontext.h>
+	<features.h>
+	<signal.h>
+	<bits/wordsize.h>
+	<bits/sigcontext.h>
+	<features.h>
+	<signal.h>
+	<bits/wordsize.h>
+	<bits/sigcontext.h>
+
+1287710266 ontext.h>
+
+1287710271 /usr/include/bits/pthreadtypes.h
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+
+1287710266 /usr/include/bits/sigthread.h
+
+1287710266 /usr/include/bits/setjmp.h
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+
+1287710266 /usr/include/errno.h
+	<features.h>
+	<bits/errno.h>
+	<features.h>
+	<bits/errno.h>
+	<features.h>
+	<bits/errno.h>
+
+1287710266 o.h>
+
+1287710266 /usr/include/bits/errno.h
+	<linux/errno.h>
+	<linux/errno.h>
+	<linux/errno.h>
+
+1287710266 no.h>
+
+1290027851 /usr/include/linux/errno.h
+	<asm/errno.h>
+	<asm/errno.h>
+	<asm/errno.h>
+
+1290027853 /usr/include/asm/errno.h
+	<asm-generic/errno.h>
+	<asm-generic/errno.h>
+	<asm-generic/errno.h>
+
+1287264423 ic/errno.h>
+
+1290027849 /usr/include/asm-generic/errno.h
+	<asm-generic/errno-base.h>
+	<asm-generic/errno-base.h>
+	<asm-generic/errno-base.h>
+
+1287264420 ic/errno-base.h>
+
+1290027849 /usr/include/asm-generic/errno-base.h
+
+1287710287 /usr/include/gnu/option-groups.h
+
+1287710267 /usr/include/bits/libio-ldbl.h
+
+1287710267 /usr/include/bits/stdio_lim.h
+
+1287710267 /usr/include/bits/sys_errlist.h
+
+1287710271 /usr/include/getopt.h
+	<ctype.h>
+	<ctype.h>
+	<ctype.h>
+
+1287710263 /usr/include/ctype.h
+	<features.h>
+	<bits/types.h>
+	<endian.h>
+	<xlocale.h>
+	<features.h>
+	<bits/types.h>
+	<endian.h>
+	<xlocale.h>
+	<features.h>
+	<bits/types.h>
+	<endian.h>
+	<xlocale.h>
+
+1287710267 /usr/include/bits/stdio.h
+
+1287710267 /usr/include/bits/stdio2.h
+
+1287710267 /usr/include/bits/stdio-ldbl.h
+
+1287710266 /usr/include/stdlib.h
+	<features.h>
+	<stddef.h>
+	<bits/waitflags.h>
+	<bits/waitstatus.h>
+	<xlocale.h>
+	<sys/types.h>
+	<alloca.h>
+	<bits/stdlib.h>
+	<bits/stdlib-ldbl.h>
+	<features.h>
+	<stddef.h>
+	<bits/waitflags.h>
+	<bits/waitstatus.h>
+	<xlocale.h>
+	<sys/types.h>
+	<alloca.h>
+	<bits/stdlib.h>
+	<bits/stdlib-ldbl.h>
+	<features.h>
+	<stddef.h>
+	<bits/waitflags.h>
+	<bits/waitstatus.h>
+	<xlocale.h>
+	<sys/types.h>
+	<alloca.h>
+	<bits/stdlib.h>
+	<bits/stdlib-ldbl.h>
+
+1287710266 ib-ldbl.h>
+
+1287710271 /usr/include/bits/waitflags.h
+
+1287710271 /usr/include/bits/waitstatus.h
+	<endian.h>
+	<endian.h>
+	<endian.h>
+
+1287710271 /usr/include/sys/types.h
+	<features.h>
+	<bits/types.h>
+	<time.h>
+	<stddef.h>
+	<endian.h>
+	<sys/select.h>
+	<sys/sysmacros.h>
+	<bits/pthreadtypes.h>
+	<features.h>
+	<bits/types.h>
+	<time.h>
+	<stddef.h>
+	<endian.h>
+	<sys/select.h>
+	<sys/sysmacros.h>
+	<bits/pthreadtypes.h>
+	<features.h>
+	<bits/types.h>
+	<time.h>
+	<stddef.h>
+	<endian.h>
+	<sys/select.h>
+	<sys/sysmacros.h>
+	<bits/pthreadtypes.h>
+
+1287710271 eadtypes.h>
+
+1287710273 /usr/include/sys/select.h
+	<features.h>
+	<bits/types.h>
+	<bits/select.h>
+	<bits/sigset.h>
+	<time.h>
+	<bits/time.h>
+	<features.h>
+	<bits/types.h>
+	<bits/select.h>
+	<bits/sigset.h>
+	<time.h>
+	<bits/time.h>
+	<features.h>
+	<bits/types.h>
+	<bits/select.h>
+	<bits/sigset.h>
+	<time.h>
+	<bits/time.h>
+
+1287710273 /usr/include/bits/select.h
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+
+1287710271 /usr/include/sys/sysmacros.h
+	<features.h>
+	<features.h>
+	<features.h>
+
+1272520269 h>
+
+1287710266 /usr/include/alloca.h
+	<features.h>
+	<stddef.h>
+	<features.h>
+	<stddef.h>
+	<features.h>
+	<stddef.h>
+
+1287710266 /usr/include/bits/stdlib.h
+
+1287710266 /usr/include/bits/stdlib-ldbl.h
+
+1287710265 /usr/include/math.h
+	<features.h>
+	<bits/huge_val.h>
+	<bits/huge_valf.h>
+	<bits/huge_vall.h>
+	<bits/inf.h>
+	<bits/nan.h>
+	<bits/mathdef.h>
+	<bits/mathcalls.h>
+	<bits/mathcalls.h>
+	<bits/mathcalls.h>
+	<bits/mathinline.h>
+	<features.h>
+	<bits/huge_val.h>
+	<bits/huge_valf.h>
+	<bits/huge_vall.h>
+	<bits/inf.h>
+	<bits/nan.h>
+	<bits/mathdef.h>
+	<bits/mathcalls.h>
+	<bits/mathcalls.h>
+	<bits/mathcalls.h>
+	<bits/mathinline.h>
+	<features.h>
+	<bits/huge_val.h>
+	<bits/huge_valf.h>
+	<bits/huge_vall.h>
+	<bits/inf.h>
+	<bits/nan.h>
+	<bits/mathdef.h>
+	<bits/mathcalls.h>
+	<bits/mathcalls.h>
+	<bits/mathcalls.h>
+	<bits/mathinline.h>
+
+1287710265 inline.h>
+
+1287710265 /usr/include/bits/huge_val.h
+	<endian.h>
+	<endian.h>
+	<endian.h>
+
+1287710265 /usr/include/bits/huge_valf.h
+
+1287710265 /usr/include/bits/huge_vall.h
+
+1287710265 /usr/include/bits/inf.h
+
+1287710265 /usr/include/bits/nan.h
+	<endian.h>
+	<endian.h>
+	<endian.h>
+
+1287710265 /usr/include/bits/mathdef.h
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+
+1287710265 /usr/include/bits/mathcalls.h
+
+1287710265 /usr/include/bits/mathinline.h
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+
+1287710263 /usr/include/assert.h
+	<features.h>
+	<features.h>
+	<features.h>
+
+1287710269 /usr/include/string.h
+	<features.h>
+	<stddef.h>
+	<xlocale.h>
+	<bits/string.h>
+	<bits/string2.h>
+	<bits/string3.h>
+	<features.h>
+	<stddef.h>
+	<xlocale.h>
+	<bits/string.h>
+	<bits/string2.h>
+	<bits/string3.h>
+	<features.h>
+	<stddef.h>
+	<xlocale.h>
+	<bits/string.h>
+	<bits/string2.h>
+	<bits/string3.h>
+
+1287710269 ng3.h>
+
+1287710269 /usr/include/bits/string.h
+
+1287710269 /usr/include/bits/string2.h
+	<endian.h>
+	<bits/types.h>
+	<stdlib.h>
+	<endian.h>
+	<bits/types.h>
+	<stdlib.h>
+	<endian.h>
+	<bits/types.h>
+	<stdlib.h>
+
+1287710269 /usr/include/bits/string3.h
+
+1290439974 /mass/Cpp/sci/clean IF code/raster.h
+
+1290439944 /mass/Cpp/sci/clean IF code/neuron.h
+
+1290439940 /mass/Cpp/sci/clean IF code/loop.h
+
+1287710271 /usr/include/unistd.h
+	<features.h>
+	<bits/posix_opt.h>
+	<bits/environments.h>
+	<bits/types.h>
+	<stddef.h>
+	<bits/confname.h>
+	<getopt.h>
+	<bits/unistd.h>
+	<features.h>
+	<bits/posix_opt.h>
+	<bits/environments.h>
+	<bits/types.h>
+	<stddef.h>
+	<bits/confname.h>
+	<getopt.h>
+	<bits/unistd.h>
+	<features.h>
+	<bits/posix_opt.h>
+	<bits/environments.h>
+	<bits/types.h>
+	<stddef.h>
+	<bits/confname.h>
+	<getopt.h>
+	<bits/unistd.h>
+
+1287710271 td.h>
+
+1287710271 /usr/include/bits/posix_opt.h
+
+1287710271 /usr/include/bits/environments.h
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+	<bits/wordsize.h>
+
+1287710271 /usr/include/bits/confname.h
+
+1287710271 /usr/include/bits/unistd.h
+
+1272520269 /usr/include/GL/gl.h
+	"gl_mangle.h"
+	<stdlib.h>
+	<windows.h>
+	<GL/mesa_wgl.h>
+	<GL/glext.h>
+	"gl_mangle.h"
+	<stdlib.h>
+	<windows.h>
+	<GL/mesa_wgl.h>
+	<GL/glext.h>
+	"gl_mangle.h"
+	<stdlib.h>
+	<windows.h>
+	<GL/mesa_wgl.h>
+	<GL/glext.h>
+
+1272520269 /usr/include/GL/gl_mangle.h
+
+1272520269 /usr/include/GL/glext.h
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1287710266 /usr/include/inttypes.h
+	<features.h>
+	<stdint.h>
+	<stddef.h>
+	<features.h>
+	<stdint.h>
+	<stddef.h>
+	<features.h>
+	<stdint.h>
+	<stddef.h>
+
+1287710266 /usr/include/stdint.h
+	<features.h>
+	<bits/wchar.h>
+	<bits/wordsize.h>
+	<features.h>
+	<bits/wchar.h>
+	<bits/wordsize.h>
+	<features.h>
+	<bits/wchar.h>
+	<bits/wordsize.h>
+
+1272520269 /usr/include/GL/glu.h
+	"glu_mangle.h"
+	<GL/gl.h>
+	"glu_mangle.h"
+	<GL/gl.h>
+	"glu_mangle.h"
+	<GL/gl.h>
+
+1272520269 /usr/include/GL/glu_mangle.h
+
+1263839526 /usr/include/GL/glut.h
+	"freeglut_std.h"
+	"freeglut_std.h"
+	"freeglut_std.h"
+
+1263839526 std.h"
+
+1263839526 /usr/include/GL/freeglut_std.h
+	<Windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<stdlib.h>
+	<Windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<stdlib.h>
+	<Windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<stdlib.h>
+
+1247872152 /mass/Cpp/sci/clean IF code/fftw3.h
+	<stdio.h>
+	<stddef.h>
+	<stdio.h>
+	<stddef.h>
+	<stdio.h>
+	<stddef.h>
+
+1290771826 /mass/Cpp/sci/clean IF code/datahandling.h
+
+1290528982 source:/mass/Cpp/sci/clean IF code/datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+
+1290439966 /mass/Cpp/sci/clean IF code/random.h
+
+1290439932 /mass/Cpp/sci/clean IF code/datainput.h
+
+1290439960 /mass/Cpp/sci/clean IF code/poisson_input.h
+
+1290441414 source:/mass/Cpp/sci/clean IF code/loop.cpp
+	"stdafx.h"
+	"loop.h"
+	"stdafx.h"
+	"loop.h"
+	"stdafx.h"
+	"loop.h"
+
+1290441558 source:/mass/Cpp/sci/clean IF code/neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+	"stdafx.h"
+	"neuron.h"
+	"stdafx.h"
+	"neuron.h"
+
+1290441558 source:/mass/Cpp/sci/clean IF code/node.cpp
+	"stdafx.h"
+	"node.h"
+	"stdafx.h"
+	"node.h"
+	"stdafx.h"
+	"node.h"
+
+1290439950 /mass/Cpp/sci/clean IF code/node.h
+
+1290791401 source:/mass/Cpp/sci/clean IF code/opengl.cpp
+	"stdafx.h"
+	"opengl.h"
+	"datahandling.h"
+	"poisson_input.h"
+	"stdafx.h"
+	"opengl.h"
+	"datahandling.h"
+	"poisson_input.h"
+	"stdafx.h"
+	"opengl.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1290440756 /mass/Cpp/sci/clean IF code/opengl.h
+
+1290445750 source:/mass/Cpp/sci/clean IF code/poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1290439896 source:/mass/Cpp/sci/clean IF code/random.cpp
+	"stdafx.h"
+	"random.h"
+	"stdafx.h"
+	"random.h"
+	"stdafx.h"
+	"random.h"
+
+1290441462 source:/mass/Cpp/sci/clean IF code/raster.cpp
+	"stdafx.h"
+	"raster.h"
+	"stdafx.h"
+	"raster.h"
+	"stdafx.h"
+	"raster.h"
+
+1290769392 source:/mass/Cpp/sci/clean IF code/raster_tuning.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+	"opengl.h"
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+	"opengl.h"
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+	"opengl.h"
+
+1290791902 source:d:\cpp\sci\clean if code\datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1290791836 d:\cpp\sci\clean if code\stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<time.h>
+	<float.h>
+	<string.h>
+	<assert.h>
+	<iostream>
+	<fstream>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"fftw3.h"
+
+1290439974 d:\cpp\sci\clean if code\raster.h
+
+1290439944 d:\cpp\sci\clean if code\neuron.h
+
+1290439940 d:\cpp\sci\clean if code\loop.h
+
+1247872152 d:\cpp\sci\clean if code\fftw3.h
+	<stdio.h>
+	<stddef.h>
+
+1290771826 d:\cpp\sci\clean if code\datahandling.h
+
+1290528982 source:d:\cpp\sci\clean if code\datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+
+1290439966 d:\cpp\sci\clean if code\random.h
+
+1290439932 d:\cpp\sci\clean if code\datainput.h
+
+1290439960 d:\cpp\sci\clean if code\poisson_input.h
+
+1290441414 source:d:\cpp\sci\clean if code\loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1290441558 source:d:\cpp\sci\clean if code\neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1290441558 source:d:\cpp\sci\clean if code\node.cpp
+	"stdafx.h"
+	"node.h"
+
+1290439950 d:\cpp\sci\clean if code\node.h
+
+1290839522 source:d:\cpp\sci\clean if code\opengl.cpp
+	"stdafx.h"
+	"opengl.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1290440756 d:\cpp\sci\clean if code\opengl.h
+
+1290445750 source:d:\cpp\sci\clean if code\poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1290439896 source:d:\cpp\sci\clean if code\random.cpp
+	"stdafx.h"
+	"random.h"
+
+1290441462 source:d:\cpp\sci\clean if code\raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1290769392 source:d:\cpp\sci\clean if code\raster_tuning.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+	"opengl.h"
+
+1290864296 source:/mass/Cpp/sci/clean IF code/datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1291030566 /mass/Cpp/sci/clean IF code/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<time.h>
+	<float.h>
+	<string.h>
+	<assert.h>
+	<iostream>
+	<fstream>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"fftw3.h"
+
+1295646258 /usr/include/stdio.h
+	<features.h>
+	<stddef.h>
+	<bits/types.h>
+	<libio.h>
+	<stdarg.h>
+	<bits/stdio_lim.h>
+	<bits/sys_errlist.h>
+	<getopt.h>
+	<bits/stdio.h>
+	<bits/stdio2.h>
+	<bits/stdio-ldbl.h>
+
+1295646243 /usr/include/features.h
+	<bits/predefs.h>
+	<sys/cdefs.h>
+	<gnu/stubs.h>
+
+1295646243 /usr/include/bits/predefs.h
+
+1295646264 /usr/include/sys/cdefs.h
+	<features.h>
+	<bits/wordsize.h>
+
+1295646257 /usr/include/bits/wordsize.h
+
+1295646243 /usr/include/gnu/stubs.h
+	<bits/wordsize.h>
+	<gnu/stubs-32.h>
+	<gnu/stubs-64.h>
+
+1295646282 /usr/include/gnu/stubs-64.h
+
+1295646262 /usr/include/bits/types.h
+	<features.h>
+	<bits/wordsize.h>
+	<bits/typesizes.h>
+
+1295646262 /usr/include/bits/typesizes.h
+
+1295646258 /usr/include/libio.h
+	<_G_config.h>
+	<stdarg.h>
+	<sys/cdefs.h>
+	<bits/stdio-lock.h>
+	<shlib-compat.h>
+	<bits/libio-ldbl.h>
+
+1295646258 /usr/include/_G_config.h
+	<bits/types.h>
+	<stddef.h>
+	<wchar.h>
+	<gconv.h>
+
+1295646260 /usr/include/wchar.h
+	<features.h>
+	<stdio.h>
+	<stdarg.h>
+	<bits/wchar.h>
+	<stddef.h>
+	<wctype.h>
+	<xlocale.h>
+	<xlocale.h>
+	<xlocale.h>
+	<wctype.h>
+	<bits/wchar2.h>
+	<bits/wchar-ldbl.h>
+
+1295646260 /usr/include/bits/wchar.h
+
+1295646265 /usr/include/wctype.h
+	<features.h>
+	<bits/types.h>
+	<wchar.h>
+	<endian.h>
+	<xlocale.h>
+
+1295646260 /usr/include/endian.h
+	<features.h>
+	<bits/endian.h>
+	<bits/byteswap.h>
+
+1295646260 /usr/include/bits/endian.h
+
+1295646260 /usr/include/bits/byteswap.h
+	<bits/wordsize.h>
+
+1295646244 /usr/include/xlocale.h
+
+1295646260 /usr/include/bits/wchar2.h
+
+1295646260 /usr/include/bits/wchar-ldbl.h
+
+1295646243 /usr/include/gconv.h
+	<features.h>
+	<wchar.h>
+	<stddef.h>
+
+1295646258 /usr/include/bits/stdio-lock.h
+	<bits/libc-lock.h>
+	<lowlevellock.h>
+
+1295646243 /usr/include/bits/libc-lock.h
+	<pthread.h>
+	<stddef.h>
+	<lowlevellock.h>
+	<tls.h>
+	<pthread-functions.h>
+	<errno.h>
+	<gnu/option-groups.h>
+	<bp-sym.h>
+
+1295646270 /usr/include/pthread.h
+	<features.h>
+	<endian.h>
+	<sched.h>
+	<time.h>
+	<bits/pthreadtypes.h>
+	<bits/setjmp.h>
+	<bits/wordsize.h>
+
+1295646262 /usr/include/sched.h
+	<features.h>
+	<bits/types.h>
+	<stddef.h>
+	<time.h>
+	<bits/sched.h>
+
+1295646261 /usr/include/time.h
+	<features.h>
+	<stddef.h>
+	<bits/time.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<bits/types.h>
+	<xlocale.h>
+
+1295646261 /usr/include/bits/time.h
+	<bits/types.h>
+	<bits/types.h>
+
+1295646262 /usr/include/bits/sched.h
+
+1287710266 /usr/include/signal.h
+	<features.h>
+	<bits/sigset.h>
+	<bits/types.h>
+	<bits/signum.h>
+	<time.h>
+	<bits/siginfo.h>
+	<bits/sigaction.h>
+	<bits/sigcontext.h>
+	<stddef.h>
+	<bits/sigstack.h>
+	<sys/ucontext.h>
+	<bits/pthreadtypes.h>
+	<bits/sigthread.h>
+
+1295646257 /usr/include/bits/sigset.h
+
+1287710266 /usr/include/bits/signum.h
+
+1287710266 /usr/include/bits/siginfo.h
+	<bits/wordsize.h>
+
+1287710266 /usr/include/bits/sigaction.h
+
+1287710266 /usr/include/bits/sigcontext.h
+	<bits/wordsize.h>
+
+1287710266 /usr/include/bits/sigstack.h
+
+1287710266 /usr/include/sys/ucontext.h
+	<features.h>
+	<signal.h>
+	<bits/wordsize.h>
+	<bits/sigcontext.h>
+
+1295646262 /usr/include/bits/pthreadtypes.h
+	<bits/wordsize.h>
+
+1287710266 /usr/include/bits/sigthread.h
+
+1295646257 /usr/include/bits/setjmp.h
+	<bits/wordsize.h>
+
+1295646257 /usr/include/errno.h
+	<features.h>
+	<bits/errno.h>
+
+1295646257 /usr/include/bits/errno.h
+	<linux/errno.h>
+
+1298996613 /usr/include/linux/errno.h
+	<asm/errno.h>
+
+1298996614 /usr/include/asm/errno.h
+	<asm-generic/errno.h>
+
+1298996612 /usr/include/asm-generic/errno.h
+	<asm-generic/errno-base.h>
+
+1298996612 /usr/include/asm-generic/errno-base.h
+
+1295646278 /usr/include/gnu/option-groups.h
+
+1295646258 /usr/include/bits/libio-ldbl.h
+
+1295646258 /usr/include/bits/stdio_lim.h
+
+1295646258 /usr/include/bits/sys_errlist.h
+
+1295646262 /usr/include/getopt.h
+	<ctype.h>
+
+1295646254 /usr/include/ctype.h
+	<features.h>
+	<bits/types.h>
+	<endian.h>
+	<xlocale.h>
+
+1295646258 /usr/include/bits/stdio.h
+
+1295646258 /usr/include/bits/stdio2.h
+
+1295646258 /usr/include/bits/stdio-ldbl.h
+
+1295646257 /usr/include/stdlib.h
+	<features.h>
+	<stddef.h>
+	<bits/waitflags.h>
+	<bits/waitstatus.h>
+	<xlocale.h>
+	<sys/types.h>
+	<alloca.h>
+	<bits/stdlib.h>
+	<bits/stdlib-ldbl.h>
+
+1295646262 /usr/include/bits/waitflags.h
+
+1295646262 /usr/include/bits/waitstatus.h
+	<endian.h>
+
+1295646262 /usr/include/sys/types.h
+	<features.h>
+	<bits/types.h>
+	<time.h>
+	<stddef.h>
+	<endian.h>
+	<sys/select.h>
+	<sys/sysmacros.h>
+	<bits/pthreadtypes.h>
+
+1295646264 /usr/include/sys/select.h
+	<features.h>
+	<bits/types.h>
+	<bits/select.h>
+	<bits/sigset.h>
+	<time.h>
+	<bits/time.h>
+
+1295646264 /usr/include/bits/select.h
+	<bits/wordsize.h>
+
+1295646262 /usr/include/sys/sysmacros.h
+	<features.h>
+
+1295646257 /usr/include/alloca.h
+	<features.h>
+	<stddef.h>
+
+1295646257 /usr/include/bits/stdlib.h
+
+1295646257 /usr/include/bits/stdlib-ldbl.h
+
+1295646256 /usr/include/math.h
+	<features.h>
+	<bits/huge_val.h>
+	<bits/huge_valf.h>
+	<bits/huge_vall.h>
+	<bits/inf.h>
+	<bits/nan.h>
+	<bits/mathdef.h>
+	<bits/mathcalls.h>
+	<bits/mathcalls.h>
+	<bits/mathcalls.h>
+	<bits/mathinline.h>
+
+1295646256 /usr/include/bits/huge_val.h
+	<endian.h>
+
+1295646256 /usr/include/bits/huge_valf.h
+
+1295646256 /usr/include/bits/huge_vall.h
+
+1295646256 /usr/include/bits/inf.h
+
+1295646256 /usr/include/bits/nan.h
+	<endian.h>
+
+1295646256 /usr/include/bits/mathdef.h
+	<bits/wordsize.h>
+
+1295646256 /usr/include/bits/mathcalls.h
+
+1295646256 /usr/include/bits/mathinline.h
+	<bits/wordsize.h>
+
+1295646260 /usr/include/string.h
+	<features.h>
+	<stddef.h>
+	<xlocale.h>
+	<bits/string.h>
+	<bits/string2.h>
+	<bits/string3.h>
+
+1295646260 /usr/include/bits/string.h
+
+1295646260 /usr/include/bits/string2.h
+	<endian.h>
+	<bits/types.h>
+	<stdlib.h>
+
+1295646260 /usr/include/bits/string3.h
+
+1295646254 /usr/include/assert.h
+	<features.h>
+
+1290439974 /mass/Cpp/sci/clean IF code/raster.h
+
+1290439944 /mass/Cpp/sci/clean IF code/neuron.h
+
+1290439940 /mass/Cpp/sci/clean IF code/loop.h
+
+1295646262 /usr/include/unistd.h
+	<features.h>
+	<bits/posix_opt.h>
+	<bits/environments.h>
+	<bits/types.h>
+	<stddef.h>
+	<bits/confname.h>
+	<getopt.h>
+	<bits/unistd.h>
+
+1295646262 /usr/include/bits/posix_opt.h
+
+1295646262 /usr/include/bits/environments.h
+	<bits/wordsize.h>
+
+1295646262 /usr/include/bits/confname.h
+
+1295646262 /usr/include/bits/unistd.h
+
+1285867037 /usr/include/GL/gl.h
+	"gl_mangle.h"
+	<stdlib.h>
+	<windows.h>
+	<GL/mesa_wgl.h>
+	<GL/glext.h>
+
+1285867037 /usr/include/GL/gl_mangle.h
+
+1285867037 /usr/include/GL/glext.h
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1295646257 /usr/include/inttypes.h
+	<features.h>
+	<stdint.h>
+	<stddef.h>
+
+1295646257 /usr/include/stdint.h
+	<features.h>
+	<bits/wchar.h>
+	<bits/wordsize.h>
+
+1285867030 /usr/include/GL/glu.h
+	"glu_mangle.h"
+	<GL/gl.h>
+
+1285867030 /usr/include/GL/glu_mangle.h
+
+1263839526 /usr/include/GL/glut.h
+	"freeglut_std.h"
+
+1263839526 /usr/include/GL/freeglut_std.h
+	<Windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<stdlib.h>
+
+1247872152 /mass/Cpp/sci/clean IF code/fftw3.h
+	<stdio.h>
+	<stddef.h>
+
+1290771826 /mass/Cpp/sci/clean IF code/datahandling.h
+
+1291030742 source:/mass/Cpp/sci/clean IF code/datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+
+1290439966 /mass/Cpp/sci/clean IF code/random.h
+
+1290439932 /mass/Cpp/sci/clean IF code/datainput.h
+
+1292061055 /mass/Cpp/sci/clean IF code/poisson_input.h
+
+1290441414 source:/mass/Cpp/sci/clean IF code/loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1290441558 source:/mass/Cpp/sci/clean IF code/neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1290441558 source:/mass/Cpp/sci/clean IF code/node.cpp
+	"stdafx.h"
+	"node.h"
+
+1290439950 /mass/Cpp/sci/clean IF code/node.h
+
+1292061030 source:/mass/Cpp/sci/clean IF code/opengl.cpp
+	"stdafx.h"
+	"opengl.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1290440756 /mass/Cpp/sci/clean IF code/opengl.h
+
+1292067638 source:/mass/Cpp/sci/clean IF code/poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1290439896 source:/mass/Cpp/sci/clean IF code/random.cpp
+	"stdafx.h"
+	"random.h"
+
+1290441462 source:/mass/Cpp/sci/clean IF code/raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1292063747 source:/mass/Cpp/sci/clean IF code/raster_tuning.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+	"opengl.h"
+
+1290864296 source:/home/xyy82148/code/sci/clean IF code_gai/datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1301316149 /home/xyy82148/code/sci/clean IF code_gai/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<time.h>
+	<float.h>
+	<string.h>
+	<assert.h>
+	<iostream>
+	<fstream>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	<fftw3.h>
+
+1290439974 /home/xyy82148/code/sci/clean IF code_gai/raster.h
+
+1290439944 /home/xyy82148/code/sci/clean IF code_gai/neuron.h
+
+1290439940 /home/xyy82148/code/sci/clean IF code_gai/loop.h
+
+1301309183 /home/xyy82148/code/sci/clean IF code_gai/fftw3.h
+	<stdio.h>
+	<stddef.h>
+
+1290771826 /home/xyy82148/code/sci/clean IF code_gai/datahandling.h
+
+1301310593 source:/home/xyy82148/code/sci/clean IF code_gai/datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+
+1290439966 /home/xyy82148/code/sci/clean IF code_gai/random.h
+
+1290439932 /home/xyy82148/code/sci/clean IF code_gai/datainput.h
+
+1292061054 /home/xyy82148/code/sci/clean IF code_gai/poisson_input.h
+
+1290441414 source:/home/xyy82148/code/sci/clean IF code_gai/loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1290441558 source:/home/xyy82148/code/sci/clean IF code_gai/neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1290441558 source:/home/xyy82148/code/sci/clean IF code_gai/node.cpp
+	"stdafx.h"
+	"node.h"
+
+1290439950 /home/xyy82148/code/sci/clean IF code_gai/node.h
+
+1301123666 source:/home/xyy82148/code/sci/clean IF code_gai/opengl.cpp
+	"stdafx.h"
+	"opengl.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1290440756 /home/xyy82148/code/sci/clean IF code_gai/opengl.h
+
+1301315764 source:/home/xyy82148/code/sci/clean IF code_gai/poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1290439896 source:/home/xyy82148/code/sci/clean IF code_gai/random.cpp
+	"stdafx.h"
+	"random.h"
+
+1290441462 source:/home/xyy82148/code/sci/clean IF code_gai/raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1301315124 source:/home/xyy82148/code/sci/clean IF code_gai/raster_tuning.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"node.h"
+	"raster.h"
+	"datainput.h"
+	"poisson_input.h"
+	"datahandling.h"
+	"opengl.h"
+
+1315230713 source:/home/xyy82148/code/sci/clean IF code_raw/datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1315685645 /home/xyy82148/code/sci/clean IF code_raw/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<time.h>
+	<string.h>
+	<assert.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1301319691 /home/xyy82148/code/sci/clean IF code_raw/raster.h
+
+1315312161 /home/xyy82148/code/sci/clean IF code_raw/neuron.h
+
+1306680689 /home/xyy82148/code/sci/clean IF code_raw/loop.h
+
+1315230713 /home/xyy82148/code/sci/clean IF code_raw/datahandling.h
+
+1315683354 source:/home/xyy82148/code/sci/clean IF code_raw/datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1301319691 /home/xyy82148/code/sci/clean IF code_raw/random.h
+
+1315644862 /home/xyy82148/code/sci/clean IF code_raw/datainput.h
+
+1315209797 /home/xyy82148/code/sci/clean IF code_raw/poisson_input.h
+
+1315230275 source:/home/xyy82148/code/sci/clean IF code_raw/loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1315229924 source:/home/xyy82148/code/sci/clean IF code_raw/myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1304327967 /home/xyy82148/code/sci/clean IF code_raw/myopengl.h
+
+1315313047 source:/home/xyy82148/code/sci/clean IF code_raw/neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1302188965 source:/home/xyy82148/code/sci/clean IF code_raw/node.cpp
+	"stdafx.h"
+	"node.h"
+
+1301319691 /home/xyy82148/code/sci/clean IF code_raw/node.h
+
+1315646700 source:/home/xyy82148/code/sci/clean IF code_raw/poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1304738258 source:/home/xyy82148/code/sci/clean IF code_raw/random.cpp
+	"stdafx.h"
+	"random.h"
+
+1315323484 source:/home/xyy82148/code/sci/clean IF code_raw/raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1315646499 source:/home/xyy82148/code/sci/clean IF code_raw/raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/time.h>
+
+1306681608 source:/home/xyy82148/code/sci/clean IF code_raw/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<time.h>
+	<string.h>
+	<assert.h>
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+

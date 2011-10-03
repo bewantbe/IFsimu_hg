@@ -1,0 +1,51 @@
+# Project: cleanIFcode
+# Makefile created by Dev-C++ 4.9.9.0
+
+CPP  = g++.exe
+CC   = gcc.exe
+OBJ  = datahandling.o datainput.o loop.o myopengl.o neuron.o poisson_input.o random.o raster.o raster_tuning.o
+LINKOBJ  = datahandling.o datainput.o loop.o myopengl.o neuron.o poisson_input.o random.o raster.o raster_tuning.o
+LIBS =  -L"C:/Dev-Cpp/lib" -lglu32 -lglut32 -lopengl32  
+INCS =  -I"C:/Dev-Cpp/include" 
+CXXINCS =  -I"C:/Dev-Cpp/include/c++/3.3.1"  -I"C:/Dev-Cpp/include/c++/3.3.1/mingw32"  -I"C:/Dev-Cpp/include/c++/3.3.1/backward"  -I"C:/Dev-Cpp/lib/gcc-lib/mingw32/3.3.1/include"  -I"C:/Dev-Cpp/include" 
+BIN  = cleanIFcode.exe
+CXXFLAGS = $(CXXINCS)  
+CFLAGS = $(INCS)  
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before cleanIFcode.exe all-after
+
+
+clean: clean-custom
+	rm -f $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o "cleanIFcode.exe" $(LIBS)
+
+datahandling.o: datahandling.cpp
+	$(CPP) -c datahandling.cpp -o datahandling.o $(CXXFLAGS)
+
+datainput.o: datainput.cpp
+	$(CPP) -c datainput.cpp -o datainput.o $(CXXFLAGS)
+
+loop.o: loop.cpp
+	$(CPP) -c loop.cpp -o loop.o $(CXXFLAGS)
+
+myopengl.o: myopengl.cpp
+	$(CPP) -c myopengl.cpp -o myopengl.o $(CXXFLAGS)
+
+neuron.o: neuron.cpp
+	$(CPP) -c neuron.cpp -o neuron.o $(CXXFLAGS)
+
+poisson_input.o: poisson_input.cpp
+	$(CPP) -c poisson_input.cpp -o poisson_input.o $(CXXFLAGS)
+
+random.o: random.cpp
+	$(CPP) -c random.cpp -o random.o $(CXXFLAGS)
+
+raster.o: raster.cpp
+	$(CPP) -c raster.cpp -o raster.o $(CXXFLAGS)
+
+raster_tuning.o: raster_tuning.cpp
+	$(CPP) -c raster_tuning.cpp -o raster_tuning.o $(CXXFLAGS)
