@@ -55,11 +55,11 @@
 	<File name="raster.h" open="1" top="0" tabpos="4">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="raster_tuning.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="2175" topLine="75" />
+	<File name="raster_tuning.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="898" topLine="2" />
 	</File>
-	<File name="stdafx.h" open="1" top="1" tabpos="2">
-		<Cursor position="7353" topLine="185" />
+	<File name="stdafx.h" open="1" top="0" tabpos="2">
+		<Cursor position="9138" topLine="236" />
 	</File>
 	<File name="test.txt" open="0" top="0" tabpos="0">
 		<Cursor position="405" topLine="0" />

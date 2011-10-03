@@ -1992,3 +1992,94 @@
 	"neuron.h"
 	"loop.h"
 
+1317658995 source:/home/xyy82148/code/sci/IFsimu/datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1317659651 /home/xyy82148/code/sci/IFsimu/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<time.h>
+	<string.h>
+	<assert.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1317658995 /home/xyy82148/code/sci/IFsimu/raster.h
+
+1317658995 /home/xyy82148/code/sci/IFsimu/neuron.h
+
+1317658995 /home/xyy82148/code/sci/IFsimu/loop.h
+
+1317658995 /home/xyy82148/code/sci/IFsimu/datahandling.h
+
+1317658995 source:/home/xyy82148/code/sci/IFsimu/datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1317658995 /home/xyy82148/code/sci/IFsimu/random.h
+
+1317658995 /home/xyy82148/code/sci/IFsimu/datainput.h
+
+1317658995 source:/home/xyy82148/code/sci/IFsimu/loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1317658995 source:/home/xyy82148/code/sci/IFsimu/myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1317658995 /home/xyy82148/code/sci/IFsimu/myopengl.h
+
+1317658995 /home/xyy82148/code/sci/IFsimu/poisson_input.h
+
+1317658995 source:/home/xyy82148/code/sci/IFsimu/neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1317658995 source:/home/xyy82148/code/sci/IFsimu/poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1317658995 source:/home/xyy82148/code/sci/IFsimu/random.cpp
+	"stdafx.h"
+	"random.h"
+
+1317658995 source:/home/xyy82148/code/sci/IFsimu/raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1317659582 source:/home/xyy82148/code/sci/IFsimu/raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/time.h>
+

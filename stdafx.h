@@ -239,6 +239,9 @@ extern bool g_b_quiet;
 extern bool g_b_save_while_cal;
 extern bool g_b_save_use_binary;
 extern bool g_b_RC_filter;
+extern bool g_b_set_pr_mul;
+extern bool g_b_set_ps_mul;
+extern bool g_b_set_psi_mul;
 
 extern double g_RC_filter_ci;          // filter coefficient
 extern double g_RC_filter_co;          // filter coefficient
@@ -258,6 +261,9 @@ extern double *g_arr_poisson_strength_I;
 extern int *tmp_tempbegin_poisson_index;
 extern int *g_tempbegin_poisson_index;
 extern int *g_begin_poisson_index;
+extern double *arr_pr_tmp;
+extern double *arr_ps_tmp;
+extern double *arr_psi_tmp;
 #endif
 
 extern char g_staffsave_path[];

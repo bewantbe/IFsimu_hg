@@ -100,6 +100,9 @@ bool g_b_save_while_cal   = true;
 bool g_b_save_use_binary  = false;
 bool g_b_RC_filter        = false;
 bool g_b_auto_seed        = true;
+bool g_b_set_pr_mul  = false;
+bool g_b_set_ps_mul  = false;
+bool g_b_set_psi_mul = false;
 
 int g_num_neu_ex = Number_Exneuron;
 int g_num_neu_in = Number_Inneuron;
@@ -442,6 +445,7 @@ int main(int argc, char *argv[])
       P_NULL_ERR(arr_pr_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_pr_tmp[j] = 1;
       pp = ReadOneLongCmdPara(argc, argv, pp, arr_pr_tmp);
+      g_b_set_pr_mul = true;
       continue;
     }
     if (strcmp(argv[pp], "--ps-mul")==0) {          // set poisson strength for Ex.
@@ -449,6 +453,7 @@ int main(int argc, char *argv[])
       P_NULL_ERR(arr_ps_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_ps_tmp[j] = 1;
       pp = ReadOneLongCmdPara(argc, argv, pp, arr_ps_tmp);
+      g_b_set_ps_mul = true;
       continue;
     }
     if (strcmp(argv[pp], "--psi-mul")==0) {          // set poisson strength for In.
@@ -456,6 +461,7 @@ int main(int argc, char *argv[])
       P_NULL_ERR(arr_psi_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_psi_tmp[j] = 1;
       pp = ReadOneLongCmdPara(argc, argv, pp, arr_psi_tmp);
+      g_b_set_psi_mul = true;
       continue;
     }
 #endif
