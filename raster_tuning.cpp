@@ -477,7 +477,7 @@ int main(int argc, char *argv[])
     if (strcmp(argv[pp], "--save-interval")==0) {// set time interval of save
       if (++pp >= argc) break;
       g_save_intervel = atof(argv[pp]);
-      if (g_save_intervel<=g_simu_dt) {
+      if (g_save_intervel<g_simu_dt) {
         printf("Illegel time interval!\nProgram terminated\n");
         return 2;
       }
@@ -602,6 +602,14 @@ int main(int argc, char *argv[])
     g_arr_poisson_strength_I[j] *= Strength_Ininput*5.0/(Time_InCon);
 #endif
   }
+  Rate_input = g_arr_poisson_rate[0];
+#if SMOOTH_CONDUCTANCE_USE
+  Strength_Exinput = g_arr_poisson_strength_E[0];
+  Strength_Ininput = g_arr_poisson_strength_I[0];
+#else
+  Strength_Exinput = g_arr_poisson_strength_E[0]/(2.0/(Time_ExCon));
+  Strength_Ininput = g_arr_poisson_strength_I[0]/(2.0/(Time_ExCon));
+#endif
 #endif
 
   input_initialization();
