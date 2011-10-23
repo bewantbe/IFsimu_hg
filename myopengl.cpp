@@ -209,12 +209,15 @@ void keyPressed(unsigned char key, int x, int y)
 #if POISSON_INPUT_USE
         case menu_top-7:
           Rate_input *= 1.02;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_rate[j]*=1.02;}
           break;
         case menu_top-6:
           Strength_Exinput *= 1.02;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_E[j]*=1.02;}
           break;
         case menu_top-5:
           Strength_Ininput *= 1.02;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_I[j]*=1.02;}
           break;
 #else
         case menu_top-7:
@@ -261,12 +264,15 @@ void keyPressed(unsigned char key, int x, int y)
 #if POISSON_INPUT_USE
         case menu_top-7:
           Rate_input *= 1.02;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_rate[j]*=1.02;}
           break;
         case menu_top-6:
           Strength_Exinput *= 1.02;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_E[j]*=1.02;}
           break;
         case menu_top-5:
           Strength_Ininput *= 1.02;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_I[j]*=1.02;}
           break;
 #else
         case menu_top-7:
@@ -310,12 +316,15 @@ void keyPressed(unsigned char key, int x, int y)
 #if POISSON_INPUT_USE
         case menu_top-7:
           Rate_input /= 1.02;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_rate[j]/=1.02;}
           break;
         case menu_top-6:
           Strength_Exinput /= 1.05;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_E[j]/=1.05;}
           break;
         case menu_top-5:
           Strength_Ininput /= 1.05;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_I[j]/=1.05;}
           break;
 #else
         case menu_top-7:
@@ -361,12 +370,15 @@ void keyPressed(unsigned char key, int x, int y)
 #if POISSON_INPUT_USE
         case menu_top-7:
           Rate_input /= 1.02;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_rate[j]/=1.02;}
           break;
         case menu_top-6:
           Strength_Exinput /= 1.02;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_E[j]/=1.02;}
           break;
         case menu_top-5:
           Strength_Ininput /= 1.02;
+          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_I[j]/=1.02;}
           break;
 #else
         case menu_top-7:

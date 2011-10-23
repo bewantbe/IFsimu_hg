@@ -100,9 +100,6 @@ bool g_b_save_while_cal   = true;
 bool g_b_save_use_binary  = false;
 bool g_b_RC_filter        = false;
 bool g_b_auto_seed        = true;
-bool g_b_set_pr_mul  = false;
-bool g_b_set_ps_mul  = false;
-bool g_b_set_psi_mul = false;
 
 int g_num_neu_ex = Number_Exneuron;
 int g_num_neu_in = Number_Inneuron;
@@ -317,8 +314,8 @@ int main(int argc, char *argv[])
     if (strcmp(argv[pp], "-t") == 0) {          // set the final time
       if (++pp >= argc) { pp--;  break; }
       double t_end = atof(argv[pp]);
-      if (t_end <= 0 || t_end > 1e10) {
-        printf("The time must between 0 and 1e10\n");
+      if (t_end <= 0 || t_end > 1e99) {
+        printf("The time must between 0 and 1e99\n");
         return 1;
       }
       g_comp_time = t_end;
@@ -346,7 +343,7 @@ int main(int argc, char *argv[])
       if (g_num_neu_ex+g_num_neu_in <= 0) {
         printf("Nothing to calculate! (Number of neurons: %d Ex. + %d In.)\n",
                g_num_neu_ex, g_num_neu_in);
-        break;
+        return 0;
       }
       continue;
     }
@@ -370,12 +367,12 @@ int main(int argc, char *argv[])
       strcpy(g_conductance_path, argv[pp]);
       continue;
     }
-    if (strcmp(argv[pp], "--save-spike")==0) { // set spike-save-file path
+    if (strcmp(argv[pp], "--save-spike")==0) { // set spike-time-file path
       if (++pp >= argc) break;
       strcpy(g_ras_path, argv[pp]);
       continue;
     }
-    if (strcmp(argv[pp], "--save-spike-interval")==0) {  // average time interval
+    if (strcmp(argv[pp], "--save-spike-interval")==0) {  // average spike interval
       if (++pp >= argc) break;
       strcpy(g_spike_interval_path, argv[pp]);
       continue;
@@ -396,11 +393,11 @@ int main(int argc, char *argv[])
       g_b_save_while_cal = true;
       continue;
     }
-    if (strcmp(argv[pp], "--save-last")==0) {  // save data while calculating
+    if (strcmp(argv[pp], "--save-last")==0) {  // save only last few data
       g_b_save_while_cal = false;
       continue;
     }
-    if (strcmp(argv[pp], "--bin-save")==0) {   // save data while calculating
+    if (strcmp(argv[pp], "--bin-save")==0) {   // save data using binary format
       g_b_save_use_binary = true;
       continue;
     }
@@ -440,28 +437,25 @@ int main(int argc, char *argv[])
       g_poisson_strength_in = atof(argv[pp]);
       continue;
     }
-    if (strcmp(argv[pp], "--pr-mul")==0) {          // set poisson rate
+    if (strcmp(argv[pp], "--pr-mul")==0) {          // set poisson rate multiplier
       arr_pr_tmp = (double*)malloc(g_num_neu*sizeof(double));
       P_NULL_ERR(arr_pr_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_pr_tmp[j] = 1;
       pp = ReadOneLongCmdPara(argc, argv, pp, arr_pr_tmp);
-      g_b_set_pr_mul = true;
       continue;
     }
-    if (strcmp(argv[pp], "--ps-mul")==0) {          // set poisson strength for Ex.
+    if (strcmp(argv[pp], "--ps-mul")==0) {          // set poisson strength multiplier for Ex.
       arr_ps_tmp = (double*)malloc(g_num_neu*sizeof(double));
       P_NULL_ERR(arr_ps_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_ps_tmp[j] = 1;
       pp = ReadOneLongCmdPara(argc, argv, pp, arr_ps_tmp);
-      g_b_set_ps_mul = true;
       continue;
     }
-    if (strcmp(argv[pp], "--psi-mul")==0) {          // set poisson strength for In.
+    if (strcmp(argv[pp], "--psi-mul")==0) {          // set poisson strength multiplier for In.
       arr_psi_tmp = (double*)malloc(g_num_neu*sizeof(double));
       P_NULL_ERR(arr_psi_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_psi_tmp[j] = 1;
       pp = ReadOneLongCmdPara(argc, argv, pp, arr_psi_tmp);
-      g_b_set_psi_mul = true;
       continue;
     }
 #endif
@@ -529,21 +523,21 @@ int main(int argc, char *argv[])
     printf("Try `raster_tuning --help' for more information.\n");
     return 2;
   }
-  if (verbose_gl) { printf(" Initializing data\n"); fflush(stdout); }
   if (g_b_quiet) g_b_verbose = false;
   verbose_gl = g_b_verbose;
-  if (g_ras_path[0] == '-')
-    strcpy(g_ras_path, "./data/ras.txt");
-  if (g_simu_dt)        Tstep = g_simu_dt;
-  if (g_save_intervel)  SLIGHT_BIN = g_save_intervel;
+  if (verbose_gl) { printf(" Initializing data\n"); fflush(stdout); }
 
   setglobals();               // assign space for variables
 
+  if (g_ras_path[0] == '-')
+    strcpy(g_ras_path, "data/ras.txt");
   if (conf_file[0] == '\0')
     strcpy(conf_file, conf_file_default);
 
   readinput(conf_file);       // read basic parameters from file
 
+  if (g_simu_dt)        Tstep = g_simu_dt;
+  if (g_save_intervel)  SLIGHT_BIN = g_save_intervel;
   if (g_strength_corEE != no_use_number) Strength_CorEE = g_strength_corEE;
   if (g_strength_corEI != no_use_number) Strength_CorIE = g_strength_corEI;  // note: the name is inversed
   if (g_strength_corIE != no_use_number) Strength_CorEI = g_strength_corIE;

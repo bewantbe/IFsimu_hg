@@ -1053,10 +1053,11 @@ void LastRun()
   }
 
   /// record firing time
+  // neuron index starting from one
   if (g_ras_path[0]) {
     FILE *frasout = fopen(g_ras_path, "w");
     for (int k=0; k<RAS.ras_index; k++) {
-      fprintf(frasout, "%d, %f\n", RAS.array_index[k], RAS.array_firingtime[k]);
+      fprintf(frasout, "%d\t%f\n", RAS.array_index[k]+1, RAS.array_firingtime[k]);
     }
     fclose(frasout);
 

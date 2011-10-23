@@ -239,9 +239,6 @@ extern bool g_b_quiet;
 extern bool g_b_save_while_cal;
 extern bool g_b_save_use_binary;
 extern bool g_b_RC_filter;
-extern bool g_b_set_pr_mul;
-extern bool g_b_set_ps_mul;
-extern bool g_b_set_psi_mul;
 
 extern double g_RC_filter_ci;          // filter coefficient
 extern double g_RC_filter_co;          // filter coefficient

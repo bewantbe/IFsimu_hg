@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release Linux" />
+	<ActiveTarget name="Debug Linux" />
 	<File name="Readme.txt" open="0" top="0" tabpos="0">
 		<Cursor position="4792" topLine="74" />
 	</File>
 	<File name="changelog" open="0" top="0" tabpos="6">
 		<Cursor position="5040" topLine="146" />
 	</File>
-	<File name="datahandling.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="541" topLine="10" />
+	<File name="datahandling.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="1660" topLine="59" />
 	</File>
-	<File name="datahandling.h" open="0" top="0" tabpos="5">
-		<Cursor position="17" topLine="0" />
+	<File name="datahandling.h" open="1" top="0" tabpos="7">
+		<Cursor position="1307" topLine="18" />
 	</File>
-	<File name="datainput.cpp" open="1" top="0" tabpos="6">
+	<File name="datainput.cpp" open="1" top="0" tabpos="4">
 		<Cursor position="201" topLine="0" />
 	</File>
-	<File name="datainput.h" open="1" top="0" tabpos="8">
+	<File name="datainput.h" open="0" top="0" tabpos="8">
 		<Cursor position="670" topLine="0" />
 	</File>
-	<File name="loop.cpp" open="1" top="0" tabpos="7">
+	<File name="loop.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="1443" topLine="40" />
 	</File>
 	<File name="loop.h" open="0" top="0" tabpos="6">
 		<Cursor position="1352" topLine="25" />
 	</File>
-	<File name="myopengl.cpp" open="1" top="0" tabpos="9">
-		<Cursor position="22258" topLine="729" />
+	<File name="myopengl.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="1705" topLine="38" />
 	</File>
 	<File name="myopengl.h" open="0" top="0" tabpos="3">
 		<Cursor position="0" topLine="0" />
@@ -38,7 +38,7 @@
 		<Cursor position="1340" topLine="0" />
 	</File>
 	<File name="poisson_input.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="31835" topLine="760" />
+		<Cursor position="32391" topLine="776" />
 	</File>
 	<File name="poisson_input.h" open="0" top="0" tabpos="7">
 		<Cursor position="4059" topLine="53" />
@@ -49,14 +49,14 @@
 	<File name="random.h" open="0" top="0" tabpos="8">
 		<Cursor position="269" topLine="0" />
 	</File>
-	<File name="raster.cpp" open="1" top="0" tabpos="5">
+	<File name="raster.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2491" topLine="106" />
 	</File>
-	<File name="raster.h" open="1" top="0" tabpos="4">
+	<File name="raster.h" open="0" top="0" tabpos="4">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="raster_tuning.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="898" topLine="2" />
+		<Cursor position="1682" topLine="51" />
 	</File>
 	<File name="stdafx.h" open="1" top="0" tabpos="2">
 		<Cursor position="9138" topLine="236" />

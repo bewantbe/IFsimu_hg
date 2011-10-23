@@ -233,7 +233,7 @@ bool IsEmptyStr(const char *st)
 }
 
 // conver string to array, won't change the value of the one not given
-// return the number of number in st
+// return the number of numbers in st
 // No error checking, use with careful
 int Str2Arr(const char *c_str, double *a)
 {
@@ -255,7 +255,6 @@ int Str2Arr(const char *c_str, double *a)
     }
     cnt++;
   }
-
   return cnt;
 }
 
