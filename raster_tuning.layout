@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug Linux" />
+	<ActiveTarget name="Release Linux" />
 	<File name="Readme.txt" open="0" top="0" tabpos="0">
 		<Cursor position="4792" topLine="74" />
 	</File>
 	<File name="changelog" open="0" top="0" tabpos="6">
-		<Cursor position="5040" topLine="146" />
+		<Cursor position="270" topLine="0" />
 	</File>
-	<File name="datahandling.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="1660" topLine="59" />
+	<File name="datahandling.cpp" open="0" top="0" tabpos="6">
+		<Cursor position="1660" topLine="0" />
 	</File>
-	<File name="datahandling.h" open="1" top="0" tabpos="7">
-		<Cursor position="1307" topLine="18" />
+	<File name="datahandling.h" open="0" top="0" tabpos="7">
+		<Cursor position="1307" topLine="0" />
 	</File>
 	<File name="datainput.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="201" topLine="0" />
+		<Cursor position="6148" topLine="0" />
 	</File>
 	<File name="datainput.h" open="0" top="0" tabpos="8">
 		<Cursor position="670" topLine="0" />
@@ -25,8 +25,8 @@
 	<File name="loop.h" open="0" top="0" tabpos="6">
 		<Cursor position="1352" topLine="25" />
 	</File>
-	<File name="myopengl.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="1705" topLine="38" />
+	<File name="myopengl.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="1809" topLine="35" />
 	</File>
 	<File name="myopengl.h" open="0" top="0" tabpos="3">
 		<Cursor position="0" topLine="0" />
@@ -38,7 +38,7 @@
 		<Cursor position="1340" topLine="0" />
 	</File>
 	<File name="poisson_input.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="32391" topLine="776" />
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="poisson_input.h" open="0" top="0" tabpos="7">
 		<Cursor position="4059" topLine="53" />
@@ -56,10 +56,10 @@
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="raster_tuning.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="1682" topLine="51" />
+		<Cursor position="24073" topLine="676" />
 	</File>
 	<File name="stdafx.h" open="1" top="0" tabpos="2">
-		<Cursor position="9138" topLine="236" />
+		<Cursor position="8425" topLine="236" />
 	</File>
 	<File name="test.txt" open="0" top="0" tabpos="0">
 		<Cursor position="405" topLine="0" />

@@ -651,13 +651,22 @@ int main(int argc, char *argv[])
     printf("Poisson input strength to In. neurons = %g\n", Strength_Ininput);
     printf("Poisson input strength to Ex. neurons = %g\n", Strength_Exinput);
     printf("Poisson input rate = %g\n", Rate_input);
-    printf("pr: ");
-    for (int j=0; j<g_num_neu; j++) printf("%g, ", g_arr_poisson_rate[j]);
-    printf("\nps: ");
-    for (int j=0; j<g_num_neu; j++) printf("%g, ", g_arr_poisson_strength_E[j]);
-    printf("\npsi: ");
-    for (int j=0; j<g_num_neu; j++) printf("%g, ", g_arr_poisson_strength_I[j]);
-    printf("\n");
+    {
+      int nn = g_num_neu;
+      if (nn>20) {
+        nn = 20;
+        printf("  Only show first 20 neurons...\n");
+      }
+      printf("pr: ");
+      for (int j=0; j<g_num_neu; j++) printf("%g, ", g_arr_poisson_rate[j]);
+      printf("\nps: ");
+      for (int j=0; j<g_num_neu; j++) printf("%g, ", g_arr_poisson_strength_E[j]);
+      if (g_num_neu_in) {
+        printf("\npsi: ");
+        for (int j=0; j<g_num_neu; j++) printf("%g, ", g_arr_poisson_strength_I[j]);
+      }
+      printf("\n");
+    }
 #else
     printf("Current average:   %g\n", Current_0);
     printf("Current amplitude: %g\n", Current_1);
