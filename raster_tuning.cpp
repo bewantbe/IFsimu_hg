@@ -658,12 +658,12 @@ int main(int argc, char *argv[])
         printf("  Only show first 20 neurons...\n");
       }
       printf("pr: ");
-      for (int j=0; j<g_num_neu; j++) printf("%g, ", g_arr_poisson_rate[j]);
+      for (int j=0; j<nn; j++) printf("%g, ", g_arr_poisson_rate[j]);
       printf("\nps: ");
-      for (int j=0; j<g_num_neu; j++) printf("%g, ", g_arr_poisson_strength_E[j]);
+      for (int j=0; j<nn; j++) printf("%g, ", g_arr_poisson_strength_E[j]);
       if (g_num_neu_in) {
         printf("\npsi: ");
-        for (int j=0; j<g_num_neu; j++) printf("%g, ", g_arr_poisson_strength_I[j]);
+        for (int j=0; j<nn; j++) printf("%g, ", g_arr_poisson_strength_I[j]);
       }
       printf("\n");
     }
