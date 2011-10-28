@@ -21,7 +21,7 @@ ZDZ 的程序的简化版的说明, v2.0.10 (alpha)
     -mat FILE     设置连接矩阵的路径. 默认是 cortical_matrix.txt
     -o FILE       设置输出电平文件的路径. 默认是 data/staffsave.txt
     --save-conductance FILE
-                  设置输出电导(兴奋电导), 并输出到文件 FILE
+                  输出电导(兴奋电导)数据到文件 FILE
     --save-spike FILE
                   设置输出放电时刻的文件路径. 默认不输出. FILE 为 "-" (短横杠) 时,
                   表示输出到 "./data/ras.txt"
@@ -43,43 +43,47 @@ ZDZ 的程序的简化版的说明, v2.0.10 (alpha)
     -ps VALUE     设置 poisson 型输入对兴奋型神经的单次强度
     -psi VALUE    设置 poisson 型输入对抑制型神经的单次强度
     --pr-mul [VALUE ...] [VALUE@POSITION ...]
-                  在命令行设置各个神经元的 poisson 输入率倍率. 可以只设定前几个.
-                  可以用 VALUE@POSITION 的语法指定第几个的值, 编号从 1 开始.
+                  在命令行设置各个神经元的 poisson 输入率倍率. 可以只设定前几个
+                  可以用 VALUE@POSITION 的语法指定第几个的值, 编号从 1 开始
                   未指定值的神经默认是 1. 必须提前指定神经元个数.
     --ps-mul [VALUE ...] [VALUE@POSITION ...]
                   在命令行设置各个神经元的 poisson 输入强度(兴奋型)倍率. 语法参见 --pr-mul
     --psi-mul [VALUE ...] [VALUE@POSITION ...]
                   在命令行设置各个神经元的 poisson 输入强度(抑制型)倍率. 语法参见 --pr-mul
     -dt VALUE     设置时间步长为 VALUE
-    --save-interval VALUE
-                  输出数据的记录间隔
+    --save-interval VALUE 或 -stv VALUE
+                  输出数据的记录间隔. 会被取为 dt 的整数倍(floor)
     --seed-auto-on, --seed-auto-off
-                  打开或关闭用微秒极(windows上是毫秒级)的系统时间设置随机种子. 默认是打开.
-    -seed VALUE   设置随机数种子. 相当于配置文件中的 initial_seed. 
-    --RC-filter   使用 RC 滤波后再采样. 截止频率为"输出数据的记录间隔"对应的最高频率
+                  打开或关闭用微秒极(windows上是毫秒级)的系统时间设置随机种子. 默认是打开
+    -seed VALUE   设置随机数种子, 隐含--seed-auto-off. 功能同配置文件中的 initial_seed
+    --RC-filter   使用 RC 低通滤波后再采样. 截止频率为"输出数据的记录间隔"对应的最高频率
+    --RC-filter VALUEci VALUEco
+                  使用 RC 低通滤波, 手动设置滤波系数. y[t] = co * y[t-dt] + ci * x[t]
+                  输出的数据是 y[stv], y[2*stv], ..., y[k*stv]
+                  其中 stv 是输出数据的记录间隔. 见 --save-interval
     -v, --verbose 计算时输出更多信息
     -q, --quiet   安静模式, 只显示错误和警告
-    -h, --help    显示帮助(以及一些默认值)
-    --version     显示版本信息
+    -h, --help    显示帮助(以及一些默认值), 然后程序终止.
+    --version     显示版本信息, 然后程序终止.
 
-命令行参数以及输出的放电时刻文件中, 神经元编号从 1 开始. (程序内部是从 0 开始的)
-
-读取程序参数的顺序是
+程序读取输入参数的顺序是
   1. 命令行
   2. 配置文件(默认是 test2.txt)
   3. 程序内置的默认值
-以先读到的值为准. 但命令行中若出现重复的选项, 以最后(右侧)的为准.
+以先读到的值为准. 命令行中若出现重复的项, 以最后(右侧)的为准.
 
-!! 注意: 输出的数据开头会有一段未平稳的状态, 未去除.
-
-图形模式时显示的 Poisson 输入频率及输入强度是指第一个神经元的, 但更改时所有值同比例变化.
+命令行参数以及输入输出的文件中, 神经元编号从 1 开始. (虽然程序内部是从 0 开始的)
+注意:
+    2011-10-22 以前的版本, 放电时刻文件神经元编号从 0 开始.
+    输出的数据开头会有一段未平稳的状态, 未去除.
+    图形模式时显示的 Poisson 输入频率及输入强度是指第一个神经元的. 但更改时所有值同比例变化.
 
 示例:
 raster_tuning -ng -n 20 -t 10000 -inf test2_0.txt -o data/staffsave2.txt -v
  含义是不显示图形界面, 20个神经元(都是兴奋型), 计算到 10000ms,
      配置(参数)文件是 test2_0.txt, 输出到 data/staffsave2.txt, 显示更多信息.
 
-raster_tuning -n 2 -pr 1 -ps 0.012 --ps-mul 0.1@2 -v
+raster_tuning -n 2 -pr 1 -ps 0.012 --ps-mul 0.1@2
  显示图形界面, 第二个神经的Poisson输入强度设为 0.1 * 0.012 (第一个仍是 0.012)
 
 raster_tuning -h
@@ -87,9 +91,9 @@ raster_tuning -h
 
 
 默认配置文件:
-test.txt            周期电流输入, POISSON_INPUT_USE 为 0 时启用
-test2.txt           Poisson 脉冲输入, POISSON_INPUT_USE 为 1 时启用
-cortical_matrix.txt 神经元间连接关系矩阵, CORTICAL_STRENGTH_NONHOMO 为 1 时启用
+test.txt            周期电流输入, 宏POISSON_INPUT_USE 为 0 时启用
+test2.txt           Poisson 脉冲输入, 宏POISSON_INPUT_USE 为 1 时启用
+cortical_matrix.txt 神经元间连接关系矩阵, 宏CORTICAL_STRENGTH_NONHOMO 为 1 时启用
 
 
 神经连接临接矩阵文件 note:

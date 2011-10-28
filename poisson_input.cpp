@@ -990,7 +990,7 @@ void compute_perstep()
     }
   }
 
-  ///XYY: output neuron data to text file per compute step (Tstep)
+  ///XYY: output neuron data to text file every SLIGHT_BIN
   /**
     structure of GLOBAL_STRA[] (same as neu)
     without smooth jump
@@ -1009,9 +1009,9 @@ void compute_perstep()
 
   if (g_b_save_while_cal) {
     static int oldtab = 0;
-    if (GLOBAL_STRA[0]->tab != oldtab) {          // if data are updated
+    if (GLOBAL_STRA[0]->tab != oldtab) {          // if data is updated
       // loop for each neuron, see the structure of GLOBAL_STRA
-      if (g_b_save_use_binary) {                  // save volt in binary or not
+      if (g_b_save_use_binary) {                  // save volt in binary format
         for (i = 0; i < g_num_neu; i++)
           fwrite(&(GLOBAL_STRA[i]->data[oldtab]), sizeof(double), 1, g_fout);
       } else {

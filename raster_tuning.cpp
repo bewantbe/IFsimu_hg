@@ -100,6 +100,7 @@ bool g_b_save_while_cal   = true;
 bool g_b_save_use_binary  = false;
 bool g_b_RC_filter        = false;
 bool g_b_auto_seed        = true;
+bool g_b_RC_filter_coef_auto = true;
 
 int g_num_neu_ex = Number_Exneuron;
 int g_num_neu_in = Number_Inneuron;
@@ -148,7 +149,7 @@ int RASTER_SIZE = (Number_Exneuron + Number_Inneuron)*5;
 
 void ShowCLIHelp()
 {
-  printf("Usage: raster_tuning [OPTION]...\n");
+  printf("Usage: raster_tuning [OPTION1] [OPTION2] ...\n");
   printf("Simulate the Integrate-and-Fire model of neurons.\n");
   printf("\n");
   printf("  -ng           no GUI(graphical user interface)\n");
@@ -156,16 +157,16 @@ void ShowCLIHelp()
   printf("                  Default: %f\n", g_comp_time);
   printf("  -n N [N2]     set number of neurons, N for Ex., N2 for In.\n");
   printf("                  Default: %d Ex. + %d In.\n", g_num_neu_ex, g_num_neu_in);
-  printf("  -inf FILE     load configuration from FILE.\n");
-  printf("                  Default: %s\n", conf_file_default);
-  printf("  -mat FILE     load cortical strength matrix from FILE.\n");
-  printf("                  Default: %s\n", cor_mat_file_default);
-  printf("  -o FILE       save voltage data to FILE.\n");
-  printf("                  Default: %s\n", g_staffsave_path_default);
+  printf("  -inf FILE     load configuration from FILE\n");
+  printf("                  Default: \"%s\"\n", conf_file_default);
+  printf("  -mat FILE     load cortical strength matrix from FILE\n");
+  printf("                  Default: \"%s\"\n", cor_mat_file_default);
+  printf("  -o FILE       save voltage data to FILE\n");
+  printf("                  Default: \"%s\"\n", g_staffsave_path_default);
   printf("  --save-conductance FILE\n");
   printf("                save conductance to FILE\n");
   printf("  --save-spike FILE\n");
-  printf("                save spikes data to FILE\n");
+  printf("                save all spike events to FILE\n");
   printf("  --save-spike-interval FILE\n");
   printf("                save average spike interval of each neuron to FILE\n");
 #if POISSON_INPUT_USE
@@ -186,29 +187,34 @@ void ShowCLIHelp()
   printf("  -scii VALUE   set cortical strength (In. to In.)\n");
 #if POISSON_INPUT_USE
   printf("  -pr VALUE     set poisson input rate\n");
-  printf("  -ps VALUE     set poisson input strength of Ex. neuron\n");
-  printf("  -psi VALUE    set poisson input strength of In. neuron\n");
+  printf("  -ps VALUE     set poisson input strength for Ex. neuron\n");
+  printf("  -psi VALUE    set poisson input strength for In. neuron\n");
   printf("  --pr-mul [VALUE ...] [VALUE@POSITION ...]\n");
-  printf("                set relative poisson input rate of each neurons.\n");
+  printf("                set relative poisson input rate for neurons\n");
   printf("  --ps-mul [VALUE ...] [VALUE@POSITION ...]\n");
-  printf("                set relative poisson input strength of Ex. neurons.\n");
+  printf("                set relative poisson input strength for Ex. neurons\n");
   printf("  --psi-mul [VALUE ...] [VALUE@POSITION ...]\n");
-  printf("                set relative poisson input strength of In. neurons.\n");
+  printf("                set relative poisson input strength for In. neurons\n");
 #endif
   printf("  -dt VALUE     set time step. Default: %f (ms)\n", Tstep);
-  printf("  --save-interval VALUE\n");
-  printf("                set time interval of each data. Default: %f (ms)\n", SLIGHT_BIN);
-  printf("  --seed VALUE  set seed for random number generator.\n");
-  printf("                Range: integer from 0 to 2^32-1 or float between 0 and 1.\n");
+  printf("  --save-interval VALUE  or  -stv VALUE\n");
+  printf("                set output time interval of data. Default: %f (ms)\n", SLIGHT_BIN);
+  printf("  --seed VALUE  set seed for random number generator\n");
+  printf("                Range: integer from 0 to 2^32-1 or float between 0 and 1\n");
   printf("  --seed-auto-on, --seed-auto-off      Default: %s\n",g_b_auto_seed?"on":"off");
-  printf("                turn on or off the function of auto random seed.\n");
-  printf("  --RC-filter   use RC low-pass filter befor sampling (instead of averaging).\n");
-  printf("  -v, --verbose show instant information\n");
+  printf("                turn on or off the function of auto set random seed\n");
+  printf("  --RC-filter   use RC low-pass filter befor sampling (instead of averaging)\n");
+  printf("  --RC-filter ci co\n");
+  printf("                same as --RC-filter, but let you set filter coefficients:\n");
+  printf("                y[t] = co * y[t-dt] + ci * x[t] (x is input, y is output)\n");
+  printf("                final output data is y[stv], y[2*stv], ... , y[k*stv]\n");
+  printf("                stv means save time interval, see --save-interval\n");
+  printf("  -v, --verbose show more information while executing\n");
   printf("  -q, --quiet   show only errors\n");
   printf("  -h, --help    show this help and exit\n");
   printf("  --version     output version information and exit\n");
   printf("\n");
-  printf("Using options above will overwrite the corresponding parameters in configuration file.\n");
+  printf("Using options above will overwrite the corresponding parameters in configuration file. (which default is \"%s\")\n", conf_file_default);
   printf("\n");
   printf("Report raster_tuning bugs to xyy82148@sjtu.edu.cn or zdz@cims.nyu.edu\n");
   printf("\n");
@@ -372,7 +378,7 @@ int main(int argc, char *argv[])
       strcpy(g_ras_path, argv[pp]);
       continue;
     }
-    if (strcmp(argv[pp], "--save-spike-interval")==0) {  // average spike interval
+    if (strcmp(argv[pp], "--save-spike-interval")==0) {  // save average spike interval
       if (++pp >= argc) break;
       strcpy(g_spike_interval_path, argv[pp]);
       continue;
@@ -468,7 +474,7 @@ int main(int argc, char *argv[])
       }
       continue;
     }
-    if (strcmp(argv[pp], "--save-interval")==0) {// set time interval of save
+    if (strcmp(argv[pp], "--save-interval")==0 || strcmp(argv[pp], "-stv")==0) {// set time interval of save
       if (++pp >= argc) break;
       g_save_intervel = atof(argv[pp]);
       if (g_save_intervel<g_simu_dt) {
@@ -495,6 +501,20 @@ int main(int argc, char *argv[])
     }
     if (strcmp(argv[pp], "--RC-filter")==0) {
       g_b_RC_filter = true;
+      if (pp+2<argc && argv[pp+1][0]!='-' && argv[pp+2][0]!='-') {  // no error checking here
+        g_b_RC_filter_coef_auto = false;
+        g_RC_filter_ci = atof(argv[pp+1]);
+        g_RC_filter_co = atof(argv[pp+2]);
+        pp += 2;
+        if (fabs(g_RC_filter_co)>=1) {
+          printf("Unstable RC filter: y[t] = %e * y[t-1] + %e * x[t]\n", g_RC_filter_co, g_RC_filter_ci);
+          printf("Absolute value of coefficient of y[t-1] must smaller than ONE.\n");
+          printf("Program terminated\n");
+          return 0;
+        }
+      } else {
+        g_b_RC_filter_coef_auto = true;
+      }
       continue;
     }
     if (strcmp(argv[pp], "-v")==0 || strcmp(argv[pp], "--verbose")==0) {
@@ -538,6 +558,8 @@ int main(int argc, char *argv[])
 
   if (g_simu_dt)        Tstep = g_simu_dt;
   if (g_save_intervel)  SLIGHT_BIN = g_save_intervel;
+  // truncate SLIGHT_BIN to multiple of Tstep, due to strobeupdate().
+  SLIGHT_BIN = floor(SLIGHT_BIN/Tstep)*Tstep;
   if (g_strength_corEE != no_use_number) Strength_CorEE = g_strength_corEE;
   if (g_strength_corEI != no_use_number) Strength_CorIE = g_strength_corEI;  // note: the name is inversed
   if (g_strength_corIE != no_use_number) Strength_CorEI = g_strength_corIE;
@@ -548,9 +570,11 @@ int main(int argc, char *argv[])
   if (g_poisson_strength_in != no_use_number) Strength_Ininput = g_poisson_strength_in;
 #endif
   if (g_b_RC_filter) {
-    double u = M_PI*Tstep/SLIGHT_BIN;
-    g_RC_filter_ci = u/(1+u);
-    g_RC_filter_co = 1/(1+u);
+    if (g_b_RC_filter_coef_auto) {
+      double u = M_PI*Tstep/SLIGHT_BIN;
+      g_RC_filter_ci = u/(1+u);
+      g_RC_filter_co = 1/(1+u);
+    }
   }
   if (g_b_auto_seed) {        // use second & microsecond as random seed
     initial_seed = GetSeedFromTime();
