@@ -1,5 +1,5 @@
-ZDZ 的程序的简化版的说明, v2.0.10 (alpha)
-最后更新 2011-10-23, xyy
+ZDZ 的程序的简化版的说明, v2.0.11 (alpha)
+最后更新 2011-10-30, xyy
 
 程序改成只有边显示图形边计算及纯计算两个模式. 其他如计算 Lyapunov 指数,
  功率谱等功能皆已去除(但愿去除干净了), 即是说关于分析的代码去除了.
@@ -19,6 +19,7 @@ ZDZ 的程序的简化版的说明, v2.0.10 (alpha)
     -n N [N2]     神经元数, N 是兴奋型, N2 是抑制型. 省略 N2 相当于 N2=0
     -inf FILE     设置配置文件的路径. 默认是 test2.txt
     -mat FILE     设置连接矩阵的路径. 默认是 cortical_matrix.txt
+                  特别地,  -mat "*" 表示路径是完全图
     -o FILE       设置输出电平文件的路径. 默认是 data/staffsave.txt
     --save-conductance FILE
                   输出电导(兴奋电导)数据到文件 FILE
@@ -56,8 +57,9 @@ ZDZ 的程序的简化版的说明, v2.0.10 (alpha)
     --seed-auto-on, --seed-auto-off
                   打开或关闭用微秒极(windows上是毫秒级)的系统时间设置随机种子. 默认是打开
     -seed VALUE   设置随机数种子, 隐含--seed-auto-off. 功能同配置文件中的 initial_seed
+                  当 seed 设为 0 时, 相当于使用 test2.txt 中的 initial_seed.
     --RC-filter   使用 RC 低通滤波后再采样. 截止频率为"输出数据的记录间隔"对应的最高频率
-    --RC-filter VALUEci VALUEco
+    --RC-filter VALUEco VALUEci
                   使用 RC 低通滤波, 手动设置滤波系数. y[t] = co * y[t-dt] + ci * x[t]
                   输出的数据是 y[stv], y[2*stv], ..., y[k*stv]
                   其中 stv 是输出数据的记录间隔. 见 --save-interval
@@ -70,7 +72,9 @@ ZDZ 的程序的简化版的说明, v2.0.10 (alpha)
   1. 命令行
   2. 配置文件(默认是 test2.txt)
   3. 程序内置的默认值
-以先读到的值为准. 命令行中若出现重复的项, 以最后(右侧)的为准.
+以先读到的值为准. 命令行中若出现重复或互斥的项, 以最后(右侧)的为准.
+
+--pr-mul 与 --read-pr 的作用是累积的.
 
 命令行参数以及输入输出的文件中, 神经元编号从 1 开始. (虽然程序内部是从 0 开始的)
 注意:
@@ -97,14 +101,13 @@ cortical_matrix.txt 神经元间连接关系矩阵, 宏CORTICAL_STRENGTH_NONHOMO
 
 
 神经连接临接矩阵文件 note:
-多余的行不会被读入, 故可在末尾加任意注释.
-对角线的值不会影响计算
-第 i 行 j 列的元素表示 j 神经元对 i 神经元的影响
-连接强度的值是配置文件(默认是test2.txt)的 Strength_CorEE 或 Strength_CorIE 或
-  Strength_CorEI 或 Strength_CorII (相应于连接的两个神经元的类型) 与矩阵元素的乘积
-抑制型神经的编号排在兴奋型后
-矩阵的元素不必是整数
-神经元个数必须与连接矩阵的阶数相同, 否则...
+  1. 第 i 行 j 列的元素表示 j 神经元对 i 神经元的影响. 元素的值不必是整数.
+  2. 对角线的值不会影响计算
+  3. 抑制型神经的编号排在兴奋型后
+  4. 连接强度的值是配置文件(默认是test2.txt)的 Strength_CorEE 或 Strength_CorIE 或
+     Strength_CorEI 或 Strength_CorII (相应于连接的两个神经元的类型) 与矩阵元素的乘积
+  5. 多余的行不会被读入, 故可在末尾加任意注释.
+  6. 神经元个数必须与连接矩阵的阶数相同, 否则...
 
 
 代码内部的宏可调节的功能有:

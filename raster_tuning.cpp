@@ -204,7 +204,7 @@ void ShowCLIHelp()
   printf("  --seed-auto-on, --seed-auto-off      Default: %s\n",g_b_auto_seed?"on":"off");
   printf("                turn on or off the function of auto set random seed\n");
   printf("  --RC-filter   use RC low-pass filter befor sampling (instead of averaging)\n");
-  printf("  --RC-filter ci co\n");
+  printf("  --RC-filter co ci\n");
   printf("                same as --RC-filter, but let you set filter coefficients:\n");
   printf("                y[t] = co * y[t-dt] + ci * x[t] (x is input, y is output)\n");
   printf("                final output data is y[stv], y[2*stv], ... , y[k*stv]\n");
@@ -222,23 +222,23 @@ void ShowCLIHelp()
 
 void ShowCLIVersion()
 {
-  printf("raster_tuning 2.0.10 (alpha)\n");
+  printf("raster_tuning 2.0.11 (alpha)\n");
   printf("Copyright: ZDZ etc.\n");
-  printf("XYY branch version, based on \"clean IF code\" (19 Nov 2010)\n");
+  printf("XYY branch version, based on \"clean IF code\" (Nov 19 2010)\n");
   printf("(Is this a free software?!)\n");
 #ifdef _MSC_VER
-  printf("Compile by Microsoft Visual Studio(C++): Version %d\n", _MSC_VER);
+  printf("Compiled by Microsoft Visual Studio(C++): Version %d\n", _MSC_VER);
 #elif __PATHCC__
-  printf("Compile by PathScale Compiler: Version %s\n", __VERSION__);
+  printf("Compiled by PathScale Compiler: Version %s\n", __VERSION__);
 #elif __GNUG__
-  printf("Compile by GCC: Version %s\n", __VERSION__);
+  printf("Compiled by GCC: Version %s\n", __VERSION__);
 #elif __GNUC__
-  printf("Compile by GNUC compatible compiler\n");
+  printf("Compiled by GNUC compatible compiler\n");
 # ifdef __VERSION__
     printf("  Version: %s\n", __VERSION__);
 # endif
 #else
-  printf("Compile by neither MS nor GNUC compiler\n");
+  printf("Compiled by neither MS nor GNUC compiler\n");
 # ifdef __VERSION__
     printf("__VERSION__ %s\n", __VERSION__);
 # endif
@@ -444,6 +444,7 @@ int main(int argc, char *argv[])
       continue;
     }
     if (strcmp(argv[pp], "--pr-mul")==0) {          // set poisson rate multiplier
+      free(arr_pr_tmp);
       arr_pr_tmp = (double*)malloc(g_num_neu*sizeof(double));
       P_NULL_ERR(arr_pr_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_pr_tmp[j] = 1;
@@ -451,6 +452,7 @@ int main(int argc, char *argv[])
       continue;
     }
     if (strcmp(argv[pp], "--ps-mul")==0) {          // set poisson strength multiplier for Ex.
+      free(arr_ps_tmp);
       arr_ps_tmp = (double*)malloc(g_num_neu*sizeof(double));
       P_NULL_ERR(arr_ps_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_ps_tmp[j] = 1;
@@ -458,6 +460,7 @@ int main(int argc, char *argv[])
       continue;
     }
     if (strcmp(argv[pp], "--psi-mul")==0) {          // set poisson strength multiplier for In.
+      free(arr_psi_tmp);
       arr_psi_tmp = (double*)malloc(g_num_neu*sizeof(double));
       P_NULL_ERR(arr_psi_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_psi_tmp[j] = 1;
@@ -494,6 +497,10 @@ int main(int argc, char *argv[])
     if (strcmp(argv[pp], "-seed")==0) { // random number seed
       if (++pp >= argc) break;
       double s = atof(argv[pp]);
+      if (fabs(s)>UINT_MAX) {
+        printf("Well, a huge number, I can't afford that. :-$\n");
+        break;
+      }
       if (0<s && s<1) s *= UINT_MAX;
       initial_seed2 = (unsigned int)s;
       g_b_auto_seed = false;
@@ -503,8 +510,8 @@ int main(int argc, char *argv[])
       g_b_RC_filter = true;
       if (pp+2<argc && argv[pp+1][0]!='-' && argv[pp+2][0]!='-') {  // no error checking here
         g_b_RC_filter_coef_auto = false;
-        g_RC_filter_ci = atof(argv[pp+1]);
-        g_RC_filter_co = atof(argv[pp+2]);
+        g_RC_filter_co = atof(argv[pp+1]);
+        g_RC_filter_ci = atof(argv[pp+2]);
         pp += 2;
         if (fabs(g_RC_filter_co)>=1) {
           printf("Unstable RC filter: y[t] = %e * y[t-1] + %e * x[t]\n", g_RC_filter_co, g_RC_filter_ci);
@@ -584,7 +591,21 @@ int main(int argc, char *argv[])
 #if CORTICAL_STRENGTH_NONHOMO
   if (cor_mat_file[0]=='\0')
     strcpy(cor_mat_file, cor_mat_file_default);
-  read_cortical_matrix(cor_mat_file, cortical_matrix);
+  if (read_cortical_matrix(cor_mat_file, cortical_matrix)!=0) {
+    printf("Fail to read cortical matrix from file: \"%s\"\n", cor_mat_file);
+    printf("Is File exists? Is number of neurons match?\n");
+    printf("Or may be you want to try -mat \"*\" to get a complete graph connection.\n");
+    printf("Program terminated.\n");
+    return 1;
+  }
+  if (g_b_verbose) {
+    printf("Cortical matrix:\n");
+    for (int i=0; i<g_num_neu; i++) {
+      for (int j=0; j<g_num_neu; j++)
+        printf("%4.2g ",cortical_matrix[i][j]);
+      printf("\n");
+    }
+  }
 #endif
 
 #if POISSON_INPUT_USE

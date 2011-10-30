@@ -199,24 +199,17 @@ int read_cortical_matrix(const char *filepath, double **cor_mat)
   }
   if (!fin.good() || i != g_num_neu) {
     fin.close();
-    cout<<"Fail to read \""<<filepath<<"\" !  ";
-    cout<<"(File exists? Number of neurons match?)"<<endl;
-    cout<<"  Now set cortical matrix to ones(:,:)"<<endl;
-    for (int i=0; i<g_num_neu; i++)
-      for (int j=0; j<g_num_neu; j++)
-        cor_mat[i][j] = 1;
-    return -1;
+    if (filepath && filepath[0]=='*' && filepath[1]=='\0') {
+      for (int i=0; i<g_num_neu; i++)
+        for (int j=0; j<g_num_neu; j++)
+          cor_mat[i][j] = 1;
+      return 0;
+    } else {
+      return -1;
+    }
   }
   fin.close();
 
-  if (g_b_verbose) {
-    cout<<"Cortical matrix:"<<endl;
-    for (int i=0; i<g_num_neu; i++) {
-      for (int j=0; j<g_num_neu; j++)
-        cout<<std::setw(4)<<cortical_matrix[i][j]<<" ";
-      cout<<endl;
-    }
-  }
   return 0;
 }
 #endif
