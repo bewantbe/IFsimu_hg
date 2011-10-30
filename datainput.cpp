@@ -425,10 +425,6 @@ void setglobals()
 
   GLOBAL_STRA = (struct strobe **)tcalloc(
     g_num_neu*size_neuronvar/*number of variables*/, sizeof(struct strobe *));
-  for (i=0; i<g_num_neu*size_neuronvar; i++) {
-    GLOBAL_STRA[i]=strobemake(WINDOW_BIN_LENGTH/*ms*/,
-      SLIGHT_BIN/*ms*/,0/*we don't want to maintain cyclical average*/);
-  }
 }
 
 void input_initialization()
@@ -456,13 +452,14 @@ void input_initialization()
   }
 #endif
 
+  for (i=0; i<g_num_neu*size_neuronvar; i++) {
+    GLOBAL_STRA[i]=strobemake(WINDOW_BIN_LENGTH/*ms*/,
+      SLIGHT_BIN/*ms*/,0/*we don't want to maintain cyclical average*/);
+  }
+
   iset = 0;
   gset = 0.0;
   time_evolution = last_time;
-
-#if CORTICAL_STRENGTH_NONHOMO
-  CORTICAL_SEED = 20080321;
-#endif
 }
 
 #if POISSON_INPUT_USE

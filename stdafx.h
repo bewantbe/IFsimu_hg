@@ -217,8 +217,6 @@ extern struct raster RAS;
 #if CORTICAL_STRENGTH_NONHOMO
 // this matrix saves the cortical strength between neurons in the network
 extern double** cortical_matrix;
-// this is the random seed for generating random numbers
-extern long CORTICAL_SEED;
 #endif
 
 // this saves neuronal network information

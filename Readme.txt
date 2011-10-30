@@ -19,8 +19,9 @@ ZDZ 的程序的简化版的说明, v2.0.11 (alpha)
     -n N [N2]     神经元数, N 是兴奋型, N2 是抑制型. 省略 N2 相当于 N2=0
     -inf FILE     设置配置文件的路径. 默认是 test2.txt
     -mat FILE     设置连接矩阵的路径. 默认是 cortical_matrix.txt
-                  特别地,  -mat "*" 表示路径是完全图
-    -o FILE       设置输出电平文件的路径. 默认是 data/staffsave.txt
+                  特别地,  -mat - 表示路径是完全图
+    -o FILE       设置输出电平文件的路径, 若路径中的目录不存在, 程序会自动建立.
+                  默认是 data/staffsave.txt
     --save-conductance FILE
                   输出电导(兴奋电导)数据到文件 FILE
     --save-spike FILE
@@ -53,12 +54,13 @@ ZDZ 的程序的简化版的说明, v2.0.11 (alpha)
                   在命令行设置各个神经元的 poisson 输入强度(抑制型)倍率. 语法参见 --pr-mul
     -dt VALUE     设置时间步长为 VALUE
     --save-interval VALUE 或 -stv VALUE
-                  输出数据的记录间隔. 会被取为 dt 的整数倍(floor)
+                  输出数据的记录间隔. 若使用 --RC-filter, 会被更改 dt 为最近整数分之一.
     --seed-auto-on, --seed-auto-off
                   打开或关闭用微秒极(windows上是毫秒级)的系统时间设置随机种子. 默认是打开
     -seed VALUE   设置随机数种子, 隐含--seed-auto-off. 功能同配置文件中的 initial_seed
                   当 seed 设为 0 时, 相当于使用 test2.txt 中的 initial_seed.
     --RC-filter   使用 RC 低通滤波后再采样. 截止频率为"输出数据的记录间隔"对应的最高频率
+                  使用此选项时, dt 会强制设成 stv 的整数分之一.
     --RC-filter VALUEco VALUEci
                   使用 RC 低通滤波, 手动设置滤波系数. y[t] = co * y[t-dt] + ci * x[t]
                   输出的数据是 y[stv], y[2*stv], ..., y[k*stv]

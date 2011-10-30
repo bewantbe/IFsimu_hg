@@ -45,7 +45,6 @@ long initial_pertub_Ex_H;
 long initial_pertub_In_H;
 #endif
 #if CORTICAL_STRENGTH_NONHOMO
-long CORTICAL_SEED;
 double** cortical_matrix = NULL;
 #endif
 
@@ -308,7 +307,6 @@ unsigned int GetSeedFromTime()
 int main(int argc, char *argv[])
 {
   int verbose_gl = 0;
-  int rt = 0;           // temporarily space for function return value.
 
   // Command line parameter translation
   g_comp_time = COMP_TIME;
@@ -566,8 +564,9 @@ int main(int argc, char *argv[])
 
   if (g_simu_dt)        Tstep = g_simu_dt;
   if (g_save_intervel)  SLIGHT_BIN = g_save_intervel;
-  // truncate SLIGHT_BIN to multiple of Tstep, due to strobeupdate().
-  SLIGHT_BIN = floor(SLIGHT_BIN/Tstep)*Tstep;
+  // truncate SLIGHT_BIN to multiple of Tstep, due to strobeupdateRCfilter().
+  //SLIGHT_BIN = floor(SLIGHT_BIN/Tstep+0.1)*Tstep;
+  if (g_b_RC_filter) Tstep = SLIGHT_BIN/floor(SLIGHT_BIN/Tstep+0.1);
   if (g_strength_corEE != no_use_number) Strength_CorEE = g_strength_corEE;
   if (g_strength_corEI != no_use_number) Strength_CorIE = g_strength_corEI;  // note: the name is inversed
   if (g_strength_corIE != no_use_number) Strength_CorEI = g_strength_corIE;
@@ -592,7 +591,7 @@ int main(int argc, char *argv[])
 #if CORTICAL_STRENGTH_NONHOMO
   if (cor_mat_file[0]=='\0')
     strcpy(cor_mat_file, cor_mat_file_default);
-  rt = read_cortical_matrix(cor_mat_file, cortical_matrix);
+  int rt = read_cortical_matrix(cor_mat_file, cortical_matrix);
   if (rt<0) {
     printf("Error: Fail to read cortical matrix from file: \"%s\"\n", cor_mat_file);
     printf("  Is File exists? Is number of neurons match?\n");
@@ -618,13 +617,13 @@ int main(int argc, char *argv[])
     return 1;
   }
   if (arr_pr_tmp) {
-    for (int j=0; j<g_num_neu; j++) g_arr_poisson_rate[j] = arr_pr_tmp[j];
+    for (int j=0; j<g_num_neu; j++) g_arr_poisson_rate[j] *= arr_pr_tmp[j];
   }
   if (arr_ps_tmp) {
-    for (int j=0; j<g_num_neu; j++) g_arr_poisson_strength_E[j] = arr_ps_tmp[j];
+    for (int j=0; j<g_num_neu; j++) g_arr_poisson_strength_E[j] *= arr_ps_tmp[j];
   }
   if (arr_psi_tmp) {
-    for (int j=0; j<g_num_neu; j++) g_arr_poisson_strength_I[j] = arr_psi_tmp[j];
+    for (int j=0; j<g_num_neu; j++) g_arr_poisson_strength_I[j] *= arr_psi_tmp[j];
   }
   free(arr_pr_tmp);   arr_pr_tmp = NULL;
   free(arr_ps_tmp);   arr_ps_tmp = NULL;
@@ -679,8 +678,9 @@ int main(int argc, char *argv[])
     printf("Input type: %s\n", POISSON_INPUT_USE?"poisson":"current");
     if (g_b_verbose && POISSON_INPUT_USE)
       printf("  Random seed: %u\n", initial_seed);
-    printf("Cortical strength network type: %shomogeneous\n",
-           CORTICAL_STRENGTH_NONHOMO?"non-":"");
+    if (g_b_verbose)
+      printf("Cortical strength network type: %shomogeneous\n",
+             CORTICAL_STRENGTH_NONHOMO?"non-":"");
     printf("Simulation time: %g ms,  dt = %f ms\n", g_comp_time, Tstep);
     printf("Data record interval: %f ms\n", SLIGHT_BIN);
     if (SMOOTH_CONDUCTANCE_USE) printf("Use smoothed conductance.\n");
@@ -700,12 +700,14 @@ int main(int argc, char *argv[])
         nn = 16;
         printf("Only show first 16 neurons' detail:\n");
       }
+#if CORTICAL_STRENGTH_NONHOMO
       printf("Cortical matrix:\n");
       for (int i=0; i<nn; i++) {
         for (int j=0; j<nn; j++)
           printf("%4.2g ", cortical_matrix[i][j]);
         printf("\n");
       }
+#endif
       printf("pr: ");
       for (int j=0; j<nn; j++) printf("%g, ", g_arr_poisson_rate[j]);
       printf("\nps: ");

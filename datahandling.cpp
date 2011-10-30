@@ -52,37 +52,26 @@ struct strobe * strobemake(int length,double update_timestep,int cycle_bother)
   return st;
 }
 
-// Only suitable for truncated update_timestep
-void strobeupdateRCFilter(struct strobe *st, double t, double DT, double val)
-{
-  double vo = g_RC_filter_ci * val + g_RC_filter_co * st->data[st->tab];
-  if (t+DT*(1+1e-9) >= st->last_time + st->update_timestep) {
-    st->last_time = t+DT;
-    if (++st->tab == st->length)
-      st->tab = 0;
-  }
-  st->data[st->tab] = vo;
-}
-
+// there is actually a small bug here: the first strobe data has only 4 data
+// if you set st->update_timestep = 5*DT
 void strobeupdate(struct strobe *st, double t, double DT, double val)
 {
   /* this averages, rather than strobes, which is better for spike statistics
      in addition, time-steps are resolved accurately */
   double oldstep=0, newstep=0,
          nexttime = st->last_time + st->update_timestep;
-  int oldtab=0,newtab=0;
+  int newtab=0;
   if (t+DT < nexttime) {
     st->data[st->tab] += val * DT / st->update_timestep;
   } else { /* if (t+DT >= nexttime) */
     oldstep = minimum(st->update_timestep, maximum(0, nexttime-t));
     newstep = minimum(st->update_timestep, maximum(0, t+DT-nexttime));
-    oldtab = st->tab;
-    st->data[oldtab] += val * oldstep / st->update_timestep;
+    st->data[st->tab] += val * oldstep / st->update_timestep;
     newtab = st->tab+1;
     if (newtab == st->length) {
-      int i=0;
       newtab = 0;
       if (st->cycle_bother) {
+        int i=0;
         for (i=0; i<st->length; i++) {
           st->cycledata[i] += st->data[i];
         }
@@ -92,27 +81,41 @@ void strobeupdate(struct strobe *st, double t, double DT, double val)
     st->data[newtab] = val * newstep / st->update_timestep;
     st->tab = newtab;
 //    st->last_time = maximum(t+DT, st->last_time + st->update_timestep);
-    st->last_time = st->last_time + st->update_timestep;
+    st->last_time = nexttime;
   }
 }
 
-void strobeupdate_old(struct strobe *st, double t, double val)
+// Only suitable for truncated update_timestep and dt
+void strobeupdateRCFilter(struct strobe *st, double t, double DT, double val)
 {
-  /* this strobes, as opposed to averaging, which is not good for discontinuous data
-	 like spike statistics */
-  if (t >= st->last_time + st->update_timestep){
-    st->data[st->tab] = val; st->tab++;
-    if (st->tab >= st->length){
-      st->tab=0;
-      if (st->cycle_bother) {
-        for (int i=0; i<st->length; i++)
-          st->cycledata[i] += st->data[i];
-        st->cyclenum++;
-      }
-    }
-    st->last_time = maximum(t,st->last_time + st->update_timestep);
+  double vo = g_RC_filter_co * st->data[st->tab] + g_RC_filter_ci * val;
+  if (t+DT/2 >= st->last_time + st->update_timestep) {
+    // due to floating point error, you can't set it to st->last_time + st->update_timestep
+    st->last_time = t;
+    if (++st->tab == st->length)
+      st->tab = 0;
   }
+  st->data[st->tab] = vo;
 }
+
+// now you can use cmd parameter "--RC-filter 0 1" to get the same results
+//void strobeupdate_old(struct strobe *st, double t, double val)
+//{
+//  /* this strobes, as opposed to averaging, which is not good for discontinuous data
+//	 like spike statistics */
+//  if (t >= st->last_time + st->update_timestep){
+//    st->data[st->tab] = val; st->tab++;
+//    if (st->tab >= st->length){
+//      st->tab=0;
+//      if (st->cycle_bother) {
+//        for (int i=0; i<st->length; i++)
+//          st->cycledata[i] += st->data[i];
+//        st->cyclenum++;
+//      }
+//    }
+//    st->last_time = maximum(t,st->last_time + st->update_timestep);
+//  }
+//}
 
 void strobetfree(struct strobe *st)
 {

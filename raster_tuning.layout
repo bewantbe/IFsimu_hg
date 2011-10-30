@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release Linux" />
+	<ActiveTarget name="Debug Linux" />
 	<File name="Readme.txt" open="0" top="0" tabpos="0">
 		<Cursor position="3489" topLine="22" />
 	</File>
@@ -8,13 +8,13 @@
 		<Cursor position="270" topLine="0" />
 	</File>
 	<File name="datahandling.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="1660" topLine="0" />
+		<Cursor position="10113" topLine="0" />
 	</File>
 	<File name="datahandling.h" open="0" top="0" tabpos="7">
-		<Cursor position="1307" topLine="0" />
+		<Cursor position="2567" topLine="18" />
 	</File>
-	<File name="datainput.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="5670" topLine="183" />
+	<File name="datainput.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="108" topLine="0" />
 	</File>
 	<File name="datainput.h" open="0" top="0" tabpos="8">
 		<Cursor position="670" topLine="0" />
@@ -26,7 +26,7 @@
 		<Cursor position="1352" topLine="25" />
 	</File>
 	<File name="myopengl.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="13464" topLine="447" />
+		<Cursor position="176" topLine="0" />
 	</File>
 	<File name="myopengl.h" open="0" top="0" tabpos="3">
 		<Cursor position="0" topLine="0" />
@@ -38,28 +38,28 @@
 		<Cursor position="1340" topLine="0" />
 	</File>
 	<File name="poisson_input.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="6697" topLine="143" />
+		<Cursor position="33144" topLine="790" />
 	</File>
 	<File name="poisson_input.h" open="0" top="0" tabpos="7">
 		<Cursor position="796" topLine="8" />
 	</File>
 	<File name="random.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="1475" topLine="52" />
+		<Cursor position="280" topLine="11" />
 	</File>
 	<File name="random.h" open="0" top="0" tabpos="8">
 		<Cursor position="269" topLine="0" />
 	</File>
-	<File name="raster.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="1173" topLine="42" />
+	<File name="raster.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="1317" topLine="42" />
 	</File>
 	<File name="raster.h" open="0" top="0" tabpos="4">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="raster_tuning.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="24723" topLine="690" />
+	<File name="raster_tuning.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="21311" topLine="582" />
 	</File>
-	<File name="stdafx.h" open="1" top="0" tabpos="2">
-		<Cursor position="796" topLine="0" />
+	<File name="stdafx.h" open="1" top="1" tabpos="2">
+		<Cursor position="2880" topLine="78" />
 	</File>
 	<File name="test.txt" open="0" top="0" tabpos="0">
 		<Cursor position="405" topLine="0" />
