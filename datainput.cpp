@@ -43,6 +43,7 @@ void readinput(char *filename)
       }
       continue;
     }
+#if POISSON_INPUT_USE
     if (strcmp(varname,"Strength_Exinput")==0) {
       data_readin>>Strength_Exinput;
       if (verbose) {
@@ -59,6 +60,24 @@ void readinput(char *filename)
       }
       continue;
     }
+#else
+    if (strcmp(varname,"average_current")==0) {
+      data_readin>>Current_0;
+      if (verbose) {
+        cout<<"average external current read to be: "
+            <<Current_0<<endl;
+      }
+      continue;
+    }
+    if (strcmp(varname,"amplitude_current")==0) {
+      data_readin>>Current_1;
+      if (verbose) {
+        cout<<"average external current read to be: "
+            <<Current_1<<endl;
+      }
+      continue;
+    }
+#endif
     if (strcmp(varname,"Strength_CorEE")==0) {
       data_readin>>Strength_CorEE;
       if (verbose) {
@@ -143,22 +162,6 @@ void readinput(char *filename)
       }
       continue;
     }
-    if (strcmp(varname,"average_current")==0) {
-      data_readin>>Current_0;
-      if (verbose) {
-        cout<<"average external current read to be: "
-            <<Current_0<<endl;
-      }
-      continue;
-    }
-    if (strcmp(varname,"amplitude_current")==0) {
-      data_readin>>Current_1;
-      if (verbose) {
-        cout<<"average external current read to be: "
-            <<Current_1<<endl;
-      }
-      continue;
-    }
     if (strcmp(varname,"last_time")==0) {
       data_readin>>last_time;
       if (verbose) {
@@ -199,11 +202,11 @@ int read_cortical_matrix(const char *filepath, double **cor_mat)
   }
   if (!fin.good() || i != g_num_neu) {
     fin.close();
-    if (filepath && filepath[0]=='*' && filepath[1]=='\0') {
+    if (filepath && filepath[0]=='-' && filepath[1]=='\0') {
       for (int i=0; i<g_num_neu; i++)
         for (int j=0; j<g_num_neu; j++)
           cor_mat[i][j] = 1;
-      return 0;
+      return 1;
     } else {
       return -1;
     }
@@ -328,13 +331,6 @@ void setglobals()
   raster_initialize(RAS);
   raster_allocate(RAS, RASTER_SIZE);
 
-  // each neuron has different phase for external input current!
-  phase = (double *)malloc(g_num_neu*sizeof(double));
-  P_NULL_ERR(phase, err_st_mem);
-  for (i=0; i<g_num_neu; i++) {
-    phase[i] = 2*PI*i/g_num_neu;
-  }
-
 #if CORTICAL_STRENGTH_NONHOMO
   cortical_matrix = (double**)malloc(g_num_neu*sizeof(double*));
   P_NULL_ERR(cortical_matrix, err_st_mem);
@@ -417,6 +413,13 @@ void setglobals()
     g_arr_poisson_rate[j] = 1;
     g_arr_poisson_strength_E[j] = 1;
     g_arr_poisson_strength_I[j] = 1;
+  }
+#else
+  // each neuron has different phase for external input current!
+  phase = (double *)malloc(g_num_neu*sizeof(double));
+  P_NULL_ERR(phase, err_st_mem);
+  for (i=0; i<g_num_neu; i++) {
+    phase[i] = 2*M_PI*i/g_num_neu;
   }
 #endif
 
@@ -519,7 +522,6 @@ void data_dump()
   raster_destroy(RAS);
   raster_destroy(spike_list);
   free(neu);                          neu = NULL;
-  free(phase);                        phase = NULL;
 #if POISSON_INPUT_USE
   free(poisson_input);                poisson_input = NULL;
   free(g_arr_poisson_rate);           g_arr_poisson_rate = NULL;
@@ -532,6 +534,8 @@ void data_dump()
   free(ran_iv);                       ran_iv = NULL;
   free(last_input);                   last_input = NULL;
   free(initialseed_neuron);           initialseed_neuron = NULL;
+#else
+  free(phase);                        phase = NULL;
 #endif
 #if CORTICAL_STRENGTH_NONHOMO
   free(cortical_matrix);              cortical_matrix = NULL;

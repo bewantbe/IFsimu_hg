@@ -5,31 +5,6 @@
 #include "poisson_input.h"
 #include "myopengl.h"
 
-#ifdef _WINDOWS_USE_
-unsigned int GetSeedFromTime()
-{
-  SYSTEMTIME sys_time;
-  GetLocalTime(&sys_time);
-  //QueryPerformanceCounter
-  return (unsigned int)sys_time.wMilliseconds+(((sys_time.wDay*24+sys_time.wHour)*60+sys_time.wMinute)*60+sys_time.wSecond) * 1000;
-}
-#else
-#include <sys/time.h>
-unsigned int GetSeedFromTime()
-{
-  struct timeval tv;
-  if (gettimeofday(&tv, NULL) != 0) {
-    printf("Error: gettimeofday: Fail to get system time! (for random seed)");
-    perror("");
-    tv.tv_sec = time(NULL);
-    if (tv.tv_sec == ((time_t) -1)) {
-      perror("Tried to use time(), but failed.");
-    }
-  }
-  return (unsigned int)(tv.tv_sec*1000000 + tv.tv_usec);
-}
-#endif
-
 int RUN_DONE = 0;
 
 GLfloat xdepth = 0.0;
@@ -305,9 +280,35 @@ int CheckDirAndCreate(const char *filepath)
   return 0;
 }
 
+#ifdef _WINDOWS_USE_
+unsigned int GetSeedFromTime()
+{
+  SYSTEMTIME sys_time;
+  GetLocalTime(&sys_time);
+  //QueryPerformanceCounter
+  return (unsigned int)sys_time.wMilliseconds+(((sys_time.wDay*24+sys_time.wHour)*60+sys_time.wMinute)*60+sys_time.wSecond) * 1000;
+}
+#else
+#include <sys/time.h>
+unsigned int GetSeedFromTime()
+{
+  struct timeval tv;
+  if (gettimeofday(&tv, NULL) != 0) {
+    printf("Error: gettimeofday: Fail to get system time! (for random seed)");
+    perror("");
+    tv.tv_sec = time(NULL);
+    if (tv.tv_sec == ((time_t) -1)) {
+      perror("Tried to use time(), but failed.");
+    }
+  }
+  return (unsigned int)(tv.tv_sec*1000000 + tv.tv_usec);
+}
+#endif
+
 int main(int argc, char *argv[])
 {
   int verbose_gl = 0;
+  int rt = 0;           // temporarily space for function return value.
 
   // Command line parameter translation
   g_comp_time = COMP_TIME;
@@ -591,20 +592,17 @@ int main(int argc, char *argv[])
 #if CORTICAL_STRENGTH_NONHOMO
   if (cor_mat_file[0]=='\0')
     strcpy(cor_mat_file, cor_mat_file_default);
-  if (read_cortical_matrix(cor_mat_file, cortical_matrix)!=0) {
-    printf("Fail to read cortical matrix from file: \"%s\"\n", cor_mat_file);
-    printf("Is File exists? Is number of neurons match?\n");
-    printf("Or may be you want to try -mat \"*\" to get a complete graph connection.\n");
+  rt = read_cortical_matrix(cor_mat_file, cortical_matrix);
+  if (rt<0) {
+    printf("Error: Fail to read cortical matrix from file: \"%s\"\n", cor_mat_file);
+    printf("  Is File exists? Is number of neurons match?\n");
+    printf("  Or may be you want to try \"-mat -\" to get a complete graph connection.\n");
     printf("Program terminated.\n");
     return 1;
   }
-  if (g_b_verbose) {
-    printf("Cortical matrix:\n");
-    for (int i=0; i<g_num_neu; i++) {
-      for (int j=0; j<g_num_neu; j++)
-        printf("%4.2g ",cortical_matrix[i][j]);
-      printf("\n");
-    }
+  if (rt==1) {
+    printf("Warning: The file name of cortical matrix is \"%s\"\n", cor_mat_file);
+    printf("         which means a complete graph connection.\n");
   }
 #endif
 
@@ -698,9 +696,15 @@ int main(int argc, char *argv[])
     printf("Poisson input rate = %g\n", Rate_input);
     {
       int nn = g_num_neu;
-      if (nn>20) {
-        nn = 20;
-        printf("  Only show first 20 neurons...\n");
+      if (nn>16) {
+        nn = 16;
+        printf("Only show first 16 neurons' detail:\n");
+      }
+      printf("Cortical matrix:\n");
+      for (int i=0; i<nn; i++) {
+        for (int j=0; j<nn; j++)
+          printf("%4.2g ", cortical_matrix[i][j]);
+        printf("\n");
       }
       printf("pr: ");
       for (int j=0; j<nn; j++) printf("%g, ", g_arr_poisson_rate[j]);

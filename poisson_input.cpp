@@ -18,7 +18,7 @@ inline void force_inputR( neuron *tempneu, int index_neuron)
 //  tempneu[index_neuron].value[2*Stepsmooth_Con] += Strength_Ininput;
   tempneu[index_neuron].value[2*Stepsmooth_Con] += g_arr_poisson_strength_I[index_neuron];
 }
-#else
+#else  // of SMOOTH_CONDUCTANCE_USE
 // only use excitatory conductance and inhibitory conductance: GE and GI
 void force_input( neuron *tempneu, int index_neuron)
 {
@@ -29,35 +29,60 @@ void force_input( neuron *tempneu, int index_neuron)
 //  tempneu[index_neuron].value[Stepsmooth_Con+1] += Strength_Ininput*5.0/(Time_InCon);
   tempneu[index_neuron].value[Stepsmooth_Con+1] += g_arr_poisson_strength_I[index_neuron];
 }
-#endif
-#endif
+#endif  // SMOOTH_CONDUCTANCE_USE
 
-// only use excitatory conductance and inhibitory conductance: GE and GI
-void force_cortic( neuron *tempneu, int index_neuron, int index_spikingneuron)
+// cortical interaction by conductance, external input either by conductance
+void voltage_dt(int index_neuron, double t, double gE, double gI, double v, double &dv_dt)
 {
-  if (index_neuron != index_spikingneuron) {
-#if CORTICAL_STRENGTH_NONHOMO
-    tempneu[index_neuron].value[1] +=
-       tempneu[index_spikingneuron].type *    tempneu[index_neuron].type
-       * Strength_CorEE * cortical_matrix[index_neuron][index_spikingneuron]
-     + tempneu[index_spikingneuron].type * (1-tempneu[index_neuron].type)
-       * Strength_CorIE * cortical_matrix[index_neuron][index_spikingneuron];
+  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
+          - gI*(v - Vot_Inhibitory);
+}
 
-    tempneu[index_neuron].value[Stepsmooth_Con+1] +=
-       (1-tempneu[index_spikingneuron].type) *    tempneu[index_neuron].type
-       * Strength_CorEI * cortical_matrix[index_neuron][index_spikingneuron]
-     + (1-tempneu[index_spikingneuron].type) * (1-tempneu[index_neuron].type)
-       * Strength_CorII * cortical_matrix[index_neuron][index_spikingneuron];
-#else
-    tempneu[index_neuron].value[1] +=
-       tempneu[index_spikingneuron].type *    tempneu[index_neuron].type  * Strength_CorEE
-     + tempneu[index_spikingneuron].type * (1-tempneu[index_neuron].type) * Strength_CorIE;
+#else   // of POISSON_INPUT_USE
 
-    tempneu[index_neuron].value[Stepsmooth_Con+1] +=
-       (1-tempneu[index_spikingneuron].type) *    tempneu[index_neuron].type  * Strength_CorEI
-     + (1-tempneu[index_spikingneuron].type) * (1-tempneu[index_neuron].type) * Strength_CorII;
-#endif
-  }
+double external_current(int index_neuron, double t)
+{
+  return (Current_0 + Current_1*cos(2*M_PI*Rate_input*t+phase[index_neuron]));
+}
+
+// cortical interaction by conductance, external input either by current
+void voltage_dt(int index_neuron, double t, double gE, double gI, double v, double &dv_dt)
+{
+  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
+          - gI*(v - Vot_Inhibitory) + external_current(index_neuron, t);
+}
+
+#endif  // POISSON_INPUT_USE
+
+
+#if SMOOTH_CONDUCTANCE_USE
+
+// use smooth conductance
+void conductance_evolve( neuron *tempneu, int index_neuron, double subTstep)
+{
+//******************************************************************************
+//********************** renew the Excitatory conductance
+  // renew the ex-conductance with highest smoothness
+  tempneu[index_neuron].value[1] =
+    tempneu[index_neuron].value[1]*exp(-subTstep/Time_ExCon)
+   +1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
+    *(exp(-subTstep/Time_ExConR) - exp(-subTstep/Time_ExCon))
+    *tempneu[index_neuron].value[Stepsmooth_Con];
+
+  tempneu[index_neuron].value[Stepsmooth_Con] =
+    tempneu[index_neuron].value[Stepsmooth_Con]*exp(-subTstep/Time_ExConR);
+
+//******************************************************************************
+//********************* renew the Inhibitory conductance
+  // renew the in-conductance with highest smoothness
+  tempneu[index_neuron].value[Stepsmooth_Con+1] =
+    tempneu[index_neuron].value[Stepsmooth_Con+1]*exp(-subTstep/Time_InCon)
+   +1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
+    *(exp(-subTstep/Time_InConR) - exp(-subTstep/Time_InCon))
+    *tempneu[index_neuron].value[2*Stepsmooth_Con];
+
+  tempneu[index_neuron].value[2*Stepsmooth_Con] =
+    tempneu[index_neuron].value[2*Stepsmooth_Con]*exp(-subTstep/Time_InConR);
 }
 
 // use smooth conductance HE and HI
@@ -88,6 +113,8 @@ void force_corticR(neuron *tempneu, int index_neuron, int index_spikingneuron)
   }
 }
 
+#else  // of SMOOTH_CONDUCTANCE_USE
+
 // use non-smooth conductance
 void conductance_decay( neuron *tempneu, int index_neuron, double subTstep)
 {
@@ -100,51 +127,38 @@ void conductance_decay( neuron *tempneu, int index_neuron, double subTstep)
     tempneu[index_neuron].value[Stepsmooth_Con+1]*exp(-subTstep/Time_InCon);
 }
 
-// use smooth conductance
-void conductance_evolve( neuron *tempneu, int index_neuron, double subTstep)
+// only use excitatory conductance and inhibitory conductance: GE and GI
+void force_cortic( neuron *tempneu, int index_neuron, int index_spikingneuron)
 {
-//******************************************************************************
-//********************** renew the Excitatory conductance
-  // renew the ex-conductance with highest smoothness
-  tempneu[index_neuron].value[1] =
-    tempneu[index_neuron].value[1]*exp(-subTstep/Time_ExCon)
-   +1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-    *(exp(-subTstep/Time_ExConR) - exp(-subTstep/Time_ExCon))
-    *tempneu[index_neuron].value[Stepsmooth_Con];
+  if (index_neuron != index_spikingneuron) {
+#if CORTICAL_STRENGTH_NONHOMO
+    tempneu[index_neuron].value[1] +=
+       tempneu[index_spikingneuron].type *    tempneu[index_neuron].type
+       * Strength_CorEE * cortical_matrix[index_neuron][index_spikingneuron]
+     + tempneu[index_spikingneuron].type * (1-tempneu[index_neuron].type)
+       * Strength_CorIE * cortical_matrix[index_neuron][index_spikingneuron];
 
-  tempneu[index_neuron].value[Stepsmooth_Con] =
-    tempneu[index_neuron].value[Stepsmooth_Con]*exp(-subTstep/Time_ExConR);
-
-//******************************************************************************
-//********************* renew the Inhibitory conductance
-  // renew the in-conductance with highest smoothness
-  tempneu[index_neuron].value[Stepsmooth_Con+1] =
-    tempneu[index_neuron].value[Stepsmooth_Con+1]*exp(-subTstep/Time_InCon)
-   +1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-    *(exp(-subTstep/Time_InConR) - exp(-subTstep/Time_InCon))
-    *tempneu[index_neuron].value[2*Stepsmooth_Con];
-
-  tempneu[index_neuron].value[2*Stepsmooth_Con] =
-    tempneu[index_neuron].value[2*Stepsmooth_Con]*exp(-subTstep/Time_InConR);
-}
-
-double external_current(int index_neuron, double t)
-{
-  return (Current_0 + Current_1*cos(2*PI*Rate_input*t+phase[index_neuron]));
-}
-
-// cortical interaction by conductance, external input either by current or by conductance
-void voltage_dt(int index_neuron, double t, double gE, double gI, double v, double &dv_dt)
-{
-#if POISSON_INPUT_USE
-  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
-          - gI*(v - Vot_Inhibitory);
+    tempneu[index_neuron].value[Stepsmooth_Con+1] +=
+       (1-tempneu[index_spikingneuron].type) *    tempneu[index_neuron].type
+       * Strength_CorEI * cortical_matrix[index_neuron][index_spikingneuron]
+     + (1-tempneu[index_spikingneuron].type) * (1-tempneu[index_neuron].type)
+       * Strength_CorII * cortical_matrix[index_neuron][index_spikingneuron];
 #else
-  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
-          - gI*(v - Vot_Inhibitory) + external_current(index_neuron, t);
+    tempneu[index_neuron].value[1] +=
+       tempneu[index_spikingneuron].type *    tempneu[index_neuron].type  * Strength_CorEE
+     + tempneu[index_spikingneuron].type * (1-tempneu[index_neuron].type) * Strength_CorIE;
+
+    tempneu[index_neuron].value[Stepsmooth_Con+1] +=
+       (1-tempneu[index_spikingneuron].type) *    tempneu[index_neuron].type  * Strength_CorEI
+     + (1-tempneu[index_spikingneuron].type) * (1-tempneu[index_neuron].type) * Strength_CorII;
 #endif
+  }
 }
 
+#endif  // SMOOTH_CONDUCTANCE_USE
+
+
+#if runge_kutta == runge_kutta2
 void runge_kutta2(neuron *tempneu, int index_neuron, double subTstep,
                   double t_evolution, double &temp_vot,
                   void (*dvdt)(int index_neuron, double t, double gE, double gI,
@@ -206,7 +220,9 @@ void runge_kutta2(neuron *tempneu, int index_neuron, double subTstep,
     temp_vot = v0 + m2*newstep;
   }
 }
+#endif
 
+#if runge_kutta == runge_kutta3
 void runge_kutta3(neuron *tempneu, int index_neuron, double subTstep,
                   double t_evolution, double &temp_vot,
                   void (*dvdt)(int index_neuron, double t, double gE, double gI,
@@ -282,7 +298,9 @@ void runge_kutta3(neuron *tempneu, int index_neuron, double subTstep,
     temp_vot = v0 + (m1 + 3*m3)*newstep/4;
   }
 }
+#endif
 
+#if runge_kutta == runge_kutta4
 void runge_kutta4(neuron *tempneu, int index_neuron, double subTstep,
                   double t_evolution, double &temp_vot,
                   void (*dvdt)(int index_neuron, double t, double gE, double gI,
@@ -365,6 +383,7 @@ void runge_kutta4(neuron *tempneu, int index_neuron, double subTstep,
     temp_vot = VOT_RESET;
   }
 }
+#endif
 
 void hermit(double a, double b, double va, double vb,
             double dva, double dvb, double x, double &fx)
@@ -511,18 +530,8 @@ void single_neuron_test(neuron *tempneu, int index_neuron, int firing_neuron,
       return;
     }
 
-#if RK2_RUN
-    runge_kutta2(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-                 voltage_dt);
-#endif
-#if RK3_RUN
-    runge_kutta3(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-                 voltage_dt);
-#endif
-#if RK4_RUN
-    runge_kutta4(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-                 voltage_dt);
-#endif
+    runge_kutta(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
+                voltage_dt);
 
     // neuron is firing without poisson input spikes
     if(temp_vot >= Vot_Threshold) {
@@ -560,18 +569,8 @@ void single_neuron_test(neuron *tempneu, int index_neuron, int firing_neuron,
       continue;
     }
 
-#if RK2_RUN
-    runge_kutta2(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-                 voltage_dt);
-#endif
-#if RK3_RUN
-    runge_kutta3(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-                 voltage_dt);
-#endif
-#if RK4_RUN
-    runge_kutta4(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-                 voltage_dt);
-#endif
+    runge_kutta(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
+                voltage_dt);
 
 //******************************************************************************
     if(temp_vot >= Vot_Threshold) {
@@ -619,18 +618,8 @@ void single_neuron_test(neuron *tempneu, int index_neuron, int firing_neuron,
     return;
   }
 
-#if RK2_RUN
-  runge_kutta2(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-               voltage_dt);
-#endif
-#if RK3_RUN
-  runge_kutta3(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-               voltage_dt);
-#endif
-#if RK4_RUN
-  runge_kutta4(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-               voltage_dt);
-#endif
+  runge_kutta(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
+              voltage_dt);
 
 //******************************************************************************
   if(temp_vot >= Vot_Threshold) {
@@ -658,7 +647,8 @@ void single_neuron_test(neuron *tempneu, int index_neuron, int firing_neuron,
   // cortical force to conductance is done outside this function!
   begin_poisson_index[index_neuron] = j;
 }
-#endif
+
+#else  // of POISSON_INPUT_USE
 
 // This is for non-poisson input only current input case!!!
 void single_neuron_test(neuron *tempneu, int index_neuron, int firing_neuron,
@@ -693,20 +683,9 @@ void single_neuron_test(neuron *tempneu, int index_neuron, int firing_neuron,
 
     return;
   }
-#if RK2_RUN
-  runge_kutta2(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-               voltage_dt);
-#endif
 
-#if RK3_RUN
-  runge_kutta3(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-               voltage_dt);
-#endif
-
-#if RK4_RUN
-  runge_kutta4(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-               voltage_dt);
-#endif
+  runge_kutta(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
+              voltage_dt);
 
 //******************************************************************************
   // neuron is firing without poisson input spikes
@@ -729,6 +708,7 @@ void single_neuron_test(neuron *tempneu, int index_neuron, int firing_neuron,
 #endif
 
 }
+#endif  // POISSON_INPUT_USE
 
 void next_cortical_spike(neuron *tempneu, double begin_time,
                          int *tempbegin_poisson_index)
