@@ -1016,15 +1016,14 @@ void LastRun()
     printf("t_end: %g ms\n", time_evolution);
   // save voltages
   if (!g_b_save_while_cal) {
-    FILE *fout = fopen(g_staffsave_path, "w");
     for (int k = 0; k < GLOBAL_STRA[0]->tab; k++) {
       // loop for each neuron, see the structure of GLOBAL_STRA
       for (int i = 0*g_num_neu; i < 1*g_num_neu; i++) {
-        fprintf(fout, "%19.16f ", GLOBAL_STRA[i]->data[k]);
+        fprintf(g_fout, "%19.16f ", GLOBAL_STRA[i]->data[k]);
       }
-      fprintf(fout,"\n");
+      fprintf(g_fout,"\n");
     }
-    fclose(fout);
+    fclose(g_fout);
   } else {
     fclose(g_fout);
   }
@@ -1036,10 +1035,14 @@ void LastRun()
   // neuron index starting from one
   if (g_ras_path[0]) {
     FILE *frasout = fopen(g_ras_path, "w");
-    for (int k=0; k<RAS.ras_index; k++) {
-      fprintf(frasout, "%d\t%f\n", RAS.array_index[k]+1, RAS.array_firingtime[k]);
+    if (frasout==NULL) {
+      printf("Error: Fail to open \"%s\" for spike time file output!\n", g_ras_path);
+    } else {
+      for (int k=0; k<RAS.ras_index; k++) {
+        fprintf(frasout, "%d\t%f\n", RAS.array_index[k]+1, RAS.array_firingtime[k]);
+      }
+      fclose(frasout);
     }
-    fclose(frasout);
 
     /// count firing number (of each neuron) in each interval outTstep
 //    const double outTstep = 32*Tstep;
@@ -1089,9 +1092,14 @@ void LastRun()
   }
   if (g_spike_interval_path[0]) {
     FILE *fout = fopen(g_spike_interval_path, "w");
-    for (int i=0; i<g_num_neu; i++)
-      fprintf(fout, "%g ", time_evolution/frct[i]);
-    fclose(fout);
+    if (fout==NULL) {
+      printf("Error: Fail to open \"%s\" for average firing interval output!\n",
+             g_spike_interval_path);
+    } else {
+      for (int i=0; i<g_num_neu; i++)
+        fprintf(fout, "%g ", time_evolution/frct[i]);
+      fclose(fout);
+    }
   }
   free(frct);
 }

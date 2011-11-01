@@ -2,15 +2,15 @@
 #define _DATAINPUT_H_
 
 // read data from input file to set up some global variables
-void readinput(char *filename);
+int readinput(char *filename);
 
 int read_cortical_matrix(const char *filepath, double **cor_mat);
-int Str2Arr(const char *c_str, double *a);
-int ReadPR(const char *filename, double *r);
+int Str2Arr(const char *c_str, double *a, int size);
+int ReadPR(const char *filename, double *r, int size);
 int ReadPS(const char *filename, double *ae, double *ai);
 
 // initial setup of global variables, such as assigning space ...
-void setglobals();
+int setglobals();
 
 // initial setup for the external drive, the neurons' information, ...
 void input_initialization();

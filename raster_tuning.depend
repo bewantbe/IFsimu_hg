@@ -1996,14 +1996,12 @@
 	"stdafx.h"
 	"datahandling.h"
 
-1320166381 /home/xyy82148/code/sci/IFsimu/stdafx.h
+1320175990 /home/xyy82148/code/sci/IFsimu/stdafx.h
 	<stdio.h>
 	<stdlib.h>
 	<limits.h>
 	<math.h>
-	<time.h>
 	<string.h>
-	<assert.h>
 	<windows.h>
 	<unistd.h>
 	<GL/gl.h>
@@ -2021,7 +2019,7 @@
 
 1317658995 /home/xyy82148/code/sci/IFsimu/datahandling.h
 
-1320164268 source:/home/xyy82148/code/sci/IFsimu/datainput.cpp
+1320178699 source:/home/xyy82148/code/sci/IFsimu/datainput.cpp
 	"stdafx.h"
 	"random.h"
 	"datainput.h"
@@ -2033,7 +2031,7 @@
 
 1317658995 /home/xyy82148/code/sci/IFsimu/random.h
 
-1317658995 /home/xyy82148/code/sci/IFsimu/datainput.h
+1320177649 /home/xyy82148/code/sci/IFsimu/datainput.h
 
 1317658995 source:/home/xyy82148/code/sci/IFsimu/loop.cpp
 	"stdafx.h"
@@ -2053,11 +2051,11 @@
 
 1317658995 /home/xyy82148/code/sci/IFsimu/poisson_input.h
 
-1317658995 source:/home/xyy82148/code/sci/IFsimu/neuron.cpp
+1320167893 source:/home/xyy82148/code/sci/IFsimu/neuron.cpp
 	"stdafx.h"
 	"neuron.h"
 
-1319981194 source:/home/xyy82148/code/sci/IFsimu/poisson_input.cpp
+1320179765 source:/home/xyy82148/code/sci/IFsimu/poisson_input.cpp
 	"stdafx.h"
 	"loop.h"
 	"neuron.h"
@@ -2074,10 +2072,11 @@
 	"stdafx.h"
 	"raster.h"
 
-1320164268 source:/home/xyy82148/code/sci/IFsimu/raster_tuning.cpp
+1320180515 source:/home/xyy82148/code/sci/IFsimu/raster_tuning.cpp
 	"stdafx.h"
 	<sys/types.h>
 	<sys/stat.h>
+	<time.h>
 	"datainput.h"
 	"poisson_input.h"
 	"myopengl.h"

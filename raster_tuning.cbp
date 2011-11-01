@@ -13,7 +13,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-ng -t 10000 -seed 0 -n 2 -pr 1 -ps 0.012 --psi-mul" />
+				<Option parameters=' -ng -t 10000 -seed 0 --bin-save -n 2 -pr 1 -ps 0.012 -inf &quot;/etc/network/interfaces&quot;' />
 				<Compiler>
 					<Add option="-pedantic" />
 					<Add option="-g" />

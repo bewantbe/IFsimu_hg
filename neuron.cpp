@@ -45,7 +45,6 @@ void neuron_copy(neuron &neu, const neuron &src)
     neu.state_neuron = src.state_neuron;
     neu.step_conductance = src.step_conductance;
     neu.value = (double*)malloc((2*src.step_conductance+2)*sizeof(double));
-    assert(neu.value);
     memcpy(neu.value, src.value, (2*src.step_conductance+2)*sizeof(double));
   }
 }
@@ -58,7 +57,6 @@ void neuron_copy_2(neuron &neu, const neuron &src)
   }
   if(neu.is_allocated == false) {
     neu.value = (double*)malloc((2*src.step_conductance+2)*sizeof(double));
-    assert(neu.value);
     neu.is_allocated = true;
   }
   neu.type = src.type;

@@ -10,20 +10,19 @@
 using std::cout;
 using std::endl;
 
-void readinput(char *filename)
+int readinput(char *filename)
 {
   int verbose = g_b_verbose_debug;
-  char varname[64];
+  char varname[128];
   double temp = 0.0;
 
-  std::ifstream data_readin;
-  data_readin.open(filename, std::ios::in);
+  if (filename==NULL || filename[0]=='\0')  // no path?
+    return 1;
 
-  if (!data_readin.good()) {
-    cout<<"bad file name: "<<filename<<endl;
-    cout<<"note : please also check the path."<<endl;
-    exit(-2);
-  }
+  std::ifstream data_readin(filename);
+
+  if (!data_readin.good())  // bad file name?
+    return -1;
 
   while (!data_readin.eof()) {
     data_readin>>varname;
@@ -177,7 +176,8 @@ void readinput(char *filename)
     }
   }
   data_readin.close();
-  data_readin.clear();
+
+  return 0;
 }
 
 #if CORTICAL_STRENGTH_NONHOMO
@@ -231,7 +231,7 @@ bool IsEmptyStr(const char *st)
 // conver string to array, won't change the value of the one not given
 // return the number of numbers in st
 // No error checking, use with careful
-int Str2Arr(const char *c_str, double *a)
+int Str2Arr(const char *c_str, double *a, int size)
 {
   std::istringstream sin(c_str);
   std::string sst;
@@ -240,13 +240,15 @@ int Str2Arr(const char *c_str, double *a)
     std::string::size_type idx = sst.find('@');
     if (idx == std::string::npos) {              // not found '@'
       std::istringstream numin(sst);
+      if (cnt>=size) return -cnt-1;    // out of range
       numin>>a[cnt];
     } else {
       sst.at(idx) = ' ';
       std::istringstream numin(sst);
       double r=0;
-      size_t j=0;
+      int j=0;
       numin>>r>>j;
+      if (j>size || j<1) return -cnt-1;       // out of range
       a[j-1] = r;
     }
     cnt++;
@@ -254,7 +256,7 @@ int Str2Arr(const char *c_str, double *a)
   return cnt;
 }
 
-int ReadPR(const char *filename, double *r)
+int ReadPR(const char *filename, double *r, int size)
 {
   if (filename==NULL || filename[0]=='\0') {
 //    for (int j=0; j<g_num_neu; j++) r[j] = 1;
@@ -263,7 +265,7 @@ int ReadPR(const char *filename, double *r)
   std::ifstream fin(filename);
   std::string str;
   getline(fin, str);
-  return (Str2Arr(str.c_str(), r)==g_num_neu) ? 0 : -1;
+  return (Str2Arr(str.c_str(), r, size)==g_num_neu) ? 0 : -1;
 }
 
 // Read poisson input strength from file filename
@@ -317,15 +319,16 @@ int *tmp_tempbegin_poisson_index = NULL;
 int *g_tempbegin_poisson_index = NULL;
 int *g_begin_poisson_index = NULL;
 
+#define ALLOCRT(rt,v) rt=(int)(v!=NULL)&(rt)?-1:0;
+
 //********************************** 2007.10.22 3:15AM *************************
-void setglobals()
+int setglobals()
 {
-  const char *err_st_mem = "Error: setglobals(): Fail to allocate memory.";
-  int i;
+//  const char *err_st_mem = "Error: setglobals(): Fail to allocate memory.";
+  int i, rt=-1;
 
   g_num_neu = g_num_neu_ex + g_num_neu_in;
   int RASTER_SIZE = g_num_neu*5;
-//  VECTOR_SIZE = g_num_neu*5;
 
   raster_initialize(spike_list);
   raster_initialize(RAS);
@@ -333,19 +336,24 @@ void setglobals()
 
 #if CORTICAL_STRENGTH_NONHOMO
   cortical_matrix = (double**)malloc(g_num_neu*sizeof(double*));
-  P_NULL_ERR(cortical_matrix, err_st_mem);
+  ALLOCRT(rt, cortical_matrix);
+//  P_NULL_ERR(cortical_matrix, err_st_mem);
   for (i=0; i<g_num_neu; i++) {
     cortical_matrix[i] = (double*)calloc(g_num_neu, sizeof(double));
-    P_NULL_ERR(cortical_matrix[i], err_st_mem);
+    ALLOCRT(rt, cortical_matrix[i]);
+//    P_NULL_ERR(cortical_matrix[i], err_st_mem);
   }
 #endif
 
   neu          = (neuron *)malloc(sizeof(neuron)*g_num_neu);
   tmp_tempneu  = (neuron *)malloc(sizeof(neuron)*g_num_neu);
   tmp_tempneu2 = (neuron *)malloc(sizeof(neuron)*g_num_neu);
-  P_NULL_ERR(neu,          err_st_mem);
-  P_NULL_ERR(tmp_tempneu,  err_st_mem);
-  P_NULL_ERR(tmp_tempneu2, err_st_mem);
+  ALLOCRT(rt, neu);
+  ALLOCRT(rt, tmp_tempneu);
+  ALLOCRT(rt, tmp_tempneu2);
+//  P_NULL_ERR(neu,          err_st_mem);
+//  P_NULL_ERR(tmp_tempneu,  err_st_mem);
+//  P_NULL_ERR(tmp_tempneu2, err_st_mem);
   for (i=0; i<g_num_neu; i++) {
     neuron_initialize(neu[i]);
     neuron_initialize(tmp_tempneu[i]);
@@ -363,32 +371,41 @@ void setglobals()
       neuron_set_value(tmp_tempneu[i],  Type_Inneuron, STATE_ACTIVE, Stepsmooth_Con);
       neuron_set_value(tmp_tempneu2[i], Type_Inneuron, STATE_ACTIVE, Stepsmooth_Con);
     }
-    P_NULL_ERR(neu[i].value,          err_st_mem);
-    P_NULL_ERR(tmp_tempneu[i].value,  err_st_mem);
-    P_NULL_ERR(tmp_tempneu2[i].value, err_st_mem);
+    ALLOCRT(rt, neu[i].value);
+    ALLOCRT(rt, tmp_tempneu[i].value);
+    ALLOCRT(rt, tmp_tempneu2[i].value);
+//    P_NULL_ERR(neu[i].value,          err_st_mem);
+//    P_NULL_ERR(tmp_tempneu[i].value,  err_st_mem);
+//    P_NULL_ERR(tmp_tempneu2[i].value, err_st_mem);
   }
 
 #if POISSON_INPUT_USE
   // poission_input[i] records the timing of poisson input spikes
   // in some time interval for i'th neuron!
   poisson_input = (vector *)malloc(sizeof(vector)*g_num_neu);
-  P_NULL_ERR(poisson_input, err_st_mem);
+  ALLOCRT(rt, poisson_input);
+//  P_NULL_ERR(poisson_input, err_st_mem);
   for (i=0; i<g_num_neu; i++) {
     vector_initialize(poisson_input[i]);
     vector_set_value(poisson_input[i], Maxnum_input, 0.0);
-    P_NULL_ERR(poisson_input[i].vect_value, err_st_mem);
+    ALLOCRT(rt, poisson_input[i].vect_value);
+//    P_NULL_ERR(poisson_input[i].vect_value, err_st_mem);
   }
 
   // record the initial random seed for each neuron!
   initialseed_neuron = (long *)malloc(sizeof(long)*g_num_neu);
   last_input = (double *)malloc(sizeof(double)*g_num_neu);
-  P_NULL_ERR(last_input, err_st_mem);
-  P_NULL_ERR(initialseed_neuron, err_st_mem);
+  ALLOCRT(rt, last_input);
+  ALLOCRT(rt, initialseed_neuron);
+//  P_NULL_ERR(last_input, err_st_mem);
+//  P_NULL_ERR(initialseed_neuron, err_st_mem);
 
   ran_iy = (long *)malloc(sizeof(long)*g_num_neu);
   ran_iv = (long **)malloc(sizeof(long*)*g_num_neu);
-  P_NULL_ERR(ran_iy, err_st_mem);
-  P_NULL_ERR(ran_iv, err_st_mem);
+  ALLOCRT(rt, ran_iy);
+  ALLOCRT(rt, ran_iv);
+//  P_NULL_ERR(ran_iy, err_st_mem);
+//  P_NULL_ERR(ran_iv, err_st_mem);
 
   for (i=0; i<g_num_neu; i++) {
     ran_iy[i] = 0;
@@ -403,11 +420,11 @@ void setglobals()
   g_arr_poisson_strength_E = (double *)malloc(g_num_neu*sizeof(double));
   g_arr_poisson_strength_I = (double *)malloc(g_num_neu*sizeof(double));
 
-  P_NULL_ERR((void*)(
+  ALLOCRT(rt, (void*)(
       (long)tmp_tempbegin_poisson_index  & (long)g_tempbegin_poisson_index
     & (long)g_begin_poisson_index        & (long)g_arr_poisson_rate
     & (long)g_arr_poisson_strength_E     & (long)g_arr_poisson_strength_I
-    ),err_st_mem);
+    ));
 
   for (int j=0; j<g_num_neu; j++) {
     g_arr_poisson_rate[j] = 1;
@@ -417,7 +434,8 @@ void setglobals()
 #else
   // each neuron has different phase for external input current!
   phase = (double *)malloc(g_num_neu*sizeof(double));
-  P_NULL_ERR(phase, err_st_mem);
+  ALLOCRT(rt, phase);
+//  P_NULL_ERR(phase, err_st_mem);
   for (i=0; i<g_num_neu; i++) {
     phase[i] = 2*M_PI*i/g_num_neu;
   }
@@ -425,6 +443,8 @@ void setglobals()
 
   GLOBAL_STRA = (struct strobe **)tcalloc(
     g_num_neu*size_neuronvar/*number of variables*/, sizeof(struct strobe *));
+
+  return -(1+rt);   // -1 when fail, 0 when success
 }
 
 void input_initialization()
@@ -482,7 +502,7 @@ void poisson_generator(int index_neuron, vector &Timing_input)
     spiketiming_wait += -log(RANDOM(initialseed_neuron+index_neuron,ran_iy,ran_iv,index_neuron))/g_arr_poisson_rate[index_neuron];
     size++;
     if(size >= Maxnum_input) {
-      std::cerr<<"There are more spikes exceeding the capacity of vector!"<<endl;
+      std::cerr<<"Error: There are more spikes exceeding the capacity of vector!"<<endl;
       std::cerr<<"Please enlarge the Maximum size of vector!"<<endl;
       exit(1);
     }

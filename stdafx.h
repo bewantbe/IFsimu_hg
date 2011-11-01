@@ -13,9 +13,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
-#include <time.h>
 #include <string.h>
-#include <assert.h>
 
 #if defined(_WIN32) || defined(__WIN32__)
 #  define _WINDOWS_USE_
@@ -159,7 +157,6 @@ extern bool g_b_RC_filter;     // use RC filter or not
 extern double g_RC_filter_ci;  // filter coefficient:
 extern double g_RC_filter_co;  // output[t] = co*output[t-dt]+ci*input[t]
 
-extern char g_staffsave_path[];
 extern char g_ras_path[];
 extern char g_spike_interval_path[];
 extern FILE *g_fout;

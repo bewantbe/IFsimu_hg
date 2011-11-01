@@ -18,8 +18,9 @@ ZDZ 的程序的简化版的说明, v2.0.11 (alpha)
     -t TIME       总计算时间, TIME 以毫秒为单位. (默认值为原来的宏COMP_TIME)
     -n N [N2]     神经元数, N 是兴奋型, N2 是抑制型. 省略 N2 相当于 N2=0
     -inf FILE     设置配置文件的路径. 默认是 test2.txt
+                  特别地, -inf - 表示不读取任何文件, 使用程序内部的默认值.
     -mat FILE     设置连接矩阵的路径. 默认是 cortical_matrix.txt
-                  特别地,  -mat - 表示路径是完全图
+                  特别地, -mat - 表示路径是完全图
     -o FILE       设置输出电平文件的路径, 若路径中的目录不存在, 程序会自动建立.
                   默认是 data/staffsave.txt
     --save-conductance FILE
@@ -47,7 +48,7 @@ ZDZ 的程序的简化版的说明, v2.0.11 (alpha)
     --pr-mul [VALUE ...] [VALUE@POSITION ...]
                   在命令行设置各个神经元的 poisson 输入率倍率. 可以只设定前几个
                   可以用 VALUE@POSITION 的语法指定第几个的值, 编号从 1 开始
-                  未指定值的神经默认是 1. 必须提前指定神经元个数.
+                  未指定值的神经默认是 1. 必须提前指定神经元个数(即 -n ).
     --ps-mul [VALUE ...] [VALUE@POSITION ...]
                   在命令行设置各个神经元的 poisson 输入强度(兴奋型)倍率. 语法参见 --pr-mul
     --psi-mul [VALUE ...] [VALUE@POSITION ...]

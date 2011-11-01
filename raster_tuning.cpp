@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <time.h>
 #include "datainput.h"
 #include "poisson_input.h"
 #include "myopengl.h"
@@ -97,10 +98,10 @@ double *arr_ps_tmp = NULL;
 double *arr_psi_tmp = NULL;
 #endif
 
-const int file_path_size = 1024;
+const int file_path_size = 1024;             // maximum file path size
 char conf_file[file_path_size] = "";
-char cor_mat_file[file_path_size] = "";
-char g_staffsave_path[file_path_size] = "";
+char cor_mat_file[file_path_size] = "cortical_matrix.txt";
+char g_staffsave_path[file_path_size] = "data/staffsave.txt";
 char g_ras_path[file_path_size] = "";
 char g_conductance_path[file_path_size] = "";
 char g_spike_interval_path[file_path_size] = "";
@@ -111,14 +112,9 @@ char conf_file_default[] = "test2.txt";
 #else
 char conf_file_default[] = "test.txt";
 #endif
-char cor_mat_file_default[] = "cortical_matrix.txt";
-const char g_staffsave_path_default[] = "data/staffsave.txt";
 
 FILE *g_fout = NULL;
 FILE *g_cond_out = NULL;
-
-//int RASTER_SIZE = (Number_Exneuron + Number_Inneuron)*5;
-//int VECTOR_SIZE = (Number_Exneuron + Number_Inneuron)*5;
 
 void ShowCLIHelp()
 {
@@ -130,12 +126,12 @@ void ShowCLIHelp()
   printf("                  Default: %f\n", g_comp_time);
   printf("  -n N [N2]     set number of neurons, N for Ex., N2 for In.\n");
   printf("                  Default: %d Ex. + %d In.\n", g_num_neu_ex, g_num_neu_in);
-  printf("  -inf FILE     load configuration from FILE\n");
+  printf("  -inf FILE     load configuration from FILE. Set to \"-\" if you want no file\n");
   printf("                  Default: \"%s\"\n", conf_file_default);
   printf("  -mat FILE     load cortical strength matrix from FILE\n");
-  printf("                  Default: \"%s\"\n", cor_mat_file_default);
+  printf("                  Default: \"%s\"\n", cor_mat_file);
   printf("  -o FILE       save voltage data to FILE\n");
-  printf("                  Default: \"%s\"\n", g_staffsave_path_default);
+  printf("                  Default: \"%s\"\n", g_staffsave_path);
   printf("  --save-conductance FILE\n");
   printf("                save conductance to FILE\n");
   printf("  --save-spike FILE\n");
@@ -221,7 +217,7 @@ void ShowCLIVersion()
   printf("\n");
 }
 
-int ReadOneLongCmdPara(int argc, char *argv[], int pp, double *vec)
+int ReadOneLongCmdPara(int argc, char *argv[], int pp, double *vec, int size)
 {
   char tmp_str[1024] = " ";
   int q = pp;
@@ -238,8 +234,12 @@ int ReadOneLongCmdPara(int argc, char *argv[], int pp, double *vec)
       strcat(tmp_str, argv[pp]);
     }
   }
-  if (Str2Arr(tmp_str, vec)==0) {
+  int rt = Str2Arr(tmp_str, vec, size);
+  if (rt==0) {
     printf("Warning: nothing after \"%s\" (expect numbers)\n", argv[q]);
+  } else if (rt<0) {
+    printf("Error: index out of range! See \"%s\"\n", argv[q]);
+    return -pp;
   }
   return pp;
 }
@@ -264,8 +264,8 @@ int CheckDirAndCreate(const char *filepath)
   path[l] = '\0';
   struct stat sb;
   if (stat(path, &sb) == -1) {
-    printf("Seems no the \"%s\" directory. Trying to create one for you.\n", path);
     char cl[file_path_size];
+    printf("Seems no the \"%s\" directory. Trying to create one for you.\n", path);
 #ifdef _WINDOWS_USE_
     sprintf(cl, "md %s", path);
 #else
@@ -276,7 +276,7 @@ int CheckDirAndCreate(const char *filepath)
     return rt;
   } else {
     if ((sb.st_mode & S_IFMT) != S_IFDIR) {
-      printf("Seems \"%s\" is not a directory!\n", path);
+      printf("Error: Seems \"%s\" is not a directory!\n", path);
       return 1;
     }
   }
@@ -321,9 +321,9 @@ int main(int argc, char *argv[])
     if (strcmp(argv[pp], "-t") == 0) {          // set the final time
       if (++pp >= argc) { pp--;  break; }
       double t_end = atof(argv[pp]);
-      if (t_end <= 0 || t_end > 1e99) {
-        printf("The time must between 0 and 1e99\n");
-        return 1;
+      if (t_end < 0 || t_end > 1e99) {
+        printf("Error: The time must between 0 and 1e99\n");
+        return 2;
       }
       g_comp_time = t_end;
       continue;
@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
       if (++pp >= argc) break;
       int n_n = atoi(argv[pp]);
       if (n_n < 0 || n_n > NUM_NEU_MAX) {
-        printf("Number of neurons must between 0 and %d\n", NUM_NEU_MAX);
+        printf("Error: Number of neurons must between 0 and %d\n", NUM_NEU_MAX);
         return 1;
       }
       g_num_neu_ex = n_n;
@@ -341,14 +341,15 @@ int main(int argc, char *argv[])
         if (argv[pp+1][0]!='-') {
           n_n = atoi(argv[++pp]);
           if (n_n < 0 || n_n > NUM_NEU_MAX) {
-            printf("Number of neurons must between 0 and %d\n", NUM_NEU_MAX);
+            printf("Error: Number of neurons must between 0 and %d\n", NUM_NEU_MAX);
             return 1;
           }
           g_num_neu_in = n_n;
         }
       }
-      if (g_num_neu_ex+g_num_neu_in <= 0) {
-        printf("Nothing to calculate! (Number of neurons: %d Ex. + %d In.)\n",
+      g_num_neu = g_num_neu_ex + g_num_neu_in;
+      if (g_num_neu <= 0) {
+        printf("Warning: Nothing to calculate! (Number of neurons: %d Ex. + %d In.)\n",
                g_num_neu_ex, g_num_neu_in);
         return 0;
       }
@@ -449,7 +450,8 @@ int main(int argc, char *argv[])
       arr_pr_tmp = (double*)malloc(g_num_neu*sizeof(double));
       P_NULL_ERR(arr_pr_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_pr_tmp[j] = 1;
-      pp = ReadOneLongCmdPara(argc, argv, pp, arr_pr_tmp);
+      pp = ReadOneLongCmdPara(argc, argv, pp, arr_pr_tmp, g_num_neu);
+      if (pp<0) return 1;
       continue;
     }
     if (strcmp(argv[pp], "--ps-mul")==0) {          // set poisson strength multiplier for Ex.
@@ -457,7 +459,8 @@ int main(int argc, char *argv[])
       arr_ps_tmp = (double*)malloc(g_num_neu*sizeof(double));
       P_NULL_ERR(arr_ps_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_ps_tmp[j] = 1;
-      pp = ReadOneLongCmdPara(argc, argv, pp, arr_ps_tmp);
+      pp = ReadOneLongCmdPara(argc, argv, pp, arr_ps_tmp, g_num_neu);
+      if (pp<0) return 1;
       continue;
     }
     if (strcmp(argv[pp], "--psi-mul")==0) {          // set poisson strength multiplier for In.
@@ -465,26 +468,19 @@ int main(int argc, char *argv[])
       arr_psi_tmp = (double*)malloc(g_num_neu*sizeof(double));
       P_NULL_ERR(arr_psi_tmp, "Error: main: Allocation failed, command line interpretation.");
       for (int j=0; j<g_num_neu; j++) arr_psi_tmp[j] = 1;
-      pp = ReadOneLongCmdPara(argc, argv, pp, arr_psi_tmp);
+      pp = ReadOneLongCmdPara(argc, argv, pp, arr_psi_tmp, g_num_neu);
+      if (pp<0) return 1;
       continue;
     }
 #endif
     if (strcmp(argv[pp], "-dt")==0) {          // set time step
       if (++pp >= argc) break;
       g_simu_dt = atof(argv[pp]);
-      if (g_simu_dt<=0) {
-        printf("Illegel time step!\nProgram terminated\n");
-        return 2;
-      }
       continue;
     }
     if (strcmp(argv[pp], "--save-interval")==0 || strcmp(argv[pp], "-stv")==0) {// set time interval of save
       if (++pp >= argc) break;
       g_save_intervel = atof(argv[pp]);
-      if (g_save_intervel<g_simu_dt) {
-        printf("Illegel time interval!\nProgram terminated\n");
-        return 2;
-      }
       continue;
     }
     if (strcmp(argv[pp], "--seed-auto-on")==0) {
@@ -514,12 +510,6 @@ int main(int argc, char *argv[])
           +sscanf(argv[pp+2],"%lf",&g_RC_filter_ci)==2) {
         pp += 2;
         g_b_RC_filter_coef_auto = false;
-        if (fabs(g_RC_filter_co)>=1) {
-          printf("Unstable RC filter: y[t] = %e * y[t-1] + %e * x[t]\n", g_RC_filter_co, g_RC_filter_ci);
-          printf("Absolute value of coefficient of y[t-1] must smaller than ONE.\n");
-          printf("Program terminated\n");
-          return 0;
-        }
       } else {
         g_b_RC_filter_coef_auto = true;
       }
@@ -551,37 +541,34 @@ int main(int argc, char *argv[])
     break;
   }
   if (pp < argc) {
-    printf("Invalid option: \"%s\"\n", argv[pp]);
+    printf("Error: Invalid option: \"%s\"\n", argv[pp]);
     printf("Try `raster_tuning --help' for more information.\n");
-    return 2;
+    return 3;
   }
   if (g_b_verbose_debug) g_b_verbose = g_b_verbose_debug;
   if (g_b_quiet) g_b_verbose = false;
-
-  if (g_b_verbose_debug) { printf(" Initializing data\n"); fflush(stdout); }
-  setglobals();               // assign space for variables
-
-  if (g_ras_path[0] == '-')
-    strcpy(g_ras_path, "data/ras.txt");
-  if (conf_file[0] == '\0')
+  if (g_b_auto_seed) {        // use second & microsecond as random seed
+    initial_seed2 = GetSeedFromTime();
+  }
+  if (conf_file[0] == '\0')             // use default configuration file name
     strcpy(conf_file, conf_file_default);
-
-  readinput(conf_file);       // read basic parameters from file
-
-  if (g_simu_dt)        Tstep = g_simu_dt;
+  if (strcmp(conf_file, "-") == 0)      // use program inner value
+    conf_file[0] = '\0';
+  if (readinput(conf_file)<0) {         // read basic parameters from conf_file
+    printf("Error: Fail to read parameters from file \"%s\"\n", conf_file);
+    return 1;
+  }
+  // already read almost all parameters, so combine and check them here
+  if (g_simu_dt) Tstep = g_simu_dt;
+  if (Tstep <= 0) {
+    printf("Error: Illegel time step!\n");
+    return 2;
+  }
   if (g_save_intervel)  SLIGHT_BIN = g_save_intervel;
-  // truncate SLIGHT_BIN to multiple of Tstep, due to strobeupdateRCfilter().
-  //SLIGHT_BIN = floor(SLIGHT_BIN/Tstep+0.1)*Tstep;
-  if (g_b_RC_filter) Tstep = SLIGHT_BIN/floor(SLIGHT_BIN/Tstep+0.1);
-  if (g_strength_corEE != no_use_number) Strength_CorEE = g_strength_corEE;
-  if (g_strength_corEI != no_use_number) Strength_CorIE = g_strength_corEI;  // note: the name is inversed
-  if (g_strength_corIE != no_use_number) Strength_CorEI = g_strength_corIE;
-  if (g_strength_corII != no_use_number) Strength_CorII = g_strength_corII;
-#if POISSON_INPUT_USE
-  if (g_poisson_rate   != no_use_number) Rate_input = g_poisson_rate;
-  if (g_poisson_strength != no_use_number)    Strength_Exinput = g_poisson_strength;
-  if (g_poisson_strength_in != no_use_number) Strength_Ininput = g_poisson_strength_in;
-#endif
+  if (SLIGHT_BIN < Tstep) {
+    printf("Error: sampling interval is smaller than time step!\n");
+    return 1;
+  }
   if (g_b_RC_filter) {
     if (g_b_RC_filter_coef_auto) {
       double u = M_PI*Tstep/SLIGHT_BIN;
@@ -589,20 +576,52 @@ int main(int argc, char *argv[])
       g_RC_filter_co = 1/(1+u);
     }
   }
-  if (g_b_auto_seed) {        // use second & microsecond as random seed
-    initial_seed = GetSeedFromTime();
-  } else {
-    if (initial_seed2) initial_seed = initial_seed2;
+  if (fabs(g_RC_filter_co)>=1) {
+    printf("Error:");
+    printf(" Unstable RC filter: y[t] = %e * y[t-1] + %e * x[t]\n", g_RC_filter_co, g_RC_filter_ci);
+    printf(" Absolute value of coefficient of y[t-1] must smaller than ONE.\n");
+    return 2;
   }
+  if (initial_seed2) initial_seed = initial_seed2;
+  // truncate SLIGHT_BIN to multiple of Tstep, due to strobeupdateRCfilter().
+  //SLIGHT_BIN = floor(SLIGHT_BIN/Tstep+0.1)*Tstep;
+  if (g_b_RC_filter) Tstep = SLIGHT_BIN/floor(SLIGHT_BIN/Tstep+0.1);
+  if (g_strength_corEE != no_use_number) Strength_CorEE = g_strength_corEE;
+  if (g_strength_corEI != no_use_number) Strength_CorIE = g_strength_corEI;  // note: the name is inversed
+  if (g_strength_corIE != no_use_number) Strength_CorEI = g_strength_corIE;
+  if (g_strength_corII != no_use_number) Strength_CorII = g_strength_corII;
+  if (Strength_CorEE<0 || Strength_CorEI<0 ||
+      Strength_CorIE<0 || Strength_CorII<0) {
+    printf("Warning: negative cortical strength!\n");
+    if (!g_b_verbose_debug) {
+      printf("Since this is not the case, program terminated.\n");
+      printf("(use parameter -vv to force continue, if you insist)\n");
+      return 1;
+    }
+  }
+#if POISSON_INPUT_USE
+  if (g_poisson_rate   != no_use_number) Rate_input = g_poisson_rate;
+  if (g_poisson_strength != no_use_number)    Strength_Exinput = g_poisson_strength;
+  if (g_poisson_strength_in != no_use_number) Strength_Ininput = g_poisson_strength_in;
+#endif
+
+  if (strcmp(g_ras_path, "-") == 0)
+    strcpy(g_ras_path, "data/ras.txt");
+
+  // assign space for variables
+  if (g_b_verbose_debug) { printf(" Initializing data\n"); fflush(stdout); }
+  if (setglobals()!=0) {
+    printf("Error: setglobals(): Fail to allocate memory.\n");
+    return -1;
+  }
+
 #if CORTICAL_STRENGTH_NONHOMO
-  if (cor_mat_file[0]=='\0')
-    strcpy(cor_mat_file, cor_mat_file_default);
   int rt = read_cortical_matrix(cor_mat_file, cortical_matrix);
   if (rt<0) {
     printf("Error: Fail to read cortical matrix from file: \"%s\"\n", cor_mat_file);
-    printf("  Is File exists? Is number of neurons match?\n");
-    printf("  Or may be you want to try \"-mat -\" to get a complete graph connection.\n");
-    printf("Program terminated.\n");
+    printf(" Is File exists? Is number of neurons match?\n");
+    printf(" And Do you permit to access this file?\n");
+    printf(" Or may be you want to try \"-mat -\" to get a complete graph connection.\n");
     return 1;
   }
   if (rt==1) {
@@ -612,14 +631,12 @@ int main(int argc, char *argv[])
 #endif
 
 #if POISSON_INPUT_USE
-  if (ReadPR(pr_file, g_arr_poisson_rate) < 0) {
-    printf("Fail to read pr from file: %s\n",ps_file);
-    printf("Program terminated.\n");
+  if (ReadPR(pr_file, g_arr_poisson_rate, g_num_neu) < 0) {
+    printf("Error: Fail to read pr from file: \"%s\"\n", pr_file);
     return 1;
   }
   if (ReadPS(ps_file, g_arr_poisson_strength_E, g_arr_poisson_strength_I) < 0) {
-    printf("Fail to read ps from file: %s\n",ps_file);
-    printf("Program terminated.\n");
+    printf("Error: Fail to read ps from file: \"%s\"\n", ps_file);
     return 1;
   }
   if (arr_pr_tmp) {
@@ -643,6 +660,11 @@ int main(int argc, char *argv[])
     g_arr_poisson_strength_E[j] *= Strength_Exinput*2.0/(Time_ExCon);
     g_arr_poisson_strength_I[j] *= Strength_Ininput*5.0/(Time_InCon);
 #endif
+    if (g_arr_poisson_rate[j]<0 || g_arr_poisson_strength_E[j]<0 ||
+        g_arr_poisson_strength_I[j]<0) {
+      printf("Error: negative input rate or strength.\n");
+      return 1;
+    }
   }
   Rate_input = g_arr_poisson_rate[0];
 #if SMOOTH_CONDUCTANCE_USE
@@ -656,25 +678,16 @@ int main(int argc, char *argv[])
 
   input_initialization();
 
-  if (g_staffsave_path[0] == '\0')
-    strcpy(g_staffsave_path, g_staffsave_path_default);
-
   CheckDirAndCreate(g_staffsave_path);      // check the existence of the dir
-
-  if (g_b_save_while_cal) {
-    if (g_b_save_use_binary)
-      g_fout = fopen(g_staffsave_path, "wb");
-    else
-      g_fout = fopen(g_staffsave_path, "w");
-    if (g_fout == NULL) {
-      printf("Fail to open \"%s\" for output!\n", g_staffsave_path);
-      return 1;
-    }
+  g_fout = fopen(g_staffsave_path, g_b_save_use_binary?"wb":"w");
+  if (g_fout == NULL) {
+    printf("Error: Fail to open \"%s\" for output!\n", g_staffsave_path);
+    return 1;
   }
   if (g_conductance_path[0]) {
     g_cond_out = fopen(g_conductance_path, "w");
     if (g_cond_out == NULL) {
-      printf("Fail to open \"%s\" for conductance output\n", g_conductance_path);
+      printf("Error: Fail to open \"%s\" for conductance output\n", g_conductance_path);
       return 1;
     }
   }
@@ -771,46 +784,45 @@ int main(int argc, char *argv[])
     data_dump();
     if (!g_b_quiet)
       printf("done.\n");
-    return 0;
+  } else {
+    // select display mode, 2xbuffer,rgba,alpha,depth_buffer
+    if (g_b_verbose_debug) { printf(" calling glutInitDisplayMode\n"); fflush(stdout); }
+  //  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    // starts at upper left corner of screen
+    if (g_b_verbose_debug) { printf(" ... WindowPosition\n"); fflush(stdout); }
+    glutInitWindowPosition(0,0);
+    // small window
+    if (g_b_verbose_debug) { printf(" calling glutInitWindowSize\n"); fflush(stdout); }
+    glutInitWindowSize(GLOBAL_WINDOW_WIDTH, GLOBAL_WINDOW_HEIGHT);
+    // initialize glut
+    if (g_b_verbose_debug) { printf(" calling glutInit\n"); fflush(stdout); }
+    glutInit(&argc, argv);
+    // open window
+    if (g_b_verbose_debug) { printf(" ... CreateWindow\n"); fflush(stdout); }
+    GLUT_WINDOW_ID = glutCreateWindow("Raster Tuning");
+    // resizing function
+    if (g_b_verbose_debug) { printf(" ReshapeFunc\n"); fflush(stdout); }
+    glutReshapeFunc(ReSizeGLScene);
+    // this does all the drawing for us
+    if (g_b_verbose_debug) { printf(" DrawGlScene\n"); fflush(stdout); }
+    glutDisplayFunc(DrawGLScene);
+    // continuously redraw
+    if (g_b_verbose_debug) { printf(" IdleFunc\n"); fflush(stdout); }
+    glutIdleFunc(DrawGLScene);
+    // input functions
+    if (g_b_verbose_debug) { printf(" KeyboardFunc\n"); fflush(stdout); }
+    glutKeyboardFunc(keyPressed);
+    if (g_b_verbose_debug) { printf(" SpecialFunc\n"); fflush(stdout); }
+    glutSpecialFunc(specialKeyPressed);
+    // init window
+    if (g_b_verbose_debug) { printf(" Finally Calling InitGL\n"); fflush(stdout); }
+    InitGL(GLOBAL_WINDOW_WIDTH, GLOBAL_WINDOW_HEIGHT);
+
+    // start processing
+    if (g_b_verbose_debug) { printf(" Passing to main loop\n"); fflush(stdout); }
+    glutMainLoop();
   }
-
-  // select display mode, 2xbuffer,rgba,alpha,depth_buffer
-  if (g_b_verbose_debug) { printf(" calling glutInitDisplayMode\n"); fflush(stdout); }
-//  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-  // starts at upper left corner of screen
-  if (g_b_verbose_debug) { printf(" ... WindowPosition\n"); fflush(stdout); }
-  glutInitWindowPosition(0,0);
-  // small window
-  if (g_b_verbose_debug) { printf(" calling glutInitWindowSize\n"); fflush(stdout); }
-  glutInitWindowSize(GLOBAL_WINDOW_WIDTH, GLOBAL_WINDOW_HEIGHT);
-  // initialize glut
-  if (g_b_verbose_debug) { printf(" calling glutInit\n"); fflush(stdout); }
-  glutInit(&argc, argv);
-  // open window
-  if (g_b_verbose_debug) { printf(" ... CreateWindow\n"); fflush(stdout); }
-  GLUT_WINDOW_ID = glutCreateWindow("Raster Tuning");
-  // resizing function
-  if (g_b_verbose_debug) { printf(" ReshapeFunc\n"); fflush(stdout); }
-  glutReshapeFunc(ReSizeGLScene);
-  // this does all the drawing for us
-  if (g_b_verbose_debug) { printf(" DrawGlScene\n"); fflush(stdout); }
-  glutDisplayFunc(DrawGLScene);
-  // continuously redraw
-  if (g_b_verbose_debug) { printf(" IdleFunc\n"); fflush(stdout); }
-  glutIdleFunc(DrawGLScene);
-  // input functions
-  if (g_b_verbose_debug) { printf(" KeyboardFunc\n"); fflush(stdout); }
-  glutKeyboardFunc(keyPressed);
-  if (g_b_verbose_debug) { printf(" SpecialFunc\n"); fflush(stdout); }
-  glutSpecialFunc(specialKeyPressed);
-  // init window
-  if (g_b_verbose_debug) { printf(" Finally Calling InitGL\n"); fflush(stdout); }
-  InitGL(GLOBAL_WINDOW_WIDTH, GLOBAL_WINDOW_HEIGHT);
-
-  // start processing
-  if (g_b_verbose_debug) { printf(" Passing to main loop\n"); fflush(stdout); }
-  glutMainLoop();
 
   return 0;
 }
