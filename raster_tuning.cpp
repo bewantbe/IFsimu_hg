@@ -58,8 +58,6 @@ long initial_pertub_In = 0;
 unsigned int initial_seed = 0;
 long* ran_iy = NULL;
 long** ran_iv = NULL;
-int iset = 0;
-double gset = 0.0;
 double time_evolution = 0.0;
 double last_time = 0.0;            // record time of last run
 double g_simu_dt = 0;
@@ -69,6 +67,7 @@ double g_RC_filter_co = 0.5;          // filter coefficient
 
 bool g_no_graphic         = false;
 bool g_b_verbose          = false;
+bool g_b_verbose_debug    = false;
 bool g_b_quiet            = false;
 bool g_b_save_while_cal   = true;
 bool g_b_save_use_binary  = false;
@@ -118,7 +117,7 @@ const char g_staffsave_path_default[] = "data/staffsave.txt";
 FILE *g_fout = NULL;
 FILE *g_cond_out = NULL;
 
-int RASTER_SIZE = (Number_Exneuron + Number_Inneuron)*5;
+//int RASTER_SIZE = (Number_Exneuron + Number_Inneuron)*5;
 //int VECTOR_SIZE = (Number_Exneuron + Number_Inneuron)*5;
 
 void ShowCLIHelp()
@@ -184,6 +183,7 @@ void ShowCLIHelp()
   printf("                final output data is y[stv], y[2*stv], ... , y[k*stv]\n");
   printf("                stv means save time interval, see --save-interval\n");
   printf("  -v, --verbose show more information while executing\n");
+  printf("  -vv           like -v, and in addition shows also debug infomation\n");
   printf("  -q, --quiet   show only errors\n");
   printf("  -h, --help    show this help and exit\n");
   printf("  --version     output version information and exit\n");
@@ -224,8 +224,10 @@ void ShowCLIVersion()
 int ReadOneLongCmdPara(int argc, char *argv[], int pp, double *vec)
 {
   char tmp_str[1024] = " ";
+  int q = pp;
   while (++pp < argc) {
-    if (argv[pp][0]=='-') {
+    if (argv[pp][0]=='-' &&
+        !(('0'<=argv[pp][1] && argv[pp][1]<='9') || argv[pp][1]=='.')) {
       pp--;
       break;
     }
@@ -236,7 +238,9 @@ int ReadOneLongCmdPara(int argc, char *argv[], int pp, double *vec)
       strcat(tmp_str, argv[pp]);
     }
   }
-  Str2Arr(tmp_str, vec);
+  if (Str2Arr(tmp_str, vec)==0) {
+    printf("Warning: nothing after \"%s\" (expect numbers)\n", argv[q]);
+  }
   return pp;
 }
 
@@ -306,8 +310,6 @@ unsigned int GetSeedFromTime()
 
 int main(int argc, char *argv[])
 {
-  int verbose_gl = 0;
-
   // Command line parameter translation
   g_comp_time = COMP_TIME;
   int pp = 0;                                   // pointer to parameter
@@ -507,11 +509,11 @@ int main(int argc, char *argv[])
     }
     if (strcmp(argv[pp], "--RC-filter")==0) {
       g_b_RC_filter = true;
-      if (pp+2<argc && argv[pp+1][0]!='-' && argv[pp+2][0]!='-') {  // no error checking here
-        g_b_RC_filter_coef_auto = false;
-        g_RC_filter_co = atof(argv[pp+1]);
-        g_RC_filter_ci = atof(argv[pp+2]);
+      if (pp+2<argc &&
+          sscanf(argv[pp+1],"%lf",&g_RC_filter_co)
+          +sscanf(argv[pp+2],"%lf",&g_RC_filter_ci)==2) {
         pp += 2;
+        g_b_RC_filter_coef_auto = false;
         if (fabs(g_RC_filter_co)>=1) {
           printf("Unstable RC filter: y[t] = %e * y[t-1] + %e * x[t]\n", g_RC_filter_co, g_RC_filter_ci);
           printf("Absolute value of coefficient of y[t-1] must smaller than ONE.\n");
@@ -525,6 +527,10 @@ int main(int argc, char *argv[])
     }
     if (strcmp(argv[pp], "-v")==0 || strcmp(argv[pp], "--verbose")==0) {
       g_b_verbose = true;
+      continue;
+    }
+    if (strcmp(argv[pp], "-vv")==0) {
+      g_b_verbose_debug = true;
       continue;
     }
     if (strcmp(argv[pp], "-q")==0 || strcmp(argv[pp], "--quiet")==0) {
@@ -549,10 +555,10 @@ int main(int argc, char *argv[])
     printf("Try `raster_tuning --help' for more information.\n");
     return 2;
   }
+  if (g_b_verbose_debug) g_b_verbose = g_b_verbose_debug;
   if (g_b_quiet) g_b_verbose = false;
-  verbose_gl = g_b_verbose;
-  if (verbose_gl) { printf(" Initializing data\n"); fflush(stdout); }
 
+  if (g_b_verbose_debug) { printf(" Initializing data\n"); fflush(stdout); }
   setglobals();               // assign space for variables
 
   if (g_ras_path[0] == '-')
@@ -601,7 +607,7 @@ int main(int argc, char *argv[])
   }
   if (rt==1) {
     printf("Warning: The file name of cortical matrix is \"%s\"\n", cor_mat_file);
-    printf("         which means a complete graph connection.\n");
+    printf("         which means it's a complete graph connection.\n");
   }
 #endif
 
@@ -769,41 +775,41 @@ int main(int argc, char *argv[])
   }
 
   // select display mode, 2xbuffer,rgba,alpha,depth_buffer
-  if (verbose_gl) { printf(" calling glutInitDisplayMode\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" calling glutInitDisplayMode\n"); fflush(stdout); }
 //  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   // starts at upper left corner of screen
-  if (verbose_gl) { printf(" ... WindowPosition\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" ... WindowPosition\n"); fflush(stdout); }
   glutInitWindowPosition(0,0);
   // small window
-  if (verbose_gl) { printf(" calling glutInitWindowSize\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" calling glutInitWindowSize\n"); fflush(stdout); }
   glutInitWindowSize(GLOBAL_WINDOW_WIDTH, GLOBAL_WINDOW_HEIGHT);
   // initialize glut
-  if (verbose_gl) { printf(" calling glutInit\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" calling glutInit\n"); fflush(stdout); }
   glutInit(&argc, argv);
   // open window
-  if (verbose_gl) { printf(" ... CreateWindow\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" ... CreateWindow\n"); fflush(stdout); }
   GLUT_WINDOW_ID = glutCreateWindow("Raster Tuning");
   // resizing function
-  if (verbose_gl) { printf(" ReshapeFunc\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" ReshapeFunc\n"); fflush(stdout); }
   glutReshapeFunc(ReSizeGLScene);
   // this does all the drawing for us
-  if (verbose_gl) { printf(" DrawGlScene\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" DrawGlScene\n"); fflush(stdout); }
   glutDisplayFunc(DrawGLScene);
   // continuously redraw
-  if (verbose_gl) { printf(" IdleFunc\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" IdleFunc\n"); fflush(stdout); }
   glutIdleFunc(DrawGLScene);
   // input functions
-  if (verbose_gl) { printf(" KeyboardFunc\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" KeyboardFunc\n"); fflush(stdout); }
   glutKeyboardFunc(keyPressed);
-  if (verbose_gl) { printf(" SpecialFunc\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" SpecialFunc\n"); fflush(stdout); }
   glutSpecialFunc(specialKeyPressed);
   // init window
-  if (verbose_gl) { printf(" Finally Calling InitGL\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" Finally Calling InitGL\n"); fflush(stdout); }
   InitGL(GLOBAL_WINDOW_WIDTH, GLOBAL_WINDOW_HEIGHT);
 
   // start processing
-  if (verbose_gl) { printf(" Passing to main loop\n"); fflush(stdout); }
+  if (g_b_verbose_debug) { printf(" Passing to main loop\n"); fflush(stdout); }
   glutMainLoop();
 
   return 0;

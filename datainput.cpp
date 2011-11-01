@@ -12,7 +12,7 @@ using std::endl;
 
 void readinput(char *filename)
 {
-  int verbose = 0;
+  int verbose = g_b_verbose_debug;
   char varname[64];
   double temp = 0.0;
 
@@ -324,7 +324,7 @@ void setglobals()
   int i;
 
   g_num_neu = g_num_neu_ex + g_num_neu_in;
-  RASTER_SIZE = g_num_neu*5;
+  int RASTER_SIZE = g_num_neu*5;
 //  VECTOR_SIZE = g_num_neu*5;
 
   raster_initialize(spike_list);
@@ -457,8 +457,6 @@ void input_initialization()
       SLIGHT_BIN/*ms*/,0/*we don't want to maintain cyclical average*/);
   }
 
-  iset = 0;
-  gset = 0.0;
   time_evolution = last_time;
 }
 

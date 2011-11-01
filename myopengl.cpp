@@ -159,8 +159,7 @@ void keyPressed(unsigned char key, int x, int y)
       LastRun();       // pour data to file
       data_dump();
       glutDestroyWindow(GLUT_WINDOW_ID); /* shut down our window */
-      if (!g_b_quiet)
-        printf(RUN_DONE?"\nCalculation finished.\n":"\nComputation interrupted\n");
+      printf(RUN_DONE?"\nCalculation finished.\n":"\nComputation interrupted\n");
       fflush(stdout);
       exit(0);       /* exit the program...normal termination. */
       break;
@@ -201,6 +200,7 @@ void keyPressed(unsigned char key, int x, int y)
         FIDDLE_PARAMETER = menu_top+1;
       }
       break;
+    case 'D':
     case 'd':
       switch (FIDDLE_PARAMETER) {
         case menu_top-8:
@@ -256,58 +256,7 @@ void keyPressed(unsigned char key, int x, int y)
           break;
       }
       break;
-    case 'D':
-      switch (FIDDLE_PARAMETER) {
-        case menu_top-8:
-          Tstep *=2;
-          break;
-#if POISSON_INPUT_USE
-        case menu_top-7:
-          Rate_input *= 1.02;
-          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_rate[j]*=1.02;}
-          break;
-        case menu_top-6:
-          Strength_Exinput *= 1.02;
-          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_E[j]*=1.02;}
-          break;
-        case menu_top-5:
-          Strength_Ininput *= 1.02;
-          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_I[j]*=1.02;}
-          break;
-#else
-        case menu_top-7:
-          Rate_input *= 1.02;
-          break;
-        case menu_top-6:
-          Current_0 *= 1.02;
-          break;
-        case menu_top-5:
-          Current_1 *= 1.02;
-          break;
-#endif
-        case menu_top-4:
-          Strength_CorEE *= 1.02;
-          break;
-        case menu_top-3:
-          Strength_CorIE *= 1.02;
-          break;
-        case menu_top-2:
-          Strength_CorII *= 1.02;
-          break;
-        case menu_top-1:
-          Strength_CorEI *= 1.02;
-          break;
-        case menu_top:
-          STEPS_PER_DRAW *= 2;
-          if (STEPS_PER_DRAW == 0)
-            STEPS_PER_DRAW = 1;
-          if (STEPS_PER_DRAW > 65536)
-            STEPS_PER_DRAW = 65536;
-          break;
-        default:
-          break;
-      }
-      break;
+    case 'A':
     case 'a':
       switch (FIDDLE_PARAMETER) {
         case menu_top-8:
@@ -357,57 +306,6 @@ void keyPressed(unsigned char key, int x, int y)
           break;
         case menu_top+1:
           DRAW_FLAG-=1;
-          break;
-        default:
-          break;
-      }
-      break;
-    case 'A':
-      switch (FIDDLE_PARAMETER) {
-        case menu_top-8:
-          Tstep /=2;
-          break;
-#if POISSON_INPUT_USE
-        case menu_top-7:
-          Rate_input /= 1.02;
-          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_rate[j]/=1.02;}
-          break;
-        case menu_top-6:
-          Strength_Exinput /= 1.02;
-          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_E[j]/=1.02;}
-          break;
-        case menu_top-5:
-          Strength_Ininput /= 1.02;
-          for (int j=0; j<g_num_neu; j++) { g_arr_poisson_strength_I[j]/=1.02;}
-          break;
-#else
-        case menu_top-7:
-          Rate_input /= 1.02;
-          break;
-        case menu_top-6:
-          Current_0 /= 1.02;
-          break;
-        case menu_top-5:
-          Current_1 /= 1.02;
-          break;
-#endif
-        case menu_top-4:
-          Strength_CorEE /= 1.02;
-          break;
-        case menu_top-3:
-          Strength_CorIE /= 1.02;
-          break;
-        case menu_top-2:
-          Strength_CorII /= 1.02;
-          break;
-        case menu_top-1:
-          Strength_CorEI /= 1.02;
-          break;
-        case menu_top:
-          STEPS_PER_DRAW /= 2;
-          if (STEPS_PER_DRAW == 0) {
-            STEPS_PER_DRAW = 1;
-          }
           break;
         default:
           break;

@@ -146,9 +146,27 @@ static inline int isnan(double x) { return x != x; }
 //     step of smoothness, (3) In_conductance without smoothness
 #define size_neuronvar  (2*Stepsmooth_Con+2)
 
-// The following are global variables used!
-extern int RUN_DONE;         // whether the running program is finished or not
-extern bool g_no_graphic;    // whether use graphic mode
+////////////////////////////////////////////////////////////
+// simulator behaviour variables
+
+extern int RUN_DONE;           // whether the running program is finished or not
+extern bool g_no_graphic;      // whether use graphic mode
+extern bool g_b_verbose_debug;
+extern bool g_b_quiet;
+extern bool g_b_save_while_cal;
+extern bool g_b_save_use_binary;
+extern bool g_b_RC_filter;     // use RC filter or not
+extern double g_RC_filter_ci;  // filter coefficient:
+extern double g_RC_filter_co;  // output[t] = co*output[t-dt]+ci*input[t]
+
+extern char g_staffsave_path[];
+extern char g_ras_path[];
+extern char g_spike_interval_path[];
+extern FILE *g_fout;
+extern FILE *g_cond_out;
+
+////////////////////////////////////////////////////////////
+// Global variables for GUI
 
 // these are global variables used in open GL
 extern GLfloat xdepth;
@@ -158,12 +176,13 @@ extern int GLUT_WINDOW_ID;
 extern int GLOBAL_WINDOW_WIDTH;
 extern int GLOBAL_WINDOW_HEIGHT;
 extern int FULL_SCREEN;
+
+extern int GRAYSCALE;
+// the initial time for the run
+extern double GLOBAL_TI;
 // this is the whole time length of data shown in the window screen
 // normally, this is choosen as 512 ms.
 extern int WINDOW_BIN_LENGTH;
-// this is the time length of each data point to show, usually, this
-// is chosen as 0.5 or 1 ms
-extern double SLIGHT_BIN;
 // this number indicates the position of cursor in the menu
 extern int FIDDLE_PARAMETER;
 // this indicates after how many time steps, for the data to show on the screen
@@ -174,16 +193,43 @@ extern struct strobe **GLOBAL_STRA;
 // this number indicates the corresponding variable shown in the window screen
 extern int DRAW_FLAG;
 
-extern int GRAYSCALE;
-// the initial time for the run
-extern double GLOBAL_TI;
+////////////////////////////////////////////////////////////
+// simulation related global variables
 
+// this is the time length of each data point to show, usually, this
+// is chosen as 0.5 or 1 ms
+extern double SLIGHT_BIN;
 // The following variables are the input reading from input file!
 // this is time step used in the run
 extern double Tstep;
 // i.e. COMP_TIME
 extern double g_comp_time;
 // this is the rate either in the current input case or poisson input case
+// this saves the current time of computation, the dimension is "ms"
+extern double time_evolution;
+// this saves the starting time of the run, normally it is chosen as zero
+extern double last_time;
+
+////////////////////////////////////////////////////////////
+// simulation global data variables
+
+// this saves the spike list in each time step
+extern struct raster spike_list;
+// this saves all the spike event during the computation
+extern struct raster RAS;
+// this saves neuronal network information
+extern struct neuron *neu;
+// this saves the generated Poisson spike train for each neuron
+extern struct vector *poisson_input;
+// this saves the first spike time of Poisson input outside the current time step
+extern double *last_input;
+
+////////////////////////////////////////////////////////////
+// neuron related global variables
+
+extern int g_num_neu;
+extern int g_num_neu_ex;
+extern int g_num_neu_in;
 extern double Rate_input;
 #if POISSON_INPUT_USE
 // this is the Poisson input strength to excitatory conductance
@@ -199,6 +245,12 @@ extern double Current_0;
 extern double Current_1;
 extern double *phase;
 #endif
+
+#if CORTICAL_STRENGTH_NONHOMO
+// this matrix saves the cortical strength between neurons in the network
+extern double** cortical_matrix;
+#endif
+
 // the strength of excitatory neuron to excitatory neuron
 extern double Strength_CorEE;
 // the strength of excitatory neuron to inhibitory neuron
@@ -208,26 +260,11 @@ extern double Strength_CorII;
 // the strength of inhibitory neuron to excitatory neuron
 extern double Strength_CorEI;
 
-// this saves the spike list in each time step
-extern struct raster spike_list;
+////////////////////////////////////////////////////////////
+// temporarily space in computation
 
-// this saves all the spike event during the computation
-extern struct raster RAS;
-
-#if CORTICAL_STRENGTH_NONHOMO
-// this matrix saves the cortical strength between neurons in the network
-extern double** cortical_matrix;
-#endif
-
-// this saves neuronal network information
-extern struct neuron *neu;
-// this saves the generated Poisson spike train for each neuron
-extern struct vector *poisson_input;
 // random seed for generating Poisson process
 extern long *initialseed_neuron;
-// this saves the first spike time of Poisson input outside the current time step
-extern double *last_input;
-
 // these are used for generating random variables
 extern long initial_pertub_Vot;
 extern long initial_pertub_Ex;
@@ -239,50 +276,15 @@ extern long initial_pertub_In_H;
 extern unsigned int initial_seed;
 extern long* ran_iy;
 extern long** ran_iv;
-extern int iset;
-extern double gset;
-
-// this saves the current time of computation, the dimension is "ms"
-extern double time_evolution;
-// this saves the starting time of the run, normally it is chosen as zero
-extern double last_time;
-
-extern bool g_b_verbose;
-extern bool g_b_quiet;
-extern bool g_b_save_while_cal;
-extern bool g_b_save_use_binary;
-extern bool g_b_RC_filter;
-
-extern double g_RC_filter_ci;          // filter coefficient
-extern double g_RC_filter_co;          // filter coefficient
-
-extern int g_num_neu;
-extern int g_num_neu_ex;
-extern int g_num_neu_in;
-
-extern double g_strength_corEE;
 
 #if POISSON_INPUT_USE
-extern double g_poisson_rate;
-extern double g_poisson_strength;
 extern double *g_arr_poisson_rate;
 extern double *g_arr_poisson_strength_E;
 extern double *g_arr_poisson_strength_I;
 extern int *g_begin_poisson_index;
-// temporarily space in computation
 extern int *g_tempbegin_poisson_index;
 extern int *tmp_tempbegin_poisson_index;
 #endif
-
-extern char g_staffsave_path[];
-extern char g_ras_path[];
-extern char g_conductance_path[];
-extern char g_spike_interval_path[];
-
-extern FILE *g_fout;
-extern FILE *g_cond_out;
-
-// temporarily space in computation
 extern neuron *tmp_tempneu;
 extern neuron *tmp_tempneu2;
 
@@ -303,9 +305,6 @@ extern neuron *tmp_tempneu2;
 // the tolerance error to differ two values
 #define LOW_BOUND (1.0e-16)
 
-// These are used for saving raster events!
-// estimated data length for raster structure (for saving all spike events)
-extern int RASTER_SIZE;
 // this number means the least tolerance space in the raster structure
 // if the space left in the raster structure is less than this number, the new space
 // will be assigned to the raster structure
