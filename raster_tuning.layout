@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release Linux" />
+	<ActiveTarget name="Debug Linux" />
 	<File name="Readme.txt" open="0" top="0" tabpos="0">
 		<Cursor position="3655" topLine="48" />
 	</File>
@@ -13,8 +13,8 @@
 	<File name="datahandling.h" open="0" top="0" tabpos="7">
 		<Cursor position="2567" topLine="18" />
 	</File>
-	<File name="datainput.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="5641" topLine="182" />
+	<File name="datainput.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="12548" topLine="419" />
 	</File>
 	<File name="datainput.h" open="0" top="0" tabpos="8">
 		<Cursor position="309" topLine="0" />
@@ -25,8 +25,8 @@
 	<File name="loop.h" open="0" top="0" tabpos="6">
 		<Cursor position="1352" topLine="25" />
 	</File>
-	<File name="myopengl.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="5363" topLine="144" />
+	<File name="myopengl.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="8740" topLine="264" />
 	</File>
 	<File name="myopengl.h" open="0" top="0" tabpos="3">
 		<Cursor position="2219" topLine="35" />
@@ -38,7 +38,7 @@
 		<Cursor position="1340" topLine="0" />
 	</File>
 	<File name="poisson_input.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="39938" topLine="1011" />
+		<Cursor position="40615" topLine="1008" />
 	</File>
 	<File name="poisson_input.h" open="0" top="0" tabpos="7">
 		<Cursor position="796" topLine="8" />
@@ -56,10 +56,10 @@
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="raster_tuning.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="0" topLine="0" />
+		<Cursor position="21063" topLine="575" />
 	</File>
 	<File name="stdafx.h" open="1" top="0" tabpos="2">
-		<Cursor position="5705" topLine="146" />
+		<Cursor position="8462" topLine="219" />
 	</File>
 	<File name="test.txt" open="0" top="0" tabpos="0">
 		<Cursor position="405" topLine="0" />

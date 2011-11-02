@@ -15,7 +15,7 @@ int GLUT_WINDOW_ID = 0;
 int GLOBAL_WINDOW_WIDTH = 640;
 int GLOBAL_WINDOW_HEIGHT = 480;
 int FIDDLE_PARAMETER = -3;
-int STEPS_PER_DRAW = 128;        ///HERE
+int STEPS_PER_DRAW = 128;         ///HERE
 int STD_VIEW = 1;
 int DRAW_FLAG = 0;
 int FULL_SCREEN = 0;
@@ -59,12 +59,6 @@ long initial_pertub_In = 0;
 unsigned int initial_seed = 0;
 long* ran_iy = NULL;
 long** ran_iv = NULL;
-double time_evolution = 0.0;
-double last_time = 0.0;            // record time of last run
-double g_simu_dt = 0;
-double g_save_intervel = 0;
-double g_RC_filter_ci = 0.5;          // filter coefficient
-double g_RC_filter_co = 0.5;          // filter coefficient
 
 bool g_no_graphic         = false;
 bool g_b_verbose          = false;
@@ -81,7 +75,8 @@ int g_num_neu_in = Number_Inneuron;
 int g_num_neu = Number_Exneuron + Number_Inneuron;
 unsigned int initial_seed2 = 0;
 
-double no_use_number = - 3.1416/2.71828*1.2345+1.4142/1.736;  // mark no change
+// mark no change, a bad idea although
+double no_use_number = -3.1416e30/2.71828*1.2345+1.4142/1.736;
 double g_strength_corEE = no_use_number;
 double g_strength_corEI = no_use_number;
 double g_strength_corIE = no_use_number;
@@ -97,6 +92,12 @@ double *arr_pr_tmp = NULL;
 double *arr_ps_tmp = NULL;
 double *arr_psi_tmp = NULL;
 #endif
+double time_evolution = 0.0;
+double last_time = 0.0;            // record time of last run
+double g_simu_dt = no_use_number;
+double g_save_intervel = no_use_number;
+double g_RC_filter_ci = 0.5;          // filter coefficient
+double g_RC_filter_co = 0.5;          // filter coefficient
 
 const int file_path_size = 1024;             // maximum file path size
 char conf_file[file_path_size] = "";
@@ -238,7 +239,7 @@ int ReadOneLongCmdPara(int argc, char *argv[], int pp, double *vec, int size)
   if (rt==0) {
     printf("Warning: nothing after \"%s\" (expect numbers)\n", argv[q]);
   } else if (rt<0) {
-    printf("Error: index out of range! See \"%s\"\n", argv[q]);
+    printf("Error: Index out of range! See \"%s\"\n", argv[q]);
     return -pp;
   }
   return pp;
@@ -249,7 +250,7 @@ int CheckDirAndCreate(const char *filepath)
   char path[file_path_size];
   strcpy(path, filepath);
   int l = (int)strlen(path);
-  if (path[0]=='.' && path[1]=='/') {              // extract the path name
+  if (l>=2 && path[0]=='.' && path[1]=='/') {         // extract the path name
     l -= 2;
     for (int i=0; i<l; i++) { path[i] = path[i+2]; }
   }
@@ -261,18 +262,22 @@ int CheckDirAndCreate(const char *filepath)
   }
   if (l < 0) return 0;
   if (l == 0 && path[0] == '.') return 0;
-  path[l] = '\0';
+  if (l>1) path[l] = '\0';                // so that we can save as /foo.txt
   struct stat sb;
   if (stat(path, &sb) == -1) {
     char cl[file_path_size];
-    printf("Seems no the \"%s\" directory. Trying to create one for you.\n", path);
+    printf("Seems no the \"%s\" directory. Trying to create one for you...", path);
 #ifdef _WINDOWS_USE_
     sprintf(cl, "md %s", path);
 #else
     sprintf(cl, "mkdir -p %s", path);
 #endif
     int rt = system(cl);
-    printf("  (Return value of mkdir: %d)\n", rt);
+    if (rt) {
+      printf("\n  (Fail: Return value of mkdir: %d)\n", rt);
+    } else {
+      printf("done\n");
+    }
     return rt;
   } else {
     if ((sb.st_mode & S_IFMT) != S_IFDIR) {
@@ -521,10 +526,13 @@ int main(int argc, char *argv[])
     }
     if (strcmp(argv[pp], "-vv")==0) {
       g_b_verbose_debug = true;
+      g_b_verbose = true;
+      g_b_quiet = false;
       continue;
     }
     if (strcmp(argv[pp], "-q")==0 || strcmp(argv[pp], "--quiet")==0) {
       g_b_quiet = true;
+      g_b_verbose = false;
       continue;
     }
     if (strcmp(argv[pp], "-h")==0 || strcmp(argv[pp], "--help")==0) {
@@ -545,8 +553,6 @@ int main(int argc, char *argv[])
     printf("Try `raster_tuning --help' for more information.\n");
     return 3;
   }
-  if (g_b_verbose_debug) g_b_verbose = g_b_verbose_debug;
-  if (g_b_quiet) g_b_verbose = false;
   if (g_b_auto_seed) {        // use second & microsecond as random seed
     initial_seed2 = GetSeedFromTime();
   }
@@ -554,38 +560,46 @@ int main(int argc, char *argv[])
     strcpy(conf_file, conf_file_default);
   if (strcmp(conf_file, "-") == 0)      // use program inner value
     conf_file[0] = '\0';
-  if (readinput(conf_file)<0) {         // read basic parameters from conf_file
+  // read basic parameters from conf_file ------------------------------------
+  if (readinput(conf_file)<0) {
     printf("Error: Fail to read parameters from file \"%s\"\n", conf_file);
     return 1;
   }
   // already read almost all parameters, so combine and check them here
-  if (g_simu_dt) Tstep = g_simu_dt;
+  if (initial_seed2) initial_seed = initial_seed2;
+  if (g_simu_dt != no_use_number) Tstep = g_simu_dt;
+  if (g_save_intervel != no_use_number) SLIGHT_BIN = g_save_intervel;
   if (Tstep <= 0) {
-    printf("Error: Illegel time step!\n");
+    printf("Error: Illegel time step! I can only calculate forward direction.\n");
     return 2;
   }
-  if (g_save_intervel)  SLIGHT_BIN = g_save_intervel;
+  if (SLIGHT_BIN<0) {
+    printf("Error: Only support positive sampling interval.\n");
+    return 2;
+  }
   if (SLIGHT_BIN < Tstep) {
-    printf("Error: sampling interval is smaller than time step!\n");
-    return 1;
+    printf("Error: Sampling interval is smaller than time step!\n");
+    return 2;
   }
   if (g_b_RC_filter) {
-    if (g_b_RC_filter_coef_auto) {
+    // truncate SLIGHT_BIN to multiple of Tstep, due to strobeupdateRCfilter().
+    int k = (int)floor(SLIGHT_BIN/Tstep+0.5);
+    g_simu_dt = SLIGHT_BIN/k;
+    if (fabs(SLIGHT_BIN/Tstep-k)>1e-6)
+      printf("\nWarning: truncate dt from %e to %e\n\n", Tstep, g_simu_dt);
+    Tstep = g_simu_dt;
+    if (g_b_RC_filter_coef_auto) {  // calculate the default filter coefficients
       double u = M_PI*Tstep/SLIGHT_BIN;
       g_RC_filter_ci = u/(1+u);
       g_RC_filter_co = 1/(1+u);
     }
+    if (fabs(g_RC_filter_co)>=1) {
+      printf("Error: Unstable RC filter: y[t] = %g * y[t-dt] + %g * x[t]\n",
+             g_RC_filter_co, g_RC_filter_ci);
+      printf("Coefficient of y[t-1] must in interval (-1,1).\n");
+      return 2;
+    }
   }
-  if (fabs(g_RC_filter_co)>=1) {
-    printf("Error:");
-    printf(" Unstable RC filter: y[t] = %e * y[t-1] + %e * x[t]\n", g_RC_filter_co, g_RC_filter_ci);
-    printf(" Absolute value of coefficient of y[t-1] must smaller than ONE.\n");
-    return 2;
-  }
-  if (initial_seed2) initial_seed = initial_seed2;
-  // truncate SLIGHT_BIN to multiple of Tstep, due to strobeupdateRCfilter().
-  //SLIGHT_BIN = floor(SLIGHT_BIN/Tstep+0.1)*Tstep;
-  if (g_b_RC_filter) Tstep = SLIGHT_BIN/floor(SLIGHT_BIN/Tstep+0.1);
   if (g_strength_corEE != no_use_number) Strength_CorEE = g_strength_corEE;
   if (g_strength_corEI != no_use_number) Strength_CorIE = g_strength_corEI;  // note: the name is inversed
   if (g_strength_corIE != no_use_number) Strength_CorEI = g_strength_corIE;
@@ -594,7 +608,7 @@ int main(int argc, char *argv[])
       Strength_CorIE<0 || Strength_CorII<0) {
     printf("Warning: negative cortical strength!\n");
     if (!g_b_verbose_debug) {
-      printf("Since this is not the case, program terminated.\n");
+      printf("Since this is not my job, program terminated.\n");
       printf("(use parameter -vv to force continue, if you insist)\n");
       return 1;
     }
@@ -608,7 +622,7 @@ int main(int argc, char *argv[])
   if (strcmp(g_ras_path, "-") == 0)
     strcpy(g_ras_path, "data/ras.txt");
 
-  // assign space for variables
+  // assign space for variables ----------------------------------------------
   if (g_b_verbose_debug) { printf(" Initializing data\n"); fflush(stdout); }
   if (setglobals()!=0) {
     printf("Error: setglobals(): Fail to allocate memory.\n");
@@ -620,12 +634,12 @@ int main(int argc, char *argv[])
   if (rt<0) {
     printf("Error: Fail to read cortical matrix from file: \"%s\"\n", cor_mat_file);
     printf(" Is File exists? Is number of neurons match?\n");
-    printf(" And Do you permit to access this file?\n");
+    printf(" And are you permited to access this file?\n");
     printf(" Or may be you want to try \"-mat -\" to get a complete graph connection.\n");
     return 1;
   }
   if (rt==1) {
-    printf("Warning: The file name of cortical matrix is \"%s\"\n", cor_mat_file);
+    printf("Warning: the file name of cortical matrix is \"%s\"\n", cor_mat_file);
     printf("         which means it's a complete graph connection.\n");
   }
 #endif
@@ -662,7 +676,7 @@ int main(int argc, char *argv[])
 #endif
     if (g_arr_poisson_rate[j]<0 || g_arr_poisson_strength_E[j]<0 ||
         g_arr_poisson_strength_I[j]<0) {
-      printf("Error: negative input rate or strength.\n");
+      printf("Error: Negative input rate or strength.\n");
       return 1;
     }
   }
@@ -694,17 +708,26 @@ int main(int argc, char *argv[])
 
   if (!g_b_quiet) {
     printf("Number of neurons: %d Ex. + %d In.\n", g_num_neu_ex, g_num_neu_in);
-    printf("Input type: %s\n", POISSON_INPUT_USE?"poisson":"current");
-    if (g_b_verbose && POISSON_INPUT_USE)
-      printf("  Random seed: %u\n", initial_seed);
+#if POISSON_INPUT_USE
+    printf("Input type: poisson  (random seed: %u)\n", initial_seed);
+#else
+    printf("Input type: current\n");
+#endif
     if (g_b_verbose)
       printf("Cortical strength network type: %shomogeneous\n",
              CORTICAL_STRENGTH_NONHOMO?"non-":"");
-    printf("Simulation time: %g ms,  dt = %f ms\n", g_comp_time, Tstep);
-    printf("Data record interval: %f ms\n", SLIGHT_BIN);
+    printf("Simulation time: %g ms,  dt = %g ms\n", g_comp_time, Tstep);
+    printf("Data record interval: %g ms\n", SLIGHT_BIN);
     if (SMOOTH_CONDUCTANCE_USE) printf("Use smoothed conductance.\n");
   }
   if (g_b_verbose) {
+    if (g_b_RC_filter) {
+      printf("Use RC filter before output.\n");
+      printf("  output[t] = %g * output[t-dt] + %g * v[t]\n",
+             g_RC_filter_co, g_RC_filter_ci);
+    } else {
+      printf("Use average filter before output.\n");
+    }
     printf("Cortical strength of In. to In. neurons = %g\n", Strength_CorII);
     printf("Cortical strength of In. to Ex. neurons = %g\n", Strength_CorEI);
     printf("Cortical strength of Ex. to In. neurons = %g\n", Strength_CorIE);

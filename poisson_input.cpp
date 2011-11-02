@@ -1012,7 +1012,7 @@ void compute_perstep()
 /// Save data at the tail of program
 void LastRun()
 {
-  if (!g_b_quiet)
+  if (!g_b_quiet && !g_no_graphic)
     printf("t_end: %g ms\n", time_evolution);
   // save voltages
   if (!g_b_save_while_cal) {
@@ -1036,7 +1036,7 @@ void LastRun()
   if (g_ras_path[0]) {
     FILE *frasout = fopen(g_ras_path, "w");
     if (frasout==NULL) {
-      printf("Error: Fail to open \"%s\" for spike time file output!\n", g_ras_path);
+      printf("\nError: Fail to open \"%s\" for spike time file output!\n", g_ras_path);
     } else {
       for (int k=0; k<RAS.ras_index; k++) {
         fprintf(frasout, "%d\t%f\n", RAS.array_index[k]+1, RAS.array_firingtime[k]);

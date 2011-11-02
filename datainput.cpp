@@ -229,26 +229,25 @@ bool IsEmptyStr(const char *st)
 }
 
 // conver string to array, won't change the value of the one not given
-// return the number of numbers in st
-// No error checking, use with careful
+// return the number of numbers in st, or the negitave position of error
+// Only have simple error checking, use with careful
 int Str2Arr(const char *c_str, double *a, int size)
 {
   std::istringstream sin(c_str);
   std::string sst;
-  int cnt=0;
+  int cnt=0, j=0;
   while (sin>>sst) {
     std::string::size_type idx = sst.find('@');
     if (idx == std::string::npos) {              // not found '@'
       std::istringstream numin(sst);
-      if (cnt>=size) return -cnt-1;    // out of range
-      numin>>a[cnt];
+      if (++j>size) return -cnt-1;               // out of range
+      numin>>a[j-1];
     } else {
-      sst.at(idx) = ' ';
+      sst.at(idx) = ' ';                         // apart the two numbers
       std::istringstream numin(sst);
       double r=0;
-      int j=0;
       numin>>r>>j;
-      if (j>size || j<1) return -cnt-1;       // out of range
+      if (j>size || j<1) return -cnt-1;          // out of range
       a[j-1] = r;
     }
     cnt++;
