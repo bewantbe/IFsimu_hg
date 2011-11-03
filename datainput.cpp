@@ -318,13 +318,12 @@ int *tmp_tempbegin_poisson_index = NULL;
 int *g_tempbegin_poisson_index = NULL;
 int *g_begin_poisson_index = NULL;
 
-#define ALLOCRT(rt,v) rt=(int)(v!=NULL)&(rt)?-1:0;
+#define CHK_MEM_RET(v) {if((v)==NULL)return-1;}
 
 //********************************** 2007.10.22 3:15AM *************************
 int setglobals()
 {
-//  const char *err_st_mem = "Error: setglobals(): Fail to allocate memory.";
-  int i, rt=-1;
+  int i;
 
   g_num_neu = g_num_neu_ex + g_num_neu_in;
   int RASTER_SIZE = g_num_neu*5;
@@ -335,24 +334,19 @@ int setglobals()
 
 #if CORTICAL_STRENGTH_NONHOMO
   cortical_matrix = (double**)malloc(g_num_neu*sizeof(double*));
-  ALLOCRT(rt, cortical_matrix);
-//  P_NULL_ERR(cortical_matrix, err_st_mem);
+  CHK_MEM_RET(cortical_matrix);
   for (i=0; i<g_num_neu; i++) {
     cortical_matrix[i] = (double*)calloc(g_num_neu, sizeof(double));
-    ALLOCRT(rt, cortical_matrix[i]);
-//    P_NULL_ERR(cortical_matrix[i], err_st_mem);
+    CHK_MEM_RET(cortical_matrix[i]);
   }
 #endif
 
   neu          = (neuron *)malloc(sizeof(neuron)*g_num_neu);
   tmp_tempneu  = (neuron *)malloc(sizeof(neuron)*g_num_neu);
   tmp_tempneu2 = (neuron *)malloc(sizeof(neuron)*g_num_neu);
-  ALLOCRT(rt, neu);
-  ALLOCRT(rt, tmp_tempneu);
-  ALLOCRT(rt, tmp_tempneu2);
-//  P_NULL_ERR(neu,          err_st_mem);
-//  P_NULL_ERR(tmp_tempneu,  err_st_mem);
-//  P_NULL_ERR(tmp_tempneu2, err_st_mem);
+  CHK_MEM_RET(neu);
+  CHK_MEM_RET(tmp_tempneu);
+  CHK_MEM_RET(tmp_tempneu2);
   for (i=0; i<g_num_neu; i++) {
     neuron_initialize(neu[i]);
     neuron_initialize(tmp_tempneu[i]);
@@ -370,41 +364,32 @@ int setglobals()
       neuron_set_value(tmp_tempneu[i],  Type_Inneuron, STATE_ACTIVE, Stepsmooth_Con);
       neuron_set_value(tmp_tempneu2[i], Type_Inneuron, STATE_ACTIVE, Stepsmooth_Con);
     }
-    ALLOCRT(rt, neu[i].value);
-    ALLOCRT(rt, tmp_tempneu[i].value);
-    ALLOCRT(rt, tmp_tempneu2[i].value);
-//    P_NULL_ERR(neu[i].value,          err_st_mem);
-//    P_NULL_ERR(tmp_tempneu[i].value,  err_st_mem);
-//    P_NULL_ERR(tmp_tempneu2[i].value, err_st_mem);
+    CHK_MEM_RET(neu[i].value);
+    CHK_MEM_RET(tmp_tempneu[i].value);
+    CHK_MEM_RET(tmp_tempneu2[i].value);
   }
 
 #if POISSON_INPUT_USE
   // poission_input[i] records the timing of poisson input spikes
   // in some time interval for i'th neuron!
   poisson_input = (vector *)malloc(sizeof(vector)*g_num_neu);
-  ALLOCRT(rt, poisson_input);
-//  P_NULL_ERR(poisson_input, err_st_mem);
+  CHK_MEM_RET(poisson_input);
   for (i=0; i<g_num_neu; i++) {
     vector_initialize(poisson_input[i]);
     vector_set_value(poisson_input[i], Maxnum_input, 0.0);
-    ALLOCRT(rt, poisson_input[i].vect_value);
-//    P_NULL_ERR(poisson_input[i].vect_value, err_st_mem);
+    CHK_MEM_RET(poisson_input[i].vect_value);
   }
 
   // record the initial random seed for each neuron!
   initialseed_neuron = (long *)malloc(sizeof(long)*g_num_neu);
   last_input = (double *)malloc(sizeof(double)*g_num_neu);
-  ALLOCRT(rt, last_input);
-  ALLOCRT(rt, initialseed_neuron);
-//  P_NULL_ERR(last_input, err_st_mem);
-//  P_NULL_ERR(initialseed_neuron, err_st_mem);
+  CHK_MEM_RET(last_input);
+  CHK_MEM_RET(initialseed_neuron);
 
   ran_iy = (long *)malloc(sizeof(long)*g_num_neu);
   ran_iv = (long **)malloc(sizeof(long*)*g_num_neu);
-  ALLOCRT(rt, ran_iy);
-  ALLOCRT(rt, ran_iv);
-//  P_NULL_ERR(ran_iy, err_st_mem);
-//  P_NULL_ERR(ran_iv, err_st_mem);
+  CHK_MEM_RET(ran_iy);
+  CHK_MEM_RET(ran_iv);
 
   for (i=0; i<g_num_neu; i++) {
     ran_iy[i] = 0;
@@ -419,10 +404,10 @@ int setglobals()
   g_arr_poisson_strength_E = (double *)malloc(g_num_neu*sizeof(double));
   g_arr_poisson_strength_I = (double *)malloc(g_num_neu*sizeof(double));
 
-  ALLOCRT(rt, (void*)(
-      (long)tmp_tempbegin_poisson_index  & (long)g_tempbegin_poisson_index
-    & (long)g_begin_poisson_index        & (long)g_arr_poisson_rate
-    & (long)g_arr_poisson_strength_E     & (long)g_arr_poisson_strength_I
+  CHK_MEM_RET((int*)(
+       tmp_tempbegin_poisson_index!=NULL && g_tempbegin_poisson_index!=NULL
+    && g_begin_poisson_index!=NULL       && g_arr_poisson_rate!=NULL
+    && g_arr_poisson_strength_E!=NULL    && g_arr_poisson_strength_I!=NULL
     ));
 
   for (int j=0; j<g_num_neu; j++) {
@@ -433,8 +418,7 @@ int setglobals()
 #else
   // each neuron has different phase for external input current!
   phase = (double *)malloc(g_num_neu*sizeof(double));
-  ALLOCRT(rt, phase);
-//  P_NULL_ERR(phase, err_st_mem);
+  CHK_MEM_RET(phase);
   for (i=0; i<g_num_neu; i++) {
     phase[i] = 2*M_PI*i/g_num_neu;
   }
@@ -443,7 +427,7 @@ int setglobals()
   GLOBAL_STRA = (struct strobe **)tcalloc(
     g_num_neu*size_neuronvar/*number of variables*/, sizeof(struct strobe *));
 
-  return -(1+rt);   // -1 when fail, 0 when success
+  return 0;
 }
 
 void input_initialization()

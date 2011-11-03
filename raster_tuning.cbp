@@ -13,7 +13,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters=' -ng -t 10000 -seed 0 --bin-save -n 2 -pr 1 -ps 0.012 -inf &quot;/etc/network/interfaces&quot;' />
+				<Option parameters=" -ng -t 1000 -seed 0 --bin-save -n 2 -pr 1 -ps 0.012" />
 				<Compiler>
 					<Add option="-pedantic" />
 					<Add option="-g" />
@@ -32,11 +32,14 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="-ng -n 3 -t 1000000 -inf test2_test.txt -mat - -seed 0" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-pg" />
+					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
+					<Add option="-pg" />
 					<Add library="GL" />
 					<Add library="GLU" />
 					<Add library="glut" />
