@@ -6,6 +6,12 @@
 #include "poisson_input.h"
 #include "myopengl.h"
 
+#ifndef _WINDOWS_USE_
+#include <sys/file.h>   // for checking file lock state
+#include <errno.h>
+#include <err.h>
+#endif
+
 int RUN_DONE = 0;
 
 GLfloat xdepth = 0.0;
@@ -696,8 +702,18 @@ int main(int argc, char *argv[])
   g_fout = fopen(g_staffsave_path, g_b_save_use_binary?"wb":"w");
   if (g_fout == NULL) {
     printf("Error: Fail to open \"%s\" for output!\n", g_staffsave_path);
+    printf("Check whether it's a legal path name, and you have permission to access and write it.");
     return 1;
   }
+#ifndef _WINDOWS_USE_
+  // Due to the nature of Unix-like system, we have to do this to check
+  // whether we are the only process writing data to g_staffsave_path
+  if (lockf(fileno(g_fout),F_TLOCK,0) != 0) {
+    err(1, "\nFail to open \"%s\" for output! May be there is another program using it.\n",
+        g_staffsave_path);
+    return 3;
+  }
+#endif
   if (g_conductance_path[0]) {
     g_cond_out = fopen(g_conductance_path, "w");
     if (g_cond_out == NULL) {
