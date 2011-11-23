@@ -591,7 +591,7 @@ int main(int argc, char *argv[])
     // truncate SLIGHT_BIN to multiple of Tstep, due to strobeupdateRCfilter().
     int k = (int)floor(SLIGHT_BIN/Tstep+0.5);
     g_simu_dt = SLIGHT_BIN/k;
-    if (fabs(SLIGHT_BIN/Tstep-k)>1e-6)
+    if (fabs(1-Tstep/g_simu_dt)>1e-14)
       printf("\nWarning: truncate dt from %e to %e\n\n", Tstep, g_simu_dt);
     Tstep = g_simu_dt;
     if (g_b_RC_filter_coef_auto) {  // calculate the default filter coefficients
@@ -602,7 +602,7 @@ int main(int argc, char *argv[])
     if (fabs(g_RC_filter_co)>=1) {
       printf("Error: Unstable RC filter: y[t] = %g * y[t-dt] + %g * x[t]\n",
              g_RC_filter_co, g_RC_filter_ci);
-      printf("Coefficient of y[t-1] must in interval (-1,1).\n");
+      printf("Coefficient of y[t-dt] must in interval (-1,1).\n");
       return 2;
     }
   }
@@ -641,7 +641,7 @@ int main(int argc, char *argv[])
     printf("Error: Fail to read cortical matrix from file: \"%s\"\n", cor_mat_file);
     printf(" Is File exists? Is number of neurons match?\n");
     printf(" And are you permited to access this file?\n");
-    printf(" Or may be you want to try \"-mat -\" to get a complete graph connection.\n");
+    printf(" Or maybe you want to try \"-mat -\" to get a complete graph connection.\n");
     return 1;
   }
   if (rt==1) {
@@ -696,9 +696,25 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
-  input_initialization();
+  input_initialization();                   // initialize the simulation engine
 
   CheckDirAndCreate(g_staffsave_path);      // check the existence of the dir
+
+#ifndef _WINDOWS_USE_
+  {
+    // Due to the nature of Unix-like system, we have to do this to check
+    // whether we are the only process writing data to g_staffsave_path
+    FILE *f_tmp = fopen(g_staffsave_path, "r");
+    if (f_tmp != NULL) {                    // file exist, then check file lock
+      if (lockf(fileno(f_tmp),F_TEST,0) == -1) {  //and errno==EAGAIN or EACCES
+        err(1, "\nCan't open \"%s\" for output!\nMaybe there's another program using it.\n",
+            g_staffsave_path);
+        return 3;
+      }
+      fclose(f_tmp);
+    }
+  }
+#endif
   g_fout = fopen(g_staffsave_path, g_b_save_use_binary?"wb":"w");
   if (g_fout == NULL) {
     printf("Error: Fail to open \"%s\" for output!\n", g_staffsave_path);
@@ -706,10 +722,8 @@ int main(int argc, char *argv[])
     return 1;
   }
 #ifndef _WINDOWS_USE_
-  // Due to the nature of Unix-like system, we have to do this to check
-  // whether we are the only process writing data to g_staffsave_path
-  if (lockf(fileno(g_fout),F_TLOCK,0) != 0) {
-    err(1, "\nFail to open \"%s\" for output! May be there is another program using it.\n",
+  if (lockf(fileno(g_fout),F_TLOCK,0) != 0) {     // add file lock
+    err(1, "\nFail to lock file \"%s\"!\nMaybe there is another program using it.\nAnd, it's very likely that I have destroyed part of that file.",
         g_staffsave_path);
     return 3;
   }
@@ -729,9 +743,6 @@ int main(int argc, char *argv[])
 #else
     printf("Input type: current\n");
 #endif
-    if (g_b_verbose)
-      printf("Cortical strength network type: %shomogeneous\n",
-             CORTICAL_STRENGTH_NONHOMO?"non-":"");
     printf("Simulation time: %g ms,  dt = %g ms\n", g_comp_time, Tstep);
     printf("Data record interval: %g ms\n", SLIGHT_BIN);
     if (SMOOTH_CONDUCTANCE_USE) printf("Use smoothed conductance.\n");
@@ -744,14 +755,18 @@ int main(int argc, char *argv[])
     } else {
       printf("Use average filter before output.\n");
     }
+    if (g_num_neu_in) {
     printf("Cortical strength of In. to In. neurons = %g\n", Strength_CorII);
     printf("Cortical strength of In. to Ex. neurons = %g\n", Strength_CorEI);
     printf("Cortical strength of Ex. to In. neurons = %g\n", Strength_CorIE);
+    }
     printf("Cortical strength of Ex. to Ex. neurons = %g\n", Strength_CorEE);
 #if POISSON_INPUT_USE
-    printf("Poisson input strength to In. neurons = %g\n", Strength_Ininput);
-    printf("Poisson input strength to Ex. neurons = %g\n", Strength_Exinput);
     printf("Poisson input rate = %g\n", Rate_input);
+    if (g_num_neu_in) {
+    printf("Poisson input strength to In. neurons = %g\n", Strength_Ininput);
+    }
+    printf("Poisson input strength to Ex. neurons = %g\n", Strength_Exinput);
     {
       int nn = g_num_neu;
       if (nn>16) {
