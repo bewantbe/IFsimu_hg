@@ -955,12 +955,31 @@ void compute_perstep()
     imax = g_num_neu*size_neuronvar;
   }
   if (g_b_RC_filter) {
-    for (i=0; i<imax; i++) {
+    // smooth the spike
+    for (i=0; i<g_num_neu; i++) {
+      double v = neu[i].value[0];
+#if SMOOTH_CONDUCTANCE_USE
+      if (neu[i].value[5] != 0.0 && neu[i].value[5] < Tstep)
+        v = 1.0 - neu[i].value[5]/Tstep;
+#else
+      if (neu[i].value[3] != 0.0 && neu[i].value[3] < Tstep)
+        v = 1.0 - neu[i].value[3]/Tstep;
+#endif
+      strobeupdateRCFilter(GLOBAL_STRA[i], time_evolution, Tstep, v);
+    }
+    for (i=g_num_neu; i<imax; i++) {
       neuron_index = i%g_num_neu;
       var_index = i/g_num_neu;
       strobeupdateRCFilter(GLOBAL_STRA[i], time_evolution, Tstep,
                            neu[neuron_index].value[var_index]);
     }
+//    orignal version
+//    for (i=0; i<imax; i++) {
+//      neuron_index = i%g_num_neu;
+//      var_index = i/g_num_neu;
+//      strobeupdateRCFilter(GLOBAL_STRA[i], time_evolution, Tstep,
+//                           neu[neuron_index].value[var_index]);
+//    }
   } else {
     for (i=0; i<imax; i++) {
       neuron_index = i%g_num_neu;
