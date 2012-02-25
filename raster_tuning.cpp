@@ -199,7 +199,7 @@ void ShowCLIHelp()
 
 void ShowCLIVersion()
 {
-  printf("raster_tuning 2.0.11 (alpha)\n");
+  printf("raster_tuning 2.0.13\n");
   printf("Copyright: ZDZ etc.\n");
   printf("XYY branch version, based on \"clean IF code\" (Nov 19 2010)\n");
   printf("(Is this a free software?!)\n");
