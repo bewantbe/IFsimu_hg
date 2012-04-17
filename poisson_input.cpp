@@ -34,11 +34,16 @@ void force_input( neuron *tempneu, int index_neuron)
 // cortical interaction by conductance, external input either by conductance
 void voltage_dt(int index_neuron, double t, double gE, double gI, double v, double &dv_dt)
 {
+# if EXPONENTIAL_IF_USE
+  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
+          - gI*(v - Vot_Inhibitory) + Con_Leakage*VOT_DELTAT*exp((v-VOT_TAKEOFF)/VOT_DELTAT);
+# else
   dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
           - gI*(v - Vot_Inhibitory);
+# endif
 }
 
-#else   // of POISSON_INPUT_USE
+#else   // not POISSON_INPUT_USE
 
 double external_current(int index_neuron, double t)
 {
@@ -48,8 +53,16 @@ double external_current(int index_neuron, double t)
 // cortical interaction by conductance, external input either by current
 void voltage_dt(int index_neuron, double t, double gE, double gI, double v, double &dv_dt)
 {
+//  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
+//          - gI*(v - Vot_Inhibitory) + external_current(index_neuron, t);
+#if EXPONENTIAL_IF_USE
+  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
+          - gI*(v - Vot_Inhibitory) + Con_Leakage*VOT_DELTAT*exp((v-VOT_TAKEOFF)/VOT_DELTAT)
+          + external_current(index_neuron, t);
+#else
   dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
           - gI*(v - Vot_Inhibitory) + external_current(index_neuron, t);
+#endif
 }
 
 #endif  // POISSON_INPUT_USE
@@ -442,7 +455,15 @@ double root_search(void (*func)(double a, double b, double va, double vb,
       return root;
     }
   }
+  static int cnt_bad;
+  cnt_bad++;
   P_ERR("Too many bisections in root searching!\n");
+  // at most ONE error per 1000ms per neuron
+  if (cnt_bad > 0.001*time_evolution*g_num_neu) {
+    fprintf(stderr,"There are over 1000 warnings (too many bisections in root searching).\n");
+    fprintf(stderr,"Program terminated\n");
+    exit(3);
+  }
   return xmid;
 }
 

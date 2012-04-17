@@ -88,6 +88,14 @@ static inline int isnan(double x) { return x != x; }
 // strength between neurons
 #define CORTICAL_STRENGTH_NONHOMO 1      /// modify this
 
+// check if using exponential I&F model!
+#define EXPONENTIAL_IF_USE 1
+#if EXPONENTIAL_IF_USE
+#  define EIF_CUBIC_INTERPOLATION 1
+#else
+#  define EIF_CUBIC_INTERPOLATION 0
+#endif
+
 // maximum number of neurons that can accepted
 #define NUM_NEU_MAX (32767)
 // the number of excitatory neurons
@@ -111,10 +119,19 @@ static inline int isnan(double x) { return x != x; }
 #define Time_InConR     0.8
 // the length of refractory period
 #define TIME_REFRACTORY 2.0
+
+#if EXPONENTIAL_IF_USE
+#define VOT_RESET  (-0.375)
+#define Vot_Threshold  (4.375)
+#define VOT_TAKEOFF (0.625)
+#define VOT_DELTAT (0.4375)
+#else
 // the reset value for voltage after spike
 #define VOT_RESET       0.0
 // the threshold value for voltage
 #define Vot_Threshold   1.0
+#endif
+
 // the resting value of leakage conductance
 #define Vot_Leakage     0.0
 // the resting value of excitatory conductance

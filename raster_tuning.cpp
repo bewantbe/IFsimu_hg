@@ -127,6 +127,12 @@ void ShowCLIHelp()
 {
   printf("Usage: raster_tuning [OPTION1] [OPTION2] ...\n");
   printf("Simulate the Integrate-and-Fire model of neurons.\n");
+#if EXPONENTIAL_IF_USE
+  printf("! Use Exponential I&F model\n");
+#endif
+#if POISSON_INPUT_USE == 0
+  printf("! Use current input model\n");
+#endif
   printf("\n");
   printf("  -ng           no GUI(graphical user interface)\n");
   printf("  -t TIME       set simulation time length, in millisecond\n");
@@ -199,10 +205,18 @@ void ShowCLIHelp()
 
 void ShowCLIVersion()
 {
-  printf("raster_tuning 2.0.13\n");
+  printf("raster_tuning 2.1 (development version)\n");
   printf("Copyright: ZDZ etc.\n");
   printf("XYY branch version, based on \"clean IF code\" (Nov 19 2010)\n");
   printf("(Is this a free software?!)\n");
+#if POISSON_INPUT_USE
+  printf("! Use Poisson input model\n");
+#else
+  printf("! Use current input model\n");
+#endif
+#if EXPONENTIAL_IF_USE
+  printf("! Use Exponential I&F model\n");
+#endif
 #ifdef _MSC_VER
   printf("Compiled by Microsoft Visual Studio(C++): Version %d\n", _MSC_VER);
 #elif __PATHCC__
@@ -280,7 +294,7 @@ int CheckDirAndCreate(const char *filepath)
 #endif
     int rt = system(cl);
     if (rt) {
-      printf("\n  (Fail: Return value of mkdir: %d)\n", rt);
+      printf("\n  (Failed: Return value of mkdir: %d)\n", rt);
     } else {
       printf("done\n");
     }
@@ -742,6 +756,9 @@ int main(int argc, char *argv[])
     printf("Input type: poisson  (random seed: %u)\n", initial_seed);
 #else
     printf("Input type: current\n");
+#endif
+#if EXPONENTIAL_IF_USE
+    printf("! Using Exponential I&F model\n");
 #endif
     printf("Simulation time: %g ms,  dt = %g ms\n", g_comp_time, Tstep);
     printf("Data record interval: %g ms\n", SLIGHT_BIN);

@@ -438,7 +438,13 @@ void input_initialization()
   if (g_num_neu_in) NONE_INHIBITORY = 0; else NONE_INHIBITORY = 1;
 
   for( i = 0; i < g_num_neu; i++ ) {
+#if EXPONENTIAL_IF_USE
+    neu[i].value[0] = VOT_RESET+ran0(&initial_pertub_Vot)
+                     *(VOT_TAKEOFF-VOT_RESET);
+#else // use I&F model
     neu[i].value[0] = ran0(&initial_pertub_Vot);
+#endif
+//    neu[i].value[0] = ran0(&initial_pertub_Vot);
     neu[i].value[1] = ran0(&initial_pertub_Ex);
     neu[i].value[Stepsmooth_Con+1] = (1 - NONE_INHIBITORY)*ran0(&initial_pertub_In);
 #if SMOOTH_CONDUCTANCE_USE
