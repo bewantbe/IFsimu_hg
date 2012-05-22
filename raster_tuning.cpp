@@ -658,7 +658,7 @@ int main(int argc, char *argv[])
     printf(" Or maybe you want to try \"-mat -\" to get a complete graph connection.\n");
     return 1;
   }
-  if (rt==1) {
+  if (rt==1 && !g_b_quiet) {
     printf("Warning: the file name of cortical matrix is \"%s\"\n", cor_mat_file);
     printf("         which means it's a complete graph connection.\n");
   }

@@ -458,10 +458,10 @@ double root_search(void (*func)(double a, double b, double va, double vb,
   static int cnt_bad;
   cnt_bad++;
   P_ERR("Too many bisections in root searching!\n");
-  // at most ONE error per 1000ms per neuron
-  if (cnt_bad > 0.001*time_evolution*g_num_neu) {
-    fprintf(stderr,"There are over 1000 warnings (too many bisections in root searching).\n");
-    fprintf(stderr,"Program terminated\n");
+  // at most ONE error per 1000ms per neuron in total
+  if (cnt_bad > 0.001*g_comp_time*g_num_neu) {
+    fprintf(stderr,"There are over 1 warning per second per neuron (too many bisections in root searching)!\n");
+    fprintf(stderr,"Program terminated.\n");
     exit(3);
   }
   return xmid;
@@ -1137,7 +1137,7 @@ void LastRun()
              g_spike_interval_path);
     } else {
       for (int i=0; i<g_num_neu; i++)
-        fprintf(fout, "%g ", time_evolution/frct[i]);
+        fprintf(fout, "%.15g ", time_evolution/frct[i]);
       fclose(fout);
     }
   }
