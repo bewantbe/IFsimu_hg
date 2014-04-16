@@ -228,8 +228,9 @@ bool IsEmptyStr(const char *st)
   return c=='\0';
 }
 
-// conver string to array, won't change the value of the one not given
-// return the number of numbers in st, or the negitave position of error
+// Convert string to array, won't change the value of the one not given
+// c_str format: value1[@position1] ...   (position start from 1)
+// Return the number of numbers in c_str, or the negitave position of error
 // Only have simple error checking, use with careful
 int Str2Arr(const char *c_str, double *a, int size)
 {

@@ -238,9 +238,20 @@ void ShowCLIVersion()
   printf("\n");
 }
 
+// Convert the positioned number array string to double array
+// Actual works are done in Str2Arr(). This function is slow and ugly,
+//  consider rewrite it using C++ string
+// pp  : start position in argv[]
+// vec : restore the numbers in argv to vec[]
+// size: size of vec, usually the number of neurons
 int ReadOneLongCmdPara(int argc, char *argv[], int pp, double *vec, int size)
 {
-  char tmp_str[1024] = " ";
+  // calculate the length of argv[]
+  int argvs_sz = 10;  // 10 is just for safe
+  for (int k=pp; k<argc; k++) {
+    argvs_sz += strlen(argv[k]);
+  }
+  char *tmp_str = (char*)calloc(argvs_sz, sizeof(char));
   int q = pp;
   while (++pp < argc) {
     if (argv[pp][0]=='-' &&
@@ -256,6 +267,7 @@ int ReadOneLongCmdPara(int argc, char *argv[], int pp, double *vec, int size)
     }
   }
   int rt = Str2Arr(tmp_str, vec, size);
+  free(tmp_str);
   if (rt==0) {
     printf("Warning: nothing after \"%s\" (expect numbers)\n", argv[q]);
   } else if (rt<0) {
