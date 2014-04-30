@@ -84,8 +84,8 @@ long* ran_iy = NULL;
 long** ran_iv = NULL;
 
 bool g_no_graphic         = false;
-bool g_b_verbose          = true;
-bool g_b_verbose_debug    = true;
+bool g_b_verbose          = false;
+bool g_b_verbose_debug    = false;
 bool g_b_quiet            = false;
 bool g_b_save_while_cal   = true;
 bool g_b_save_use_binary  = false;
@@ -567,7 +567,9 @@ int main(int argc, char *argv[])
       continue;
     }
     if (strcmp(argv[pp], "-v")==0 || strcmp(argv[pp], "--verbose")==0) {
+      g_b_quiet = false;
       g_b_verbose = true;
+      g_b_verbose_debug = false;
       continue;
     }
     if (strcmp(argv[pp], "-vv")==0) {
@@ -579,6 +581,7 @@ int main(int argc, char *argv[])
     if (strcmp(argv[pp], "-q")==0 || strcmp(argv[pp], "--quiet")==0) {
       g_b_quiet = true;
       g_b_verbose = false;
+      g_b_verbose_debug = false;
       continue;
     }
     if (strcmp(argv[pp], "-h")==0 || strcmp(argv[pp], "--help")==0) {

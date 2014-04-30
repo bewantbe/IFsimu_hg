@@ -266,7 +266,8 @@ int read_cortical_matrix(const char *filepath, double **cor_mat)
   int i;
   for (i=0; i<g_num_neu; i++) {       // read the matrix
     getline(fin, str);
-    std::cerr<<"str:"<<str<<std::endl;
+    if (g_b_verbose_debug)
+      std::cerr<<"str:"<<str<<std::endl;
     std::istringstream sin(str);
     int j;
     for (j=0; j<g_num_neu; j++) {

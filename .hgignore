@@ -7,4 +7,5 @@ tags
 raster_tuning.layout
 .ycm_extra_conf.pyc
 *.layout
+data/
 bin/Release/raster_tuning_HH
