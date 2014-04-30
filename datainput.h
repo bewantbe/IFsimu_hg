@@ -1,3 +1,4 @@
+///mark: modified on 2013/1/20
 #ifndef _DATAINPUT_H_
 #define _DATAINPUT_H_
 

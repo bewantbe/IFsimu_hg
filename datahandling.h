@@ -1,3 +1,4 @@
+///mark: modified on 2013/1/20
 #ifndef _DATAHANDLING_H_
 #define _DATAHANDLING_H_
 
@@ -29,6 +30,7 @@ struct strobe * strobemake(int length,double update_timestep,int cycle_bother);
 // update data in the strobe structure
 void strobeupdateRCFilter(struct strobe *st,double t,double DT,double val);
 void strobeupdate(struct strobe *st,double t,double DT,double val);
+void strobe_veri(struct strobe *st,double t,double val);
 void strobeupdate_old(struct strobe *st, double t, double val);
 // release data structure
 void strobetfree(struct strobe *st);

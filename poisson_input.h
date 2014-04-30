@@ -1,52 +1,39 @@
+///mark: modified on 2013/1/20
 #ifndef _POISSON_INPUT_H_
 #define _POISSON_INPUT_H_
 
 #if SMOOTH_CONDUCTANCE_USE
-// same as the above but for smoothed conductance case, it describes the jump
-// of H by the external Poisson spike train
-inline void force_inputR( neuron *tempneu, int index_neuron);
+
+//this computes the effect of the poisson spike force towards the target neuron in the condition of smooth conductance
+//specifically, the poisson force is targeted on KE & KI
+void force_inputR( neuron *tempneu, int index_neuron);
+
 #else
-// this is used for non-smooth conductance case, it describes the jump of
-// conductance G by the external Poisson spike train
+//this computes the effect of the poisson spike force towards the target neuron in the condition of nonsmooth conductance
+//specifically, the poisson force is targeted on GE & GI
 void force_input( neuron *tempneu, int index_neuron);
 #endif
 
-// this is used for non-smooth conductance case, it describes the jump of
-// conductance G by other neurons' spikes
-void force_cortic( neuron *tempneu, int index_neuron, int index_spikingneuron);
+// this function is used to compute the derivative of all the variables in neuron
+void whole_dt(const neuron *neu_val, neuron *neu_dt, double *volt, int index_neuron, double t);
 
-// same as the above but for smoothed conductance case, it describes the jump
-// of H by other neurons' spikes where H is non-smoothed part
-void force_corticR( neuron *tempneu, int index_neuron, int index_spikingneuron);
+//this is used to search the immediate next poisson spike of the whole network
+void next_poisson_spike(neuron *tempneu, double begin_time,
+                        int *tempbegin_poisson_index, double &end_time, int &next_neu_index);
 
-// this is used for non-smooth conductance case, it describes the evolution of
-// conductance between two adjacent cortical spikes
-void conductance_decay( neuron *tempneu, int index_neuron, double subTstep);
+double hermexp(double volt1, double volt2, double deno);
 
-// same as the above but for smoothed conductance case
-void conductance_evolve( neuron *tempneu, int index_neuron, double subTstep);
-
+// this function is used in the computation of the spiking time
+void voltage_dt(int index_neuron,double t,double m,double h,double n,double gE,double gI,double v,double &dv);
 // this computes the external input current at time t (only for current input case)
 double external_current(int index_neuron, double t);
 
-// this computes the derivative of voltage at time t
-void voltage_dt(int index_neuron, double t, double gE, double gI, double v, double &dv_dt);
-
 // The following are the Runge-Kutta algorithm with different orders of convergence
-void runge_kutta2(neuron *tempneu, int index_neuron, double subTstep, double t_evolution,
-                  double &temp_vot,
-                  void (*dvdt)(int index_neuron, double t, double gE, double gI, double v,
-                               double &dv_dt));
+void runge_kutta2(neuron *tempneu, double subTstep, double t_evolution);
 
-void runge_kutta3(neuron *tempneu, int index_neuron, double subTstep, double t_evolution,
-                  double &temp_vot,
-                  void (*dvdt)(int index_neuron, double t, double gE, double gI, double v,
-                               double &dv_dt));
+void runge_kutta3(neuron *tempneu, double subTstep, double t_evolution);
 
-void runge_kutta4(neuron *tempneu, int index_neuron, double subTstep, double t_evolution,
-                  double &temp_vot,
-                  void (*dvdt)(int index_neuron, double t, double gE, double gI, double v,
-                               double &dv_dt));
+void runge_kutta4(neuron *tempneu, double subTstep, double t_evolution);
 
 // this uses four values to form a hermitian polynomial on the given interval [a,b]
 // "va", "vb" are the given values of voltage at the point "a" and "b",
@@ -62,22 +49,11 @@ double root_search(void (*func)(double a, double b, double va, double vb,
                    double fx1, double fx2, double dfx1, double dfx2, double xacc);
 
 // this determines the spike time of neuron at the given interval
-void spiking_time(neuron *tempneu, int index_neuron, double t_evolution, double Ta,
-                  double Tb, double vot_cross, double &firing_time);
+void spiking_time(neuron *bef_neu, neuron *cur_neu, int index_neuron, double t_evolution, double Ta,
+                  double Tb, double &firing_time);
 
-// This is for poisson input case!!!
-void single_neuron_test(neuron *tempneu, int index_neuron,
-                        int firing_neuron, double begin_time, double end_time,
-                        int *begin_poisson_index, struct raster &temp_spike_list, int &jump);
-
-// This is for current input case!!!
-void single_neuron_test(neuron *tempneu, int index_neuron,
-                        int firing_neuron, double begin_time, double end_time,
-                        struct raster &temp_spike_list, int &jump);
-
-// this determines the next cortical spike time at the given interval
-void next_cortical_spike(neuron *tempneu, double begin_time,
-                         int *tempbegin_poisson_index);
+// this function is used to compute all the information of the whole network in a smooth subTstep [begin_time,end_time]
+void sub_network_evolve(neuron *tempneu, double begin_time, double end_time);
 
 // initial setup of the whole neuron system (for reference trajectory)
 void network_initialization();

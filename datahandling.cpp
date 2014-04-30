@@ -85,6 +85,18 @@ void strobeupdate(struct strobe *st, double t, double DT, double val)
   }
 }
 
+void strobe_veri(struct strobe *st,double t,double val)
+{
+    int t_int = t;
+    if(t - t_int == 0){
+        st->data[st->tab] = val;
+        st->tab++;
+    if (st->tab == st->length)
+        st->tab = 0;
+    }
+}
+
+
 // Only suitable for truncated update_timestep and dt
 void strobeupdateRCFilter(struct strobe *st, double t, double DT, double val)
 {

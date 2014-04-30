@@ -765,13 +765,37 @@ void DrawGLScene()
         sprintf(text,"gEX--HE");
         break;
       case 3:
-        sprintf(text,"gIn--GI");
+        sprintf(text,"gEx--IE");
         break;
       case 4:
-        sprintf(text,"gIn--HI");
+        sprintf(text,"gEx--JE");
         break;
       case 5:
-        sprintf(text,"refractory time");
+        sprintf(text,"gEx--KE");
+        break;
+      case 6:
+        sprintf(text,"gIn--GI");
+        break;
+      case 7:
+        sprintf(text,"gIn--HI");
+        break;
+      case 8:
+        sprintf(text,"gIn--II");
+        break;
+      case 9:
+        sprintf(text,"gIn--JI");
+        break;
+      case 10:
+        sprintf(text,"gIn--KI");
+        break;
+      case 11:
+        sprintf(text,"condvar--m");
+        break;
+      case 12:
+        sprintf(text,"condvar--h");
+        break;
+      case 13:
+        sprintf(text,"condvar--n");
         break;
 #else
       case 1:
@@ -781,7 +805,13 @@ void DrawGLScene()
         sprintf(text,"gIn--GI");
         break;
       case 3:
-        sprintf(text,"refractory time");
+        sprintf(text,"condvar--m");
+        break;
+      case 4:
+        sprintf(text,"condvar--h");
+        break;
+      case 5:
+        sprintf(text,"condvar--n");
         break;
 #endif
       default:

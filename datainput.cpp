@@ -117,6 +117,31 @@ int readinput(char *filename)
       }
       continue;
     }
+    ///jyl:m,h,n
+    if (strcmp(varname,"initial_pertub_m")==0) {
+      data_readin>>initial_pertub_m;
+      if (verbose) {
+        cout<<"initial random seed for fast activation sodium ion channel variable m read to be: "
+            <<initial_pertub_m<<endl;
+      }
+      continue;
+    }
+    if (strcmp(varname,"initial_pertub_h")==0) {
+      data_readin>>initial_pertub_h;
+      if (verbose) {
+        cout<<"initial random seed for slow inactivation sodium ion channel variable h read to be: "
+            <<initial_pertub_h<<endl;
+      }
+      continue;
+    }
+    if (strcmp(varname,"initial_pertub_n")==0) {
+      data_readin>>initial_pertub_n;
+      if (verbose) {
+        cout<<"initial random seed for slow activation potassium ion channel variable n read to be: "
+            <<initial_pertub_n<<endl;
+      }
+      continue;
+    }
     if (strcmp(varname,"initial_pertub_Ex")==0) {
       data_readin>>initial_pertub_Ex;
       if (verbose) {
@@ -125,12 +150,37 @@ int readinput(char *filename)
       }
       continue;
     }
+
 #if SMOOTH_CONDUCTANCE_USE
     if (strcmp(varname,"initial_pertub_Ex_H")==0) {
       data_readin>>initial_pertub_Ex_H;
       if (verbose) {
-        cout<<"initial random seed for subexcitatory conductance read to be: "
+        cout<<"initial random seed for subexcitatory conductance Ex_H read to be: "
             <<initial_pertub_Ex_H<<endl;
+      }
+      continue;
+    }
+    if (strcmp(varname,"initial_pertub_Ex_I")==0) {
+      data_readin>>initial_pertub_Ex_I;
+      if (verbose) {
+        cout<<"initial random seed for subexcitatory conductance Ex_I read to be: "
+            <<initial_pertub_Ex_I<<endl;
+      }
+      continue;
+    }
+    if (strcmp(varname,"initial_pertub_Ex_J")==0) {
+      data_readin>>initial_pertub_Ex_J;
+      if (verbose) {
+        cout<<"initial random seed for subexcitatory conductance Ex_J read to be: "
+            <<initial_pertub_Ex_J<<endl;
+      }
+      continue;
+    }
+    if (strcmp(varname,"initial_pertub_Ex_K")==0) {
+      data_readin>>initial_pertub_Ex_K;
+      if (verbose) {
+        cout<<"initial random seed for subexcitatory conductance Ex_K read to be: "
+            <<initial_pertub_Ex_K<<endl;
       }
       continue;
     }
@@ -147,8 +197,32 @@ int readinput(char *filename)
     if (strcmp(varname,"initial_pertub_In_H")==0) {
       data_readin>>initial_pertub_In_H;
       if (verbose) {
-        cout<<"initial random seed for subinhibitory conductance read to be: "
+        cout<<"initial random seed for subinhibitory conductance In_H read to be: "
             <<initial_pertub_In_H<<endl;
+      }
+      continue;
+    }
+    if (strcmp(varname,"initial_pertub_In_I")==0) {
+      data_readin>>initial_pertub_In_I;
+      if (verbose) {
+        cout<<"initial random seed for subinhibitory conductance In_I read to be: "
+            <<initial_pertub_In_I<<endl;
+      }
+      continue;
+    }
+    if (strcmp(varname,"initial_pertub_In_J")==0) {
+      data_readin>>initial_pertub_In_J;
+      if (verbose) {
+        cout<<"initial random seed for subinhibitory conductance In_J read to be: "
+            <<initial_pertub_In_J<<endl;
+      }
+      continue;
+    }
+    if (strcmp(varname,"initial_pertub_In_K")==0) {
+      data_readin>>initial_pertub_In_K;
+      if (verbose) {
+        cout<<"initial random seed for subinhibitory conductance In_K read to be: "
+            <<initial_pertub_In_K<<endl;
       }
       continue;
     }
@@ -192,6 +266,7 @@ int read_cortical_matrix(const char *filepath, double **cor_mat)
   int i;
   for (i=0; i<g_num_neu; i++) {       // read the matrix
     getline(fin, str);
+    std::cerr<<"str:"<<str<<std::endl;
     std::istringstream sin(str);
     int j;
     for (j=0; j<g_num_neu; j++) {
@@ -340,33 +415,59 @@ int setglobals()
     CHK_MEM_RET(cortical_matrix[i]);
   }
 #endif
-
+  vol          = (double *)malloc(sizeof(double)*g_num_neu);
+  CHK_MEM_RET(vol);
   neu          = (neuron *)malloc(sizeof(neuron)*g_num_neu);
-  tmp_tempneu  = (neuron *)malloc(sizeof(neuron)*g_num_neu);
-  tmp_tempneu2 = (neuron *)malloc(sizeof(neuron)*g_num_neu);
   CHK_MEM_RET(neu);
-  CHK_MEM_RET(tmp_tempneu);
-  CHK_MEM_RET(tmp_tempneu2);
+  former_neu   = (neuron *)malloc(sizeof(neuron)*g_num_neu);
+  CHK_MEM_RET(former_neu);
+  neuRK        = (neuron *)malloc(sizeof(neuron)*g_num_neu);
+  CHK_MEM_RET(neuRK);
+  neu_d1       = (neuron *)malloc(sizeof(neuron)*g_num_neu);
+  CHK_MEM_RET(neu_d1);
+  neu_d2       = (neuron *)malloc(sizeof(neuron)*g_num_neu);
+  CHK_MEM_RET(neu_d2);
+  neu_d3       = (neuron *)malloc(sizeof(neuron)*g_num_neu);
+  CHK_MEM_RET(neu_d3);
+  neu_d4       = (neuron *)malloc(sizeof(neuron)*g_num_neu);
+  CHK_MEM_RET(neu_d4);
   for (i=0; i<g_num_neu; i++) {
     neuron_initialize(neu[i]);
-    neuron_initialize(tmp_tempneu[i]);
-    neuron_initialize(tmp_tempneu2[i]);
+    neuron_initialize(former_neu[i]);
+    neuron_initialize(neuRK[i]);
+    neuron_initialize(neu_d1[i]);
+    neuron_initialize(neu_d2[i]);
+    neuron_initialize(neu_d3[i]);
+    neuron_initialize(neu_d4[i]);
   }
 
   // intialize the voltage, Exconductance and Inconductance
   for( i = 0; i < g_num_neu; i++ ) {
     if ( i < g_num_neu_ex ) {
-      neuron_set_value(neu[i],          Type_Exneuron, STATE_ACTIVE, Stepsmooth_Con);
-      neuron_set_value(tmp_tempneu[i],  Type_Exneuron, STATE_ACTIVE, Stepsmooth_Con);
-      neuron_set_value(tmp_tempneu2[i], Type_Exneuron, STATE_ACTIVE, Stepsmooth_Con);
+      neuron_set_value(neu[i],          Type_Exneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(former_neu[i],   Type_Exneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(neuRK[i],        Type_Exneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(neu_d1[i],       Type_Exneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(neu_d2[i],       Type_Exneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(neu_d3[i],       Type_Exneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(neu_d4[i],       Type_Exneuron, STATE_NORMAL, Stepsmooth_Con);
+
     } else {
-      neuron_set_value(neu[i],          Type_Inneuron, STATE_ACTIVE, Stepsmooth_Con);
-      neuron_set_value(tmp_tempneu[i],  Type_Inneuron, STATE_ACTIVE, Stepsmooth_Con);
-      neuron_set_value(tmp_tempneu2[i], Type_Inneuron, STATE_ACTIVE, Stepsmooth_Con);
+      neuron_set_value(neu[i],          Type_Inneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(former_neu[i],   Type_Inneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(neuRK[i],        Type_Inneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(neu_d1[i],       Type_Inneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(neu_d2[i],       Type_Inneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(neu_d3[i],       Type_Inneuron, STATE_NORMAL, Stepsmooth_Con);
+      neuron_set_value(neu_d4[i],       Type_Inneuron, STATE_NORMAL, Stepsmooth_Con);
     }
     CHK_MEM_RET(neu[i].value);
-    CHK_MEM_RET(tmp_tempneu[i].value);
-    CHK_MEM_RET(tmp_tempneu2[i].value);
+    CHK_MEM_RET(former_neu[i].value);
+    CHK_MEM_RET(neuRK[i].value);
+    CHK_MEM_RET(neu_d1[i].value);
+    CHK_MEM_RET(neu_d2[i].value);
+    CHK_MEM_RET(neu_d3[i].value);
+    CHK_MEM_RET(neu_d4[i].value);
   }
 
 #if POISSON_INPUT_USE
@@ -396,8 +497,6 @@ int setglobals()
     ran_iv[i] = (long*)malloc(sizeof(long)*NTAB);
   }
 
-  tmp_tempbegin_poisson_index = (int *)malloc(sizeof(int)*g_num_neu);
-  g_tempbegin_poisson_index = (int *)malloc(sizeof(int)*g_num_neu);
   g_begin_poisson_index = (int *)malloc(sizeof(int)*g_num_neu);
 
   g_arr_poisson_rate = (double *)malloc(g_num_neu*sizeof(double));
@@ -405,8 +504,7 @@ int setglobals()
   g_arr_poisson_strength_I = (double *)malloc(g_num_neu*sizeof(double));
 
   CHK_MEM_RET((int*)(
-       tmp_tempbegin_poisson_index!=NULL && g_tempbegin_poisson_index!=NULL
-    && g_begin_poisson_index!=NULL       && g_arr_poisson_rate!=NULL
+     g_begin_poisson_index!=NULL       && g_arr_poisson_rate!=NULL
     && g_arr_poisson_strength_E!=NULL    && g_arr_poisson_strength_I!=NULL
     ));
 
@@ -439,17 +537,35 @@ void input_initialization()
 
   for( i = 0; i < g_num_neu; i++ ) {
 #if EXPONENTIAL_IF_USE
-    neu[i].value[0] = VOT_RESET+ran0(&initial_pertub_Vot)
-                     *(VOT_TAKEOFF-VOT_RESET);
+    neu[i].value[0] = 0.5;//VOT_RESET+ran0(&initial_pertub_Vot)
+                     //*(VOT_TAKEOFF-VOT_RESET);
 #else // use I&F model
     neu[i].value[0] = ran0(&initial_pertub_Vot);
 #endif
 //    neu[i].value[0] = ran0(&initial_pertub_Vot);
     neu[i].value[1] = ran0(&initial_pertub_Ex);
-    neu[i].value[Stepsmooth_Con+1] = (1 - NONE_INHIBITORY)*ran0(&initial_pertub_In);
+    neu[i].value[Stepsmooth_Con+1] = ran0(&initial_pertub_In);
+    neu[i].value[2*Stepsmooth_Con+1] = ran0(&initial_pertub_m);
+    neu[i].value[2*Stepsmooth_Con+2] = ran0(&initial_pertub_h);
+    neu[i].value[2*Stepsmooth_Con+3] = ran0(&initial_pertub_n);
 #if SMOOTH_CONDUCTANCE_USE
-    neu[i].value[Stepsmooth_Con] = ran0(&initial_pertub_Ex_H);
-    neu[i].value[2*Stepsmooth_Con] = (1 - NONE_INHIBITORY)*ran0(&initial_pertub_In_H);
+    neu[i].value[2] = ran0(&initial_pertub_Ex_H);
+    neu[i].value[3] = ran0(&initial_pertub_Ex_I);
+    neu[i].value[4] = ran0(&initial_pertub_Ex_J);
+    neu[i].value[Stepsmooth_Con] = ran0(&initial_pertub_Ex_K);
+    neu[i].value[Stepsmooth_Con+2] = (1 - NONE_INHIBITORY)*ran0(&initial_pertub_In_H);
+    neu[i].value[Stepsmooth_Con+3] = (1 - NONE_INHIBITORY)*ran0(&initial_pertub_In_I);
+    neu[i].value[Stepsmooth_Con+4] = (1 - NONE_INHIBITORY)*ran0(&initial_pertub_In_J);
+    neu[i].value[2*Stepsmooth_Con] = (1 - NONE_INHIBITORY)*ran0(&initial_pertub_In_K);
+    //xyy: for test
+    neu[i].value[0] = 0;
+    neu[i].value[1] = 0;  // gE
+    neu[i].value[2] = 0;  // hE
+    neu[i].value[3] = 0;  // gI
+    neu[i].value[4] = 0;  // hI
+    neu[i].value[5] = 0.05293248525724958;  // m
+    neu[i].value[6] = 0.5961207535084603;  // h
+    neu[i].value[7] = 0.3176769140606974;  // n
 #endif
   }
 #if POISSON_INPUT_USE
@@ -510,8 +626,6 @@ void poisson_generator(int index_neuron, vector &Timing_input)
 void data_dump()
 {
   for(int i = 0; i < g_num_neu; i++ ) {
-    neuron_destroy(tmp_tempneu[i]);
-    neuron_destroy(tmp_tempneu2[i]);
     neuron_destroy(neu[i]);
 #if CORTICAL_STRENGTH_NONHOMO
     free(cortical_matrix[i]);
@@ -521,19 +635,22 @@ void data_dump()
     vector_destroy(poisson_input[i]);
 #endif
   }
-  free(tmp_tempneu);                  tmp_tempneu = NULL;
-  free(tmp_tempneu2);                 tmp_tempneu2 = NULL;
   raster_destroy(RAS);
   raster_destroy(spike_list);
   free(neu);                          neu = NULL;
+  free(former_neu);                   former_neu = NULL;
+  free(neuRK);                        neuRK = NULL;
+  free(neu_d1);                       neu_d1 = NULL;
+  free(neu_d2);                       neu_d2 = NULL;
+  free(neu_d3);                       neu_d3 = NULL;
+  free(neu_d4);                       neu_d4 = NULL;
+
 #if POISSON_INPUT_USE
   free(poisson_input);                poisson_input = NULL;
   free(g_arr_poisson_rate);           g_arr_poisson_rate = NULL;
   free(g_arr_poisson_strength_E);     g_arr_poisson_strength_E = NULL;
   free(g_arr_poisson_strength_I);     g_arr_poisson_strength_I = NULL;
-  free(g_tempbegin_poisson_index);    g_tempbegin_poisson_index = NULL;
   free(g_begin_poisson_index);        g_begin_poisson_index = NULL;
-  free(tmp_tempbegin_poisson_index);  tmp_tempbegin_poisson_index = NULL;
   free(ran_iy);                       ran_iy = NULL;
   free(ran_iv);                       ran_iv = NULL;
   free(last_input);                   last_input = NULL;

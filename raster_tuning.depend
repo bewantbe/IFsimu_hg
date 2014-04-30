@@ -1,0 +1,923 @@
+# depslib dependency file v1.0
+1360676499 source:g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1361531027 ing.h"
+
+1360946261 g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1337694739 
+
+1358690572 g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\raster.h
+
+1358690572 g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\neuron.h
+
+1358690572 g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\loop.h
+
+1358690572 g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\datahandling.h
+
+1360820709 source:g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1337694751 g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\random.h
+
+1358690572 g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\datainput.h
+
+1360675345 source:g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1360673726 source:g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1337694751 g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\myopengl.h
+
+1359715557 g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\poisson_input.h
+
+1337694739 source:g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1360937950 source:g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1376467387 nput.h"
+
+1337694739 source:g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\random.cpp
+	"stdafx.h"
+	"random.h"
+
+1337694739 source:g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1360680123 source:g:\神经网络\high conductance\ifsimu_release_2.1.1\ifsimu\raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
+1363615353 h>
+
+1360676499 source:g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1361024974 g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1358690572 g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\raster.h
+
+1358690572 g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\neuron.h
+
+1358690572 g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\loop.h
+
+1358690572 g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\datahandling.h
+
+1360820709 source:g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1337694751 g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\random.h
+
+1358690572 g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\datainput.h
+
+1360675345 source:g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1360673726 source:g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1337694751 g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\myopengl.h
+
+1359715557 g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\poisson_input.h
+
+1337694739 source:g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1337694739 source:g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\random.cpp
+	"stdafx.h"
+	"random.h"
+
+1337694739 source:g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1360680123 source:g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
+1361024583 source:g:\神经网络\high conductance\hcsimu_mhn_2.1.1\ifsimu\poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1361531027 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1361716578 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<cstdlib>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\raster.h
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\neuron.h
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\loop.h
+
+1361549787 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\datahandling.h
+
+1361713418 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1337694751 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\random.h
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\datainput.h
+
+1360675345 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1360673726 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1337694751 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\myopengl.h
+
+1361682209 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\poisson_input.h
+
+1361685392 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1361713203 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1337694739 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\random.cpp
+	"stdafx.h"
+	"random.h"
+
+1337694739 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1361716531 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\ifsimu\raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
+1361531027 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1363759239 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<cstdlib>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\raster.h
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\neuron.h
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\loop.h
+
+1361549787 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\datahandling.h
+
+1362325772 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1337694751 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\random.h
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\datainput.h
+
+1360675345 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1360673726 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1337694751 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\myopengl.h
+
+1363756818 g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\poisson_input.h
+
+1361685392 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1363756818 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1337694739 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\random.cpp
+	"stdafx.h"
+	"random.h"
+
+1337694739 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1363615353 source:g:\neuron science\high conductance\hcsimu_mhn_2.1.1\hcsimu\raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
+1361531027 source:g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1363862987 g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1363849781 g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\raster.h
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\neuron.h
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\loop.h
+
+1361549787 g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\datahandling.h
+
+1362325772 source:g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1337694751 g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\random.h
+
+1358690572 g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\datainput.h
+
+1360675345 source:g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1360673726 source:g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1337694751 g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\myopengl.h
+
+1363756818 g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\poisson_input.h
+
+1361685392 source:g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1363790847 source:g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1337694739 source:g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\random.cpp
+	"stdafx.h"
+	"random.h"
+
+1337694739 source:g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1363615353 source:g:\neuron science\high conductance\hcsimu_mhn_1.0\hcsimu\raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
+1361531027 source:/media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1364826269 /media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1363849781 /media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/raster.h
+
+1358690572 /media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/neuron.h
+
+1358690572 /media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/loop.h
+
+1361549787 /media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/datahandling.h
+
+1362325772 source:/media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1337694751 /media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/random.h
+
+1358690572 /media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/datainput.h
+
+1360675345 source:/media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1360673726 source:/media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1337694751 /media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/myopengl.h
+
+1363756818 /media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/poisson_input.h
+
+1361685392 source:/media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1337694739 source:/media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/random.cpp
+	"stdafx.h"
+	"random.h"
+
+1337694739 source:/media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1363615353 source:/media/sjtujyl/鏈湴纾佺洏1/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
+1361531027 source:g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1364826269 g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1363849781 g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\raster.h
+
+1358690572 g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\neuron.h
+
+1358690572 g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\loop.h
+
+1361549787 g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\datahandling.h
+
+1362325772 source:g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1337694751 g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\random.h
+
+1358690572 g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\datainput.h
+
+1360675345 source:g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1360673726 source:g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1337694751 g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\myopengl.h
+
+1363756818 g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\poisson_input.h
+
+1361685392 source:g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1337694739 source:g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\random.cpp
+	"stdafx.h"
+	"random.h"
+
+1337694739 source:g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1363615353 source:g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
+1376467387 source:g:\neuron science\gc_analysis\hcsimu_mhn_1.0\hcsimu\poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1361531027 source:/media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1394035203 /media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1363849781 /media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/raster.h
+
+1358690572 /media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/neuron.h
+
+1358690572 /media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/loop.h
+
+1361549787 /media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/datahandling.h
+
+1360675345 source:/media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1360673726 source:/media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1337694751 /media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/myopengl.h
+
+1358690572 /media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/datainput.h
+
+1363756818 /media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/poisson_input.h
+
+1361685392 source:/media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1337694739 source:/media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/random.cpp
+	"stdafx.h"
+	"random.h"
+
+1337694751 /media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/random.h
+
+1337694739 source:/media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1394035285 source:/media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1394032900 source:/media/sjtujyl/鏈湴纾佺洏/Neuron Science/GC_analysis/hcsimu_mhn_1.0/hcsimu/raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
+1361531027 source:/home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1394035203 /home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1363849781 /home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/raster.h
+
+1358690572 /home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/neuron.h
+
+1358690572 /home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/loop.h
+
+1361549787 /home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/datahandling.h
+
+1394035285 source:/home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1337694751 /home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/random.h
+
+1358690572 /home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/datainput.h
+
+1360675345 source:/home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1360673726 source:/home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1337694751 /home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/myopengl.h
+
+1363756818 /home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/poisson_input.h
+
+1361685392 source:/home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1394036062 source:/home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1337694739 source:/home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/random.cpp
+	"stdafx.h"
+	"random.h"
+
+1337694739 source:/home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1394032900 source:/home/xyy/matcode/prj_GC_clean/HH/hcsimu_mhn_1.0/hcsimu/raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
+1361531027 source:/home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1398807463 /home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1363849781 /home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/raster.h
+
+1358690572 /home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/neuron.h
+
+1358690572 /home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/loop.h
+
+1361549787 /home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/datahandling.h
+
+1398810914 source:/home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1337694751 /home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/random.h
+
+1358690572 /home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/datainput.h
+
+1360675345 source:/home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1360673726 source:/home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1337694751 /home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/myopengl.h
+
+1363756818 /home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/poisson_input.h
+
+1361685392 source:/home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1337694739 source:/home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/random.cpp
+	"stdafx.h"
+	"random.h"
+
+1337694739 source:/home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1398807824 source:/home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
+1398807943 source:/home/xyy/code/test/hcsimu_mhn_1.0/hcsimu/poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+

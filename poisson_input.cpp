@@ -9,7 +9,7 @@
 #if POISSON_INPUT_USE
 #if SMOOTH_CONDUCTANCE_USE
 // use smooth conductance HE and HI
-inline void force_inputR( neuron *tempneu, int index_neuron)
+void force_inputR( neuron *tempneu, int index_neuron)
 {
   // excitatory conductance
 //  tempneu[index_neuron].value[Stepsmooth_Con] += Strength_Exinput;
@@ -18,6 +18,9 @@ inline void force_inputR( neuron *tempneu, int index_neuron)
 //  tempneu[index_neuron].value[2*Stepsmooth_Con] += Strength_Ininput;
   tempneu[index_neuron].value[2*Stepsmooth_Con] += g_arr_poisson_strength_I[index_neuron];
 }
+
+
+
 #else  // of SMOOTH_CONDUCTANCE_USE
 // only use excitatory conductance and inhibitory conductance: GE and GI
 void force_input( neuron *tempneu, int index_neuron)
@@ -31,372 +34,489 @@ void force_input( neuron *tempneu, int index_neuron)
 }
 #endif  // SMOOTH_CONDUCTANCE_USE
 
-// cortical interaction by conductance, external input either by conductance
-void voltage_dt(int index_neuron, double t, double gE, double gI, double v, double &dv_dt)
+void voltage_dt(int index_neuron,double t,double m,double h,double n,double gE,double gI,double v,double &dv)
 {
 # if EXPONENTIAL_IF_USE
-  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
-          - gI*(v - Vot_Inhibitory) + Con_Leakage*VOT_DELTAT*exp((v-VOT_TAKEOFF)/VOT_DELTAT);
+  dv = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
+          - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory) + Con_Leakage*VOT_DELTAT*exp((v-VOT_TAKEOFF)/VOT_DELTAT);
 # else
-  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
-          - gI*(v - Vot_Inhibitory);
+  dv = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
+          - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory);
 # endif
 }
+
+void whole_dt(const neuron *neu_val, neuron *neu_dt, double *volt, int index_neuron, double t)
+{
+  //dv_dt
+double v = neu_val[index_neuron].value[0];
+double sca_v = neu_val[index_neuron].value[0]*10.0-65.0 ;//scaling of the voltage
+double gE = neu_val[index_neuron].value[1];
+double gI = neu_val[index_neuron].value[Stepsmooth_Con+1];
+double m = neu_val[index_neuron].value[2*Stepsmooth_Con+1];
+double h = neu_val[index_neuron].value[2*Stepsmooth_Con+2];
+double n = neu_val[index_neuron].value[2*Stepsmooth_Con+3];
+# if EXPONENTIAL_IF_USE
+  neu_dt[index_neuron].value[0] = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
+          - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory) + Con_Leakage*VOT_DELTAT*exp((v-VOT_TAKEOFF)/VOT_DELTAT);
+# else
+  neu_dt[index_neuron].value[0] = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
+          - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory);
+# endif
+
+//mhn_dt
+  neu_dt[index_neuron].value[2*Stepsmooth_Con+1] = 0.1*(sca_v+40.0)/(1-exp(-(sca_v+40.0)/10.0))*(1-m) - 4*exp(-(sca_v+65.0)/18.0)*m;
+
+  neu_dt[index_neuron].value[2*Stepsmooth_Con+2] = 0.07*exp(-(sca_v+65.0)/20.0)*(1-h) - exp((sca_v+35.0)/10)/(1+exp((sca_v+35.0)/10))*h;
+
+  neu_dt[index_neuron].value[2*Stepsmooth_Con+3] = 0.01*(sca_v+55.0)/(1-exp(-(sca_v+55.0)/10.0))*(1-n) - 0.125*exp(-(sca_v+65.0)/80.0)*n;
+
+//conductance_dt
+int index_firing = -1;
+# if SMOOTH_CONDUCTANCE_USE
+//smooth_dt
+    for (int con_index = 1;con_index<Stepsmooth_Con;con_index++){
+        neu_dt[index_neuron].value[con_index] = -neu_val[index_neuron].value[con_index]/Time_ExCon + neu_val[index_neuron].value[con_index+1];
+        neu_dt[index_neuron].value[Stepsmooth_Con+con_index] = -neu_val[index_neuron].value[Stepsmooth_Con+con_index]/Time_InCon + neu_val[index_neuron].value[Stepsmooth_Con+con_index+1];
+    }
+  neu_dt[index_neuron].value[Stepsmooth_Con] = -neu_val[index_neuron].value[Stepsmooth_Con]/Time_ExConR ;
+  neu_dt[index_neuron].value[2*Stepsmooth_Con] = -neu_val[index_neuron].value[2*Stepsmooth_Con]/Time_InConR ;
+
+#if CORTICAL_STRENGTH_NONHOMO
+  for (index_firing = 0; index_firing<g_num_neu; index_firing++) {
+    if (index_firing != index_neuron) {
+      if(volt[index_firing]== 0) continue;
+      neu_dt[index_neuron].value[Stepsmooth_Con] +=
+        neuRK[index_firing].type    * neuRK[index_neuron].type
+        *Strength_CorEE * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing]
+        + neuRK[index_firing].type * (1-neuRK[index_neuron].type)
+        *Strength_CorIE * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing];
+
+      neu_dt[index_neuron].value[2*Stepsmooth_Con] +=
+        (1-neuRK[index_firing].type)    * neuRK[index_neuron].type
+        *Strength_CorEI * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing]
+        + (1-neuRK[index_firing].type) * (1-neuRK[index_neuron].type)
+        *Strength_CorII * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing];
+    }
+  }
+#else
+  for (index_firing = 0; index_firing<g_num_neu; index_firing++) {
+    if (index_firing != index_neuron) {
+      if(volt[index_firing]== 0) continue;
+      neu_dt[index_neuron].value[Stepsmooth_Con] +=
+        neuRK[index_firing].type * neuRK[index_neuron].type    * Strength_CorEE
+        *volt[index_firing]
+        + neuRK[index_firing].type * (1-neuRK[index_neuron].type)* Strength_CorIE
+        *volt[index_firing];
+
+      neu_dt[index_neuron].value[2*Stepsmooth_Con] +=
+        (1-neuRK[index_firing].type) * neuRK[index_neuron].type    * Strength_CorEI
+        *volt[index_firing]
+        + (1-neuRK[index_firing].type) * (1-neuRK[index_neuron].type)* Strength_CorII
+        *volt[index_firing];
+    }
+  }
+#endif
+
+#else//non_smooth conductance
+  neu_dt[index_neuron].value[1] = -neu_val[index_neuron].value[1]/Time_ExConR;
+  neu_dt[index_neuron].value[Stepsmooth_Con+1] = -neu_val[index_neuron].value[Stepsmooth_Con+1]/Time_InConR;
+
+#if CORTICAL_STRENGTH_NONHOMO
+  for (index_firing = 0;index_firing<g_num_neu;index_firing++) {
+    if (index_firing != index_neuron) {
+      if(volt[index_firing]== 0) continue;
+      neu_dt[index_neuron].value[1] +=
+        neu_val[index_firing].type    * neu_val[index_neuron].type
+        *Strength_CorEE * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing]
+        + neu_val[index_firing].type * (1-neu_val[index_neuron].type)
+        *Strength_CorIE * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing];
+
+      neu_dt[index_neuron].value[Stepsmooth_Con+1] +=
+        (1-neu_val[index_firing].type)    * neu_val[index_neuron].type
+        *Strength_CorEI * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing]
+        + (1-neu_val[index_firing].type) * (1-neu_val[index_neuron].type)
+        *Strength_CorII * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing];
+    }
+  }
+#else
+for (index_firing = 0;index_firing<g_num_neu;index_firing++) {
+  if (index_firing != index_neuron) {
+    if(volt[index_firing]== 0) continue;
+    neu_dt[index_neuron].value[1] +=
+      neu_val[index_firing].type * neu_val[index_neuron].type    * Strength_CorEE
+      *volt[index_firing]
+      + neu_val[index_firing].type * (1-neu_val[index_neuron].type)* Strength_CorIE
+      *volt[index_firing];
+
+    neu_dt[index_neuron].value[Stepsmooth_Con+1] +=
+      (1-neu_val[index_firing].type) * neu_val[index_neuron].type    * Strength_CorEI
+      *volt[index_firing]
+      + (1-neu_val[index_firing].type) * (1-neu_val[index_neuron].type)* Strength_CorII
+      *volt[index_firing];
+  }
+}
+#endif
+
+#endif//nonsmooth end
+}
+
 
 #else   // not POISSON_INPUT_USE
 
 double external_current(int index_neuron, double t)
 {
-  return (Current_0 + Current_1*cos(2*M_PI*Rate_input*t+phase[index_neuron]));
+  return Current_0;//(Current_0 + Current_1*cos(2*M_PI*Rate_input*t+phase[index_neuron]));
 }
 
-// cortical interaction by conductance, external input either by current
-void voltage_dt(int index_neuron, double t, double gE, double gI, double v, double &dv_dt)
+void voltage_dt(int index_neuron,double t,double m,double h,double n,double gE,double gI,double v,double &dv)
 {
-//  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
-//          - gI*(v - Vot_Inhibitory) + external_current(index_neuron, t);
+# if EXPONENTIAL_IF_USE
+  dv = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory) + Con_Leakage*VOT_DELTAT*exp((v-VOT_TAKEOFF)/VOT_DELTAT)
+          + external_current(index_neuron, t);
+# else
+  dv = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
+       - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory) + external_current(index_neuron, t);
+#endif
+}
+
+void whole_dt(const neuron *neu_val, neuron *neu_dt, double *volt, int index_neuron, double t)
+{
+//dv_dt
+double v = neu_val[index_neuron].value[0];
+double sca_v = neu_val[index_neuron].value[0]*10.0-65.0 ;//rescale the voltage
+double gE = neu_val[index_neuron].value[1];
+double gI = neu_val[index_neuron].value[Stepsmooth_Con+1];
+double m = neu_val[index_neuron].value[2*Stepsmooth_Con+1];
+double h = neu_val[index_neuron].value[2*Stepsmooth_Con+2];
+double n = neu_val[index_neuron].value[2*Stepsmooth_Con+3];
 #if EXPONENTIAL_IF_USE
-  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
-          - gI*(v - Vot_Inhibitory) + Con_Leakage*VOT_DELTAT*exp((v-VOT_TAKEOFF)/VOT_DELTAT)
+  neu_dt[index_neuron].value[0] = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory) + Con_Leakage*VOT_DELTAT*exp((v-VOT_TAKEOFF)/VOT_DELTAT)
           + external_current(index_neuron, t);
 #else
-  dv_dt = - Con_Leakage*(v - Vot_Leakage) - gE*(v - Vot_Excitatory)
-          - gI*(v - Vot_Inhibitory) + external_current(index_neuron, t);
+  neu_dt[index_neuron].value[0] = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
+        - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory) + external_current(index_neuron, t);
 #endif
-}
 
-#endif  // POISSON_INPUT_USE
+//mhn_dt
+  neu_dt[index_neuron].value[2*Stepsmooth_Con+1] = 0.1*(sca_v+40.0)/(1-exp(-(sca_v+40.0)/10.0))*(1-m) - 4*exp(-(sca_v+65.0)/18.0)*m;
 
+  neu_dt[index_neuron].value[2*Stepsmooth_Con+2] = 0.07*exp(-(sca_v+65.0)/20.0)*(1-h) - exp((sca_v+35.0)/10)/(1+exp((sca_v+35.0)/10))*h;
 
-#if SMOOTH_CONDUCTANCE_USE
+  neu_dt[index_neuron].value[2*Stepsmooth_Con+3] = 0.01*(sca_v+55.0)/(1-exp(-(sca_v+55.0)/10.0))*(1-n) - 0.125*exp(-(sca_v+65.0)/80.0)*n;
 
-// use smooth conductance
-void conductance_evolve( neuron *tempneu, int index_neuron, double subTstep)
-{
-//******************************************************************************
-//********************** renew the Excitatory conductance
-  // renew the ex-conductance with highest smoothness
-  tempneu[index_neuron].value[1] =
-    tempneu[index_neuron].value[1]*exp(-subTstep/Time_ExCon)
-   +1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-    *(exp(-subTstep/Time_ExConR) - exp(-subTstep/Time_ExCon))
-    *tempneu[index_neuron].value[Stepsmooth_Con];
+//conductance_dt
+int index_firing = -1;
+# if SMOOTH_CONDUCTANCE_USE
+//smooth_dt
+ for (int con_index = 1;con_index<Stepsmooth_Con;con_index++){
+        neu_dt[index_neuron].value[con_index] = -neu_val[index_neuron].value[con_index]/Time_ExCon + neu_val[index_neuron].value[con_index+1];
+        neu_dt[index_neuron].value[Stepsmooth_Con+con_index] = -neu_val[index_neuron].value[Stepsmooth_Con+con_index]/Time_InCon + neu_val[index_neuron].value[Stepsmooth_Con+con_index+1];
+    }
+  neu_dt[index_neuron].value[Stepsmooth_Con] = -neu_val[index_neuron].value[Stepsmooth_Con]/Time_ExConR + external_current(index_neuron, t);
+  neu_dt[index_neuron].value[2*Stepsmooth_Con] = -neu_val[index_neuron].value[2*Stepsmooth_Con]/Time_InConR ;
 
-  tempneu[index_neuron].value[Stepsmooth_Con] =
-    tempneu[index_neuron].value[Stepsmooth_Con]*exp(-subTstep/Time_ExConR);
-
-//******************************************************************************
-//********************* renew the Inhibitory conductance
-  // renew the in-conductance with highest smoothness
-  tempneu[index_neuron].value[Stepsmooth_Con+1] =
-    tempneu[index_neuron].value[Stepsmooth_Con+1]*exp(-subTstep/Time_InCon)
-   +1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-    *(exp(-subTstep/Time_InConR) - exp(-subTstep/Time_InCon))
-    *tempneu[index_neuron].value[2*Stepsmooth_Con];
-
-  tempneu[index_neuron].value[2*Stepsmooth_Con] =
-    tempneu[index_neuron].value[2*Stepsmooth_Con]*exp(-subTstep/Time_InConR);
-}
-
-// use smooth conductance HE and HI
-void force_corticR(neuron *tempneu, int index_neuron, int index_spikingneuron)
-{
-  if (index_neuron != index_spikingneuron) {
 #if CORTICAL_STRENGTH_NONHOMO
-    tempneu[index_neuron].value[Stepsmooth_Con] +=
-       tempneu[index_spikingneuron].type *    tempneu[index_neuron].type
-       * Strength_CorEE * cortical_matrix[index_neuron][index_spikingneuron]
-     + tempneu[index_spikingneuron].type * (1-tempneu[index_neuron].type)
-       * Strength_CorIE * cortical_matrix[index_neuron][index_spikingneuron];
+  for (index_firing = 0; index_firing<g_num_neu; index_firing++) {
+    if (index_firing != index_neuron) {
+      if(volt[index_firing]== 0) continue;
+      neu_dt[index_neuron].value[Stepsmooth_Con] +=
+        neuRK[index_firing].type    * neuRK[index_neuron].type
+        *Strength_CorEE * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing]
+        + neuRK[index_firing].type * (1-neuRK[index_neuron].type)
+        *Strength_CorIE * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing];
 
-    tempneu[index_neuron].value[2*Stepsmooth_Con] +=
-       (1-tempneu[index_spikingneuron].type) *    tempneu[index_neuron].type
-       * Strength_CorEI * cortical_matrix[index_neuron][index_spikingneuron]
-     + (1-tempneu[index_spikingneuron].type) * (1-tempneu[index_neuron].type)
-       * Strength_CorII * cortical_matrix[index_neuron][index_spikingneuron];
+      neu_dt[index_neuron].value[2*Stepsmooth_Con] +=
+        (1-neuRK[index_firing].type)    * neuRK[index_neuron].type
+        *Strength_CorEI * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing]
+        + (1-neuRK[index_firing].type) * (1-neuRK[index_neuron].type)
+        *Strength_CorII * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing];
+    }
+  }
 #else
-    tempneu[index_neuron].value[Stepsmooth_Con] +=
-       tempneu[index_spikingneuron].type *    tempneu[index_neuron].type  * Strength_CorEE
-     + tempneu[index_spikingneuron].type * (1-tempneu[index_neuron].type) * Strength_CorIE;
+  for (index_firing = 0; index_firing<g_num_neu; index_firing++) {
+    if (index_firing != index_neuron) {
+      if(volt[index_firing]== 0) continue;
+      neu_dt[index_neuron].value[Stepsmooth_Con] +=
+        neuRK[index_firing].type * neuRK[index_neuron].type    * Strength_CorEE
+        *volt[index_firing]
+        + neuRK[index_firing].type * (1-neuRK[index_neuron].type)* Strength_CorIE
+        *volt[index_firing];
 
-    tempneu[index_neuron].value[2*Stepsmooth_Con] +=
-       (1-tempneu[index_spikingneuron].type) *    tempneu[index_neuron].type  * Strength_CorEI
-     + (1-tempneu[index_spikingneuron].type) * (1-tempneu[index_neuron].type) * Strength_CorII;
+      neu_dt[index_neuron].value[2*Stepsmooth_Con] +=
+        (1-neuRK[index_firing].type) * neuRK[index_neuron].type    * Strength_CorEI
+        *volt[index_firing]
+        + (1-neuRK[index_firing].type) * (1-neuRK[index_neuron].type)* Strength_CorII
+        *volt[index_firing];
+    }
+  }
 #endif
+
+#else//non_smooth conductance
+  neu_dt[index_neuron].value[1] = -neu_val[index_neuron].value[1]/Time_ExConR+external_current(index_neuron, t);
+  neu_dt[index_neuron].value[Stepsmooth_Con+1] = -neu_val[index_neuron].value[Stepsmooth_Con+1]/Time_InConR;
+
+#if CORTICAL_STRENGTH_NONHOMO
+  for (index_firing = 0;index_firing<g_num_neu;index_firing++) {
+    if (index_firing != index_neuron) {
+      if(volt[index_firing]== 0) continue;
+      neu_dt[index_neuron].value[1] +=
+        neu_val[index_firing].type    * neu_val[index_neuron].type
+        *Strength_CorEE * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing]
+        + neu_val[index_firing].type * (1-neu_val[index_neuron].type)
+        *Strength_CorIE * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing];
+
+      neu_dt[index_neuron].value[Stepsmooth_Con+1] +=
+        (1-neu_val[index_firing].type)    * neu_val[index_neuron].type
+        *Strength_CorEI * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing]
+        + (1-neu_val[index_firing].type) * (1-neu_val[index_neuron].type)
+        *Strength_CorII * cortical_matrix[index_neuron][index_firing]
+        *volt[index_firing];
+    }
+  }
+#else
+for (index_firing = 0;index_firing<g_num_neu;index_firing++) {
+  if (index_firing != index_neuron) {
+    if(volt[index_firing]== 0) continue;
+    neu_dt[index_neuron].value[1] +=
+      neu_val[index_firing].type * neu_val[index_neuron].type    * Strength_CorEE
+      *volt[index_firing]
+      + neu_val[index_firing].type * (1-neu_val[index_neuron].type)* Strength_CorIE
+      *volt[index_firing];
+
+    neu_dt[index_neuron].value[Stepsmooth_Con+1] +=
+      (1-neu_val[index_firing].type) * neu_val[index_neuron].type    * Strength_CorEI
+      *volt[index_firing]
+      + (1-neu_val[index_firing].type) * (1-neu_val[index_neuron].type)* Strength_CorII
+      *volt[index_firing];
   }
 }
-
-#else  // of SMOOTH_CONDUCTANCE_USE
-
-// use non-smooth conductance
-void conductance_decay( neuron *tempneu, int index_neuron, double subTstep)
-{
-// renew the Excitatory conductance
-  tempneu[index_neuron].value[1] =
-    tempneu[index_neuron].value[1]*exp(-subTstep/Time_ExCon);
-
-// renew the Inhibitory conductance
-  tempneu[index_neuron].value[Stepsmooth_Con+1] =
-    tempneu[index_neuron].value[Stepsmooth_Con+1]*exp(-subTstep/Time_InCon);
-}
-
-// only use excitatory conductance and inhibitory conductance: GE and GI
-void force_cortic( neuron *tempneu, int index_neuron, int index_spikingneuron)
-{
-  if (index_neuron != index_spikingneuron) {
-#if CORTICAL_STRENGTH_NONHOMO
-    tempneu[index_neuron].value[1] +=
-       tempneu[index_spikingneuron].type *    tempneu[index_neuron].type
-       * Strength_CorEE * cortical_matrix[index_neuron][index_spikingneuron]
-     + tempneu[index_spikingneuron].type * (1-tempneu[index_neuron].type)
-       * Strength_CorIE * cortical_matrix[index_neuron][index_spikingneuron];
-
-    tempneu[index_neuron].value[Stepsmooth_Con+1] +=
-       (1-tempneu[index_spikingneuron].type) *    tempneu[index_neuron].type
-       * Strength_CorEI * cortical_matrix[index_neuron][index_spikingneuron]
-     + (1-tempneu[index_spikingneuron].type) * (1-tempneu[index_neuron].type)
-       * Strength_CorII * cortical_matrix[index_neuron][index_spikingneuron];
-#else
-    tempneu[index_neuron].value[1] +=
-       tempneu[index_spikingneuron].type *    tempneu[index_neuron].type  * Strength_CorEE
-     + tempneu[index_spikingneuron].type * (1-tempneu[index_neuron].type) * Strength_CorIE;
-
-    tempneu[index_neuron].value[Stepsmooth_Con+1] +=
-       (1-tempneu[index_spikingneuron].type) *    tempneu[index_neuron].type  * Strength_CorEI
-     + (1-tempneu[index_spikingneuron].type) * (1-tempneu[index_neuron].type) * Strength_CorII;
 #endif
-  }
+
+#endif//nonsmooth ends
 }
 
-#endif  // SMOOTH_CONDUCTANCE_USE
+#endif
+// deal with the function 1/(1+exp(-(volt1+volt2)/deno))
+
+///note by jyl: This function is supposed to increase the speed of simulation in the exponential part
+///using the hermit interpolation, though not applied. If interested, have a try! :)
+double hermexp(double volt1, double volt2, double deno)
+{
+    double f = 1/(1+exp(-(volt1+volt2)/deno));
+    /*double der0 =0.25;
+    double g0 = 0.5;
+    double v = (volt1+volt2)/deno;
+    double f;
+    if (v<xleft)
+    f = maximum((v-xleft)*dgdt+gleft,0.0);
+    else{
+        if (v>-xleft)
+        f = minimum((v+xleft)*dgdt+1-gleft,1.0);
+        else{
+                    // use gleft, gright, dleft, dright to construct a cubic polynomial
+                    // basic function f1 satisfies: f1(left)=1, f1(0)=0, f1'(left)=0, f1'(0)=0
+                    double f1 = gleft*(2*v+0-3*xleft)*(v-0)*(v-0)/(0-xleft)/(0-xleft)/(0-xleft);
+                    // basic function f2 satisfies: f2(left)=0, f2(0)=1, f2'(left)=0, f2'(0)=0
+                    double f2 = g0*(3*0-2*v-xleft)*(v-xleft)*(v-xleft)/(0-xleft)/(0-xleft)/(0-xleft);
+                    // basic function f3 satisfies: f3(a)=0, f3(b)=0, f3'(a)=1, f3'(b)=0
+                    double f3 = dgdt*(v-xleft)*(v-0)*(v-0)/(0-xleft)/(0-xleft);
+                    // basic function f4 satisfies: f4(a)=0, f4(b)=0, f4'(a)=0, f4'(b)=1
+                    double f4 = der0*(v-xleft)*(v-xleft)*(v-0)/(0-xleft)/(0-xleft);
+
+                    f=f1+f2+f3+f4;
+                if (v > 0)
+                    f = 1-f;
+
+        }
+    }*/
+    return f;
+}
+
+
 
 
 #if runge_kutta == runge_kutta2
-void runge_kutta2(neuron *tempneu, int index_neuron, double subTstep,
-                  double t_evolution, double &temp_vot,
-                  void (*dvdt)(int index_neuron, double t, double gE, double gI,
-                               double v, double &dv_dt))
+void runge_kutta2(neuron *tempneu, double subTstep, double t_evolution)
 {
-  // dy/dt = f(t,y) t = t(n), y = y(n)
-  double m1, m2;
-  double newstep = subTstep; // time step needs to be changed for awaken neuron
+        // dy/dt = f(t,y) t = t(n), y = y(n)
+  double ini_time = t_evolution;
+  double mid_time = t_evolution + subTstep/2;
 
-  // the neuron is in refractory period
-  tempneu[index_neuron].value[size_neuronvar-1] += ( 1 - tempneu[index_neuron].state_neuron )*newstep;
+  int i = -1;
+  int j = -1;
+  //initialize the information of the network
+  for (i = 0; i<g_num_neu; i++) {
+    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
+      neuRK[i].value[j]  = tempneu[i].value[j];
+    }
+    vol[i]=(neuRK[i].value[0]>4?(exp((tempneu[i].value[0]-8.5)*5)/(1+exp((tempneu[i].value[0]-8.5)*5))):0);
+  } ///jyl: I set this value(4) to increase the computing speed. Once the voltage is larger than this value, the simulation program
+  ///would take into account. Note that the error caused by this technique is smaller than the accuracy of RK method
 
-  // the neuron is in refractory period but will be awaken in this time!
-  if (tempneu[index_neuron].value[size_neuronvar-1] >= TIME_REFRACTORY) {
-    newstep = tempneu[index_neuron].value[size_neuronvar-1] - TIME_REFRACTORY;
-    tempneu[index_neuron].state_neuron = STATE_ACTIVE;
-    tempneu[index_neuron].value[size_neuronvar-1] = 0;
+  //compute the dy1 = f(t(n), y(n)), here y,f,dy1 are 2*stepsmooth+4-dimension vectors
+  for (i = 0; i<g_num_neu; i++) {
+    whole_dt(neuRK, neu_d1, vol, i, ini_time);
+    //update the information of the network at midtime, which will be used in the following RK2 method
+    for (j = 0; j<2*Stepsmooth_Con+4; j++)
+      neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d1[i].value[j]  * subTstep/2;
   }
+  for (i = 0; i<g_num_neu; i++)
+    vol[i]=(neuRK[i].value[0]>4?exp((tempneu[i].value[0] + neu_d1[i].value[0]  * subTstep/2-8.5)*5)/(1+exp((tempneu[i].value[0] + neu_d1[i].value[0]  * subTstep/2-8.5)*5)):0);
 
-  if (tempneu[index_neuron].state_neuron == STATE_ACTIVE) {
-    double v0 = tempneu[index_neuron].value[0];
-// if the neuron is awaken in this time step, the value of conductance should be used
-// with the value of the awaking point******************************************
-#if SMOOTH_CONDUCTANCE_USE
-    double g_E0 = tempneu[index_neuron].value[1]*exp((newstep-subTstep)/Time_ExCon)
-                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp((newstep-subTstep)/Time_ExConR) - exp((newstep-subTstep)/Time_ExCon))
-                  *tempneu[index_neuron].value[Stepsmooth_Con];
-    double H_E0 = tempneu[index_neuron].value[Stepsmooth_Con]*exp((newstep-subTstep)/Time_ExConR);
 
-    double g_I0 = tempneu[index_neuron].value[Stepsmooth_Con+1]*exp((newstep-subTstep)/Time_InCon)
-                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp((newstep-subTstep)/Time_InConR) - exp((newstep-subTstep)/Time_InCon))
-                  *tempneu[index_neuron].value[2*Stepsmooth_Con];
-    double H_I0 = tempneu[index_neuron].value[2*Stepsmooth_Con]*exp((newstep-subTstep)/Time_InConR);
+  // dy2 = f(t(n)+h/3, y(n)+dy1*h/2)
+  for (i = 0; i<g_num_neu; i++)
+    whole_dt(neuRK, neu_d2, vol, i, mid_time);
 
-    double g_E1 = g_E0*exp(-newstep/2/Time_ExCon)
-                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp(-newstep/2/Time_ExConR) - exp(-newstep/2/Time_ExCon))*H_E0;
-    double g_I1 = g_I0*exp(-newstep/2/Time_InCon)
-                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp(-newstep/2/Time_InConR) - exp(-newstep/2/Time_InCon))*H_I0;
-#else
-    double g_E0 = tempneu[index_neuron].value[1]*exp((newstep-subTstep)/Time_ExCon);
-    double g_I0 = tempneu[index_neuron].value[Stepsmooth_Con+1]*exp((newstep-subTstep)/Time_InCon);
-    double g_E1 = g_E0*exp(-newstep/2/Time_ExCon);
-    double g_I1 = g_I0*exp(-newstep/2/Time_InCon);
-#endif
 
-    double ini_time = t_evolution + (subTstep - newstep);
-    double mid_time = t_evolution + (subTstep - newstep) + newstep/2;
-
-    // m1 = f(t(n), y(n))
-    (*dvdt)(index_neuron, ini_time, g_E0, g_I0, v0, m1);
-
-    // m2 = f(t(n)+h/2, y(n)+m1*h/2)
-    (*dvdt)(index_neuron, mid_time, g_E1, g_I1, v0+m1/2*newstep, m2);
-
-    temp_vot = v0 + m2*newstep;
+//update the final data
+//dy = dy2
+  for (i = 0; i<g_num_neu; i++) {
+    for (j=0; j<2*Stepsmooth_Con+4; j++) {
+      tempneu[i].value[j] = tempneu[i].value[j] + neu_d2[i].value[j] *subTstep;
+    }
   }
 }
 #endif
 
 #if runge_kutta == runge_kutta3
-void runge_kutta3(neuron *tempneu, int index_neuron, double subTstep,
-                  double t_evolution, double &temp_vot,
-                  void (*dvdt)(int index_neuron, double t, double gE, double gI,
-                               double v, double &dv_dt))
+void runge_kutta3(neuron *tempneu, double subTstep, double t_evolution)
 {
-  // dy/dt = f(t,y) t = t(n), y = y(n)
-  double m1, m2, m3;
-  double newstep = subTstep; // time step needs to be changed for awaken neuron
+    // dy/dt = f(t,y) t = t(n), y = y(n)
+  double ini_time = t_evolution;
+  double one_third_time = t_evolution + subTstep/3;
+  double two_third_time = t_evolution + 2*subTstep/3;
 
-  // the neuron is in refractory period
-  tempneu[index_neuron].value[size_neuronvar-1] +=
-    (1 - tempneu[index_neuron].state_neuron)*newstep;
-
-  // the neuron is in refractory period but will be awaken in this time!
-  if (tempneu[index_neuron].value[size_neuronvar-1] >= TIME_REFRACTORY) {
-    newstep = tempneu[index_neuron].value[size_neuronvar-1] - TIME_REFRACTORY;
-    tempneu[index_neuron].state_neuron = STATE_ACTIVE;
-    tempneu[index_neuron].value[size_neuronvar-1] = 0;
+  int i = -1;
+  int j = -1;
+  //initialize the information of the network
+  for (i = 0; i<g_num_neu; i++) {
+    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
+      neuRK[i].value[j]  = tempneu[i].value[j];
+    }
+    vol[i]=(neuRK[i].value[0]>4?(exp((tempneu[i].value[0]-8.5)*5)/(1+exp((tempneu[i].value[0]-8.5)*5))):0);
   }
 
-  if (tempneu[index_neuron].state_neuron == STATE_ACTIVE) {
-    double v0 = tempneu[index_neuron].value[0];
-// if the neuron is awaken in this time step, the value of conductance should be used
-// with the value of the awaking point******************************************
-#if SMOOTH_CONDUCTANCE_USE
-    double g_E0 = tempneu[index_neuron].value[1]*exp((newstep-subTstep)/Time_ExCon)
-                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp((newstep-subTstep)/Time_ExConR) - exp((newstep-subTstep)/Time_ExCon))
-                  *tempneu[index_neuron].value[Stepsmooth_Con];
-    double H_E0 = tempneu[index_neuron].value[Stepsmooth_Con]*exp((newstep-subTstep)/Time_ExConR);
+  //compute the dy1 = f(t(n), y(n)), here y,f,dy1 are 2*stepsmooth+4-dimension vectors
+  for (i = 0; i<g_num_neu; i++) {
+    whole_dt(neuRK, neu_d1, vol, i, ini_time);
+    //update the information of the network at midtime, which will be used in the following RK2 method
+    for (j = 0; j<2*Stepsmooth_Con+4; j++)
+      neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d1[i].value[j]  * subTstep/3;
+  }
+  for (i = 0; i<g_num_neu; i++)
+    vol[i]=(neuRK[i].value[0]>4?exp((tempneu[i].value[0] + neu_d1[i].value[0]  * subTstep/2-8.5)*5)/(1+exp((tempneu[i].value[0] + neu_d1[i].value[0]  * subTstep/2-8.5)*5)):0);
 
-    double g_I0 = tempneu[index_neuron].value[Stepsmooth_Con+1]*exp((newstep-subTstep)/Time_InCon)
-                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp((newstep-subTstep)/Time_InConR) - exp((newstep-subTstep)/Time_InCon))
-                  *tempneu[index_neuron].value[2*Stepsmooth_Con];
-    double H_I0 = tempneu[index_neuron].value[2*Stepsmooth_Con]*exp((newstep-subTstep)/Time_InConR);
 
-    double g_E1 = g_E0*exp(-newstep/3/Time_ExCon)
-                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp(-newstep/3/Time_ExConR) - exp(-newstep/3/Time_ExCon))*H_E0;
-    double g_I1 = g_I0*exp(-newstep/3/Time_InCon)
-                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp(-newstep/3/Time_InConR) - exp(-newstep/3/Time_InCon))*H_I0;
+  // dy2 = f(t(n)+h/3, y(n)+dy1*h/3)
+  for (i = 0; i<g_num_neu; i++) {
+    whole_dt(neuRK, neu_d2, vol, i, one_third_time);
+    //update the information of the network at midtime, which will be used in the following RK4 method
+    for (j = 0; j<2*Stepsmooth_Con+4; j++)
+      neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d2[i].value[j]  * subTstep*2/3;
+  }
+  for (i = 0; i<g_num_neu; i++){
+    vol[i]=(neuRK[i].value[0]>4?exp((tempneu[i].value[0] + neu_d2[i].value[0]  * subTstep/2-8.5)*5)/(1+exp((tempneu[i].value[0] + neu_d2[i].value[0]  * subTstep/2-8.5)*5)):0);
+  }
 
-    double g_E2 = g_E0*exp(-2*newstep/3/Time_ExCon)
-                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp(-2*newstep/3/Time_ExConR) - exp(-2*newstep/3/Time_ExCon))*H_E0;
-    double g_I2 = g_I0*exp(-2*newstep/3/Time_InCon)
-                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp(-2*newstep/3/Time_InConR) - exp(-2*newstep/3/Time_InCon))*H_I0;
-#else
-    double g_E0 = tempneu[index_neuron].value[1]*exp((newstep-subTstep)/Time_ExCon);
-    double g_I0 = tempneu[index_neuron].value[Stepsmooth_Con+1]*exp((newstep-subTstep)/Time_InCon);
-    double g_E1 = g_E0*exp(-newstep/3/Time_ExCon);
-    double g_I1 = g_I0*exp(-newstep/3/Time_InCon);
-    double g_E2 = g_E0*exp(-2*newstep/3/Time_ExCon);
-    double g_I2 = g_I0*exp(-2*newstep/3/Time_InCon);
-#endif
 
-    double ini_time = t_evolution + (subTstep - newstep);
-    double one_third_time = t_evolution + (subTstep - newstep) + newstep/3;
-    double two_third_time = t_evolution + (subTstep - newstep) + 2*newstep/3;
+//dy3 = f(t(n)+h/2, y(n)+dy2*h*2/3)
+  for (i = 0; i<g_num_neu; i++)
+    whole_dt(neuRK, neu_d3, vol, i, two_third_time);
 
-    // m1 = f(t(n), y(n))
-    (*dvdt)(index_neuron, ini_time, g_E0, g_I0, v0, m1);
 
-    // m2 = f(t(n)+h/3, y(n)+m1*h/3)
-    (*dvdt)(index_neuron, one_third_time, g_E1, g_I1, v0+m1/3*newstep, m2);
-
-    // m3 = f(t(n)+2*h/3, y(n)+2*m2*h/3)
-    (*dvdt)(index_neuron, two_third_time, g_E2, g_I2, v0+2*m2/3*newstep, m3);
-
-    temp_vot = v0 + (m1 + 3*m3)*newstep/4;
+//update the final data
+//dy = (dy1+3*dy3)/4
+  for (i = 0; i<g_num_neu; i++) {
+    for (j=0; j<2*Stepsmooth_Con+4; j++) {
+      tempneu[i].value[j] = tempneu[i].value[j] + (neu_d1[i].value[j] + 3*neu_d3[i].value[j]) *subTstep/4;
+    }
   }
 }
 #endif
 
 #if runge_kutta == runge_kutta4
-void runge_kutta4(neuron *tempneu, int index_neuron, double subTstep,
-                  double t_evolution, double &temp_vot,
-                  void (*dvdt)(int index_neuron, double t, double gE, double gI,
-                               double v, double &dv_dt))
+void runge_kutta4(neuron *tempneu, double subTstep, double t_evolution)
 {
   // dy/dt = f(t,y) t = t(n), y = y(n)
-  double m1, m2, m3, m4;
-  double newstep = subTstep; // time step needs to be changed for awaken neuron
+  double ini_time = t_evolution;
+  double two_fourth_time = t_evolution + subTstep/2;
+  double end_time = t_evolution + subTstep;
 
-  // the neuron is in refractory period
-  tempneu[index_neuron].value[size_neuronvar-1] +=
-    (1 - tempneu[index_neuron].state_neuron)*newstep;
-
-  // the neuron is in refractory period but will be awaken in this time!
-  if (tempneu[index_neuron].value[size_neuronvar-1] >= TIME_REFRACTORY) {
-    newstep = tempneu[index_neuron].value[size_neuronvar-1] - TIME_REFRACTORY;
-    tempneu[index_neuron].state_neuron = STATE_ACTIVE;
-    tempneu[index_neuron].value[size_neuronvar-1] = 0;
-
+  int i = -1;
+  int j = -1;
+  //initialize the information of the network
+  for (i = 0; i<g_num_neu; i++) {
+    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
+      neuRK[i].value[j]  = tempneu[i].value[j];
+    }
+    vol[i]=(neuRK[i].value[0]>4?(exp((tempneu[i].value[0]-8.5)*5)/(1+exp((tempneu[i].value[0]-8.5)*5))):0);
   }
 
-  if (tempneu[index_neuron].state_neuron == STATE_ACTIVE) {
-    double v0 = tempneu[index_neuron].value[0];
-// if the neuron is awaken in this time step, the value of conductance should be used
-// with the value of the awaking point******************************************
-#if SMOOTH_CONDUCTANCE_USE
-    double g_E0 = tempneu[index_neuron].value[1]*exp((newstep-subTstep)/Time_ExCon)
-                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp((newstep-subTstep)/Time_ExConR) - exp((newstep-subTstep)/Time_ExCon))
-                  *tempneu[index_neuron].value[Stepsmooth_Con];
-    double H_E0 = tempneu[index_neuron].value[Stepsmooth_Con]*exp((newstep-subTstep)/Time_ExConR);
+  //compute the dy1 = f(t(n), y(n)), here y,f,dy1 are 2*stepsmooth+4-dimension vectors
+  for (i = 0; i<g_num_neu; i++) {
+    whole_dt(neuRK, neu_d1, vol, i, ini_time);
+    //update the information of the network at midtime, which will be used in the following RK2 method
+    for (j = 0; j<2*Stepsmooth_Con+4; j++)
+      neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d1[i].value[j]  * subTstep/2;
+  }
+  for (i = 0; i<g_num_neu; i++)
+    vol[i]=(neuRK[i].value[0]>4?exp((tempneu[i].value[0] + neu_d1[i].value[0]  * subTstep/2-8.5)*5)/(1+exp((tempneu[i].value[0] + neu_d1[i].value[0]  * subTstep/2-8.5)*5)):0);
 
-    double g_I0 = tempneu[index_neuron].value[Stepsmooth_Con+1]*exp((newstep-subTstep)/Time_InCon)
-                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp((newstep-subTstep)/Time_InConR) - exp((newstep-subTstep)/Time_InCon))
-                  *tempneu[index_neuron].value[2*Stepsmooth_Con];
-    double H_I0 = tempneu[index_neuron].value[2*Stepsmooth_Con]*exp((newstep-subTstep)/Time_InConR);
 
-    double g_E1 = g_E0*exp(-newstep/2/Time_ExCon)
-                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp(-newstep/2/Time_ExConR) - exp(-newstep/2/Time_ExCon))*H_E0;
-    double g_I1 = g_I0*exp(-newstep/2/Time_InCon)
-                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp(-newstep/2/Time_InConR) - exp(-newstep/2/Time_InCon))*H_I0;
+  // dy2 = f(t(n)+h/2, y(n)+dy1*h/2)
+  for (i = 0; i<g_num_neu; i++) {
+    whole_dt(neuRK, neu_d2, vol, i, two_fourth_time);
+    //update the information of the network at midtime, which will be used in the following RK4 method
+    for (j = 0; j<2*Stepsmooth_Con+4; j++)
+      neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d2[i].value[j]  * subTstep/2;
+  }
+  for (i = 0; i<g_num_neu; i++){
+    vol[i]=(neuRK[i].value[0]>4?exp((tempneu[i].value[0] + neu_d2[i].value[0]  * subTstep/2-8.5)*5)/(1+exp((tempneu[i].value[0] + neu_d2[i].value[0]  * subTstep/2-8.5)*5)):0);
+  }
 
-    double g_E2 = g_E0*exp(-newstep/Time_ExCon)
-                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp(-newstep/Time_ExConR) - exp(-newstep/Time_ExCon))*H_E0;
-    double g_I2 = g_I0*exp(-newstep/Time_InCon)
-                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp(-newstep/Time_InConR) - exp(-newstep/Time_InCon))*H_I0;
-#else
-    double g_E0 = tempneu[index_neuron].value[1]*exp((newstep-subTstep)/Time_ExCon);
-    double g_I0 = tempneu[index_neuron].value[Stepsmooth_Con+1]*exp((newstep-subTstep)/Time_InCon);
-    double g_E1 = g_E0*exp(-newstep/2/Time_ExCon);
-    double g_I1 = g_I0*exp(-newstep/2/Time_InCon);
-    double g_E2 = g_E0*exp(-newstep/Time_ExCon);
-    double g_I2 = g_I0*exp(-newstep/Time_InCon);
-#endif
 
-    double ini_time = t_evolution + (subTstep - newstep);
-    double two_fourth_time = t_evolution + (subTstep - newstep) + newstep/2;
-    double end_time = t_evolution + (subTstep - newstep) + newstep;
+//dy3 = f(t(n)+h/2, y(n)+dy2*h/2)
+  for (i = 0; i<g_num_neu; i++) {
+    whole_dt(neuRK, neu_d3, vol, i, two_fourth_time);
+    for (j = 0; j<2*Stepsmooth_Con+4; j++)
+      neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d3[i].value[j]  * subTstep;
+  }
+  for (i = 0; i<g_num_neu; i++)
+    vol[i]=(neuRK[i].value[0]>4?exp((tempneu[i].value[0] + neu_d3[i].value[0]  * subTstep-8.5)*5)/(1+exp((tempneu[i].value[0] + neu_d3[i].value[0]  * subTstep-8.5)*5)):0);
 
-    // m1 = f(t(n), y(n))
-    (*dvdt)(index_neuron, ini_time, g_E0, g_I0, v0, m1);
 
-    // m2 = f(t(n)+h/2, y(n)+m1*h/2)
-    (*dvdt)(index_neuron, two_fourth_time, g_E1, g_I1, v0+m1/2*newstep, m2);
+//dy4 = f(t(n)+h, y(n)+dy3*h)
+  for (i = 0; i<g_num_neu; i++)
+    whole_dt(neuRK, neu_d4, vol, i, end_time);
 
-    // m3 = f(t(n)+h/2, y(n)+m2*h/2)
-    (*dvdt)(index_neuron, two_fourth_time, g_E1, g_I1, v0+m2/2*newstep, m3);
-
-    // m4 = f(t(n)+h, y(n)+m3*h)
-    (*dvdt)(index_neuron, end_time, g_E2, g_I2, v0+m3*newstep, m4);
-
-    temp_vot = v0 + (m1 + 2*m2 + 2*m3 + m4)*newstep/6;
-
-  } else { // neuron is in the refractory period!
-    temp_vot = VOT_RESET;
+//update the final data
+//dy = (dy1+2*dy2+2*dy3+dy4)/6
+  for (i = 0; i<g_num_neu; i++) {
+    for (j=0; j<2*Stepsmooth_Con+4; j++) {
+      tempneu[i].value[j] = tempneu[i].value[j] + (neu_d1[i].value[j] + 2*neu_d2[i].value[j] + 2*neu_d3[i].value[j] + neu_d4[i].value[j]) *subTstep/6;
+    }
   }
 }
 #endif
+
+
+///modified 2013/1/13 12:51
 
 void hermit(double a, double b, double va, double vb,
             double dva, double dvb, double x, double &fx)
@@ -467,494 +587,193 @@ double root_search(void (*func)(double a, double b, double va, double vb,
   return xmid;
 }
 
-void spiking_time(neuron *tempneu, int index_neuron, double t_evolution, double Ta,
-                  double Tb, double vot_cross, double &firing_time)
+void spiking_time(neuron *bef_neu, neuron *cur_neu, int index_neuron, double t_evolution, double Ta,
+                  double Tb, double &firing_time)
 {
-  double subTstep = Tb - Ta;
 
-  double va = tempneu[index_neuron].value[0];
+  double va  = bef_neu[index_neuron].value[0];
   double dva = 0; // initialization
-  double gEa = tempneu[index_neuron].value[1];
-  double gIa = tempneu[index_neuron].value[Stepsmooth_Con+1];
+  double gEa = bef_neu[index_neuron].value[1];
+  double gIa = bef_neu[index_neuron].value[Stepsmooth_Con+1];
+  double ma  = bef_neu[index_neuron].value[2*Stepsmooth_Con+1];
+  double ha  = bef_neu[index_neuron].value[2*Stepsmooth_Con+2];
+  double na  = bef_neu[index_neuron].value[2*Stepsmooth_Con+3];
 
-  voltage_dt(index_neuron,t_evolution,gEa,gIa,va,dva);
+  voltage_dt(index_neuron,t_evolution,ma,ha,na,gEa,gIa,va,dva);
 
-  double vb = vot_cross;
+
+  double vb  = cur_neu[index_neuron].value[0];
   double dvb = 0; // initialization
+  double gEb = cur_neu[index_neuron].value[1];
+  double gIb = cur_neu[index_neuron].value[Stepsmooth_Con+1];
+  double mb  = cur_neu[index_neuron].value[2*Stepsmooth_Con+1];
+  double hb  = cur_neu[index_neuron].value[2*Stepsmooth_Con+2];
+  double nb  = cur_neu[index_neuron].value[2*Stepsmooth_Con+3];
 
-#if SMOOTH_CONDUCTANCE_USE
-  double gEb = tempneu[index_neuron].value[1]*exp(-subTstep/Time_ExCon)
-               + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-               *(exp(-subTstep/Time_ExConR) - exp(-subTstep/Time_ExCon))
-               *tempneu[index_neuron].value[Stepsmooth_Con];
-  double gIb = tempneu[index_neuron].value[Stepsmooth_Con+1]*exp(-subTstep/Time_InCon)
-               + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-               *(exp(-subTstep/Time_InConR) - exp(-subTstep/Time_InCon))
-               *tempneu[index_neuron].value[2*Stepsmooth_Con];
-#else
-  double gEb = tempneu[index_neuron].value[1]*exp(-subTstep/Time_ExCon);
-  double gIb = tempneu[index_neuron].value[Stepsmooth_Con+1]*exp(-subTstep/Time_InCon);
-#endif
-
-  voltage_dt(index_neuron,(t_evolution+Tb-Ta),gEb,gIb,vb,dvb);
+  voltage_dt(index_neuron,(t_evolution+Tb-Ta),mb,hb,nb,gEb,gIb,vb,dvb);
 
   firing_time = root_search(hermit, Ta, Tb, va, vb, dva, dvb, root_acc);
 }
 
+
 #if POISSON_INPUT_USE
-// given two cortical spike time T1 and T2 (T1<T2), evolve each neuron from
-// T1 to T2, thus the whole system evolves from T1 to T2
-// if there is some neuron firing between [T1, T2], record the nearest time TT
-// evolve the whole system from T1 to TT!
-//***************** renewing conductance process is done outside this program!
-void single_neuron_test(neuron *tempneu, int index_neuron, int firing_neuron,
-                        double begin_time, double end_time,
-                        int *begin_poisson_index, struct raster &temp_spike_list, int &jump)
+void next_poisson_spike( double begin_time,
+                         int *tempbegin_poisson_index, double &end_time, int &next_neu_index)
 {
-  // because the system may need to be pulled back, therefore some variables are
-  // just temporal such as: *tempneu, *begin_poisson_index, end_time
+  double temp_end_time = 2*Tstep;//initialization
+  double com_poisson_time = 0.0;
+  int poisson_index = -1;
+  int temp_next_neu_index = -1;
 
-  // consider if there is a neuron jump from A(quiet) group to A(spike) group!
-  jump = 0;
-  //************** cortical force to conductance is done outside this function!
-
-  // record the starting point of poisson input in this interval!
-  int j = begin_poisson_index[index_neuron];
-  // for each neuron i, [T1, T2] is divided by poisson input spikes t(i1),t(i2),...
-  // evolve interval [T1, t(i1)] and then [t(i2), t(i3)], so on and so fourth
-  double subbegin_time = begin_time;
-  double subend_time = end_time; // record the middle point of poisson input!
-  double sub_tstep = end_time - begin_time;
-
-  // do hermit interpolation if a neuron fires
-  double firing_time = 0;
-
-  // record the voltage once it fires, if neuron is during refractory period
-  // and will not wake up, then runge_kutta method just do nothing!
-  // temp_vot will be the same value as the voltage of tempneu[i]
-  double temp_vot = tempneu[index_neuron].value[0];
-//  double temp_threshold = 0; // record the value of threshold once it fires
-
-  // if there is an external input current!
-  double t_evolution = time_evolution+begin_time;
-  //****************************************************************************
-  //**************  no poisson input in the whole interval!
-  if (j >= poisson_input[index_neuron].vect_size) {
-    if (index_neuron==firing_neuron) {
-#if SMOOTH_CONDUCTANCE_USE
-      conductance_evolve(tempneu, index_neuron, sub_tstep);
-#else
-      conductance_decay(tempneu, index_neuron, sub_tstep);
-#endif
-      tempneu[index_neuron].value[0] = VOT_RESET;
-      tempneu[index_neuron].state_neuron = STATE_REFRACTORY;
-      return;
-    }
-
-    runge_kutta(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-                voltage_dt);
-
-    // neuron is firing without poisson input spikes
-    if(temp_vot >= Vot_Threshold) {
-      spiking_time(tempneu, index_neuron, t_evolution, subbegin_time,
-                   subend_time, temp_vot, firing_time);
-      raster_insert(temp_spike_list, index_neuron, firing_time);
-      jump++;
-      return;
-    }
-    tempneu[index_neuron].value[0] = temp_vot;
-
-#if SMOOTH_CONDUCTANCE_USE
-    conductance_evolve(tempneu, index_neuron, sub_tstep);
-#else
-    conductance_decay(tempneu, index_neuron, sub_tstep);
-#endif
-
-    return;
-  } // end if there is no poisson spikes
-//******************************* 2007.10.19 1:50AM ****************************
-  while ((j<poisson_input[index_neuron].vect_size)
-         && (poisson_input[index_neuron].vect_value[j]<=end_time)) {
-    subend_time = poisson_input[index_neuron].vect_value[j];
-    sub_tstep = subend_time - subbegin_time;
-    if (index_neuron == firing_neuron) {
-#if SMOOTH_CONDUCTANCE_USE
-      conductance_evolve(tempneu, index_neuron, sub_tstep);
-      force_inputR(tempneu, index_neuron);
-#else
-      conductance_decay(tempneu, index_neuron, sub_tstep);
-      force_input(tempneu, index_neuron);
-#endif
-      subbegin_time = subend_time;
-      j++;
-      continue;
-    }
-
-    runge_kutta(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-                voltage_dt);
-
-//******************************************************************************
-    if(temp_vot >= Vot_Threshold) {
-      spiking_time(tempneu, index_neuron, t_evolution, subbegin_time, subend_time,
-                   temp_vot, firing_time);
-      raster_insert(temp_spike_list, index_neuron, firing_time);
-      jump++;
-      return;
-    }
-
-//******************************************************************************
-    // neuron is not firing at this sub-interval,
-    // renew the voltage and conductance, then go ahead to the next sub-interval
-    tempneu[index_neuron].value[0] = temp_vot;
-
-#if SMOOTH_CONDUCTANCE_USE
-    conductance_evolve(tempneu, index_neuron, sub_tstep);
-    force_inputR(tempneu, index_neuron);
-#else
-    conductance_decay(tempneu, index_neuron, sub_tstep);
-    force_input(tempneu, index_neuron);
-#endif
-    subbegin_time = subend_time;
-    t_evolution += sub_tstep;
-    j++;
-  } // end of while (for poisson spikes)
-
-  // finish the last sub-interval!
-  //*******************************************************************
-  sub_tstep = end_time - subbegin_time;
-
-  if (index_neuron == firing_neuron) {
-
-#if SMOOTH_CONDUCTANCE_USE
-    conductance_evolve(tempneu, index_neuron, sub_tstep);
-#else
-    conductance_decay(tempneu, index_neuron, sub_tstep);
-#endif
-
-//********************************* 2007.10.19 18:39PM *************************
-    tempneu[index_neuron].value[0] = VOT_RESET;
-    tempneu[index_neuron].state_neuron = STATE_REFRACTORY;
-
-    begin_poisson_index[index_neuron] = j;
-    return;
-  }
-
-  runge_kutta(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-              voltage_dt);
-
-//******************************************************************************
-  if(temp_vot >= Vot_Threshold) {
-// this is just for finishing the last step, so the ending time should be "end_time"
-// instead of "subend_time"*****************************************************
-    spiking_time(tempneu, index_neuron, t_evolution, subbegin_time, end_time,
-                 temp_vot, firing_time);
-    raster_insert(temp_spike_list, index_neuron, firing_time);
-    jump++;
-    return;
-
-  }
-
-//******************************************************************************
-  // neuron is not firing at this sub-interval,
-  // renew the voltage and conductance, then go ahead to the next sub-interval
-  tempneu[index_neuron].value[0] = temp_vot;
-
-#if SMOOTH_CONDUCTANCE_USE
-  conductance_evolve(tempneu, index_neuron, sub_tstep);
-#else
-  conductance_decay(tempneu, index_neuron, sub_tstep);
-#endif
-
-  // cortical force to conductance is done outside this function!
-  begin_poisson_index[index_neuron] = j;
-}
-
-#else  // of POISSON_INPUT_USE
-
-// This is for non-poisson input only current input case!!!
-void single_neuron_test(neuron *tempneu, int index_neuron, int firing_neuron,
-                        double begin_time, double end_time,
-                        struct raster &temp_spike_list, int &jump)
-{
-  // because the system may need to be pulled back, therefore some variables are
-  // just temporal such as: *tempneu, end_time
-
-  // consider if there is a neuron jump from A(quiet) group to A(spike) group!
-  jump = 0;
-  //************** cortical force to conductance is done outside this function!
-
-  // do hermit interpolation if a neuron fires
-  double firing_time = 0;
-  double temp_vot = tempneu[index_neuron].value[0]; // record the voltage once it fires
-
-  // if there is an external input current!
-  double sub_tstep = end_time - begin_time;
-
-  double t_evolution = time_evolution + begin_time;
-  //****************************************************************************
-  //**************  no poisson input in the whole interval!
-  if (index_neuron==firing_neuron) {
-#if SMOOTH_CONDUCTANCE_USE
-    conductance_evolve(tempneu, index_neuron, sub_tstep);
-#else
-    conductance_decay(tempneu, index_neuron, sub_tstep);
-#endif
-    tempneu[index_neuron].value[0] = VOT_RESET;
-    tempneu[index_neuron].state_neuron = STATE_REFRACTORY;
-
-    return;
-  }
-
-  runge_kutta(tempneu, index_neuron, sub_tstep, t_evolution, temp_vot,
-              voltage_dt);
-
-//******************************************************************************
-  // neuron is firing without poisson input spikes
-  if(temp_vot >= Vot_Threshold) {
-    spiking_time(tempneu, index_neuron, t_evolution, begin_time,
-                 end_time, temp_vot, firing_time);
-    raster_insert(temp_spike_list, index_neuron, firing_time);
-
-    jump++;
-    return;
-  }
-
-//******************************************************************************
-  tempneu[index_neuron].value[0] = temp_vot;
-
-#if SMOOTH_CONDUCTANCE_USE
-  conductance_evolve(tempneu, index_neuron, sub_tstep);
-#else
-  conductance_decay(tempneu, index_neuron, sub_tstep);
-#endif
-
-}
-#endif  // POISSON_INPUT_USE
-
-void next_cortical_spike(neuron *tempneu, double begin_time,
-                         int *tempbegin_poisson_index)
-{
-  struct raster new_spike_list;
-  raster_initialize(new_spike_list);
-  raster_allocate(new_spike_list, spike_list.ras_size);
-
-  for (int i=0; i<g_num_neu; i++) {
-#if POISSON_INPUT_USE
-    tmp_tempbegin_poisson_index[i] = tempbegin_poisson_index[i];
-#endif
-    neuron_copy_2(tmp_tempneu[i], tempneu[i]);
-  }
-  // search the A(spike) list tempneurons first to get the most probable next spiking time!
-  for (int i=0; i<spike_list.ras_index; i++) {
-    double end_time = Tstep;
-    int num_jump = 0;
-    int index_tempneu = spike_list.array_index[i];
-    // This is for determining the next cortical spike by searching
-#if POISSON_INPUT_USE
-    // choose begin_time as the last firing time, and end_time as the whole timestep!
-    single_neuron_test(tmp_tempneu, index_tempneu, -1, begin_time, end_time,
-                       tmp_tempbegin_poisson_index, new_spike_list, num_jump);
-#else
-    single_neuron_test(tmp_tempneu, index_tempneu, -1, begin_time, end_time,
-                       new_spike_list, num_jump);
-#endif
-    // the tempneuron will not be firing in this time interval!
-    if(num_jump == 0) {
-      // still remain this tempneuron in the new list
-      // but put the firing time of this tempneuron to later time
-      raster_insert(new_spike_list, index_tempneu, 2*Tstep);
+  for (int i=0; i < g_num_neu; i++)
+  {
+    poisson_index = tempbegin_poisson_index[i];
+    if (poisson_index == -1) continue;//this means the current calculating neuron has no poisson spikes in the Tstep any more
+    com_poisson_time = poisson_input[i].vect_value[poisson_index];
+    if (temp_end_time >= com_poisson_time) {
+      temp_end_time = com_poisson_time;
+      temp_next_neu_index = i;
     }
   }
-  // get a sequential increment spiking time list
-  raster_destroy(spike_list);
-  raster_copy(spike_list, new_spike_list);
-  raster_destroy(new_spike_list);
-
-  raster_quicksort(spike_list);  // sort the new firing events!
+  end_time = temp_end_time;
+  next_neu_index = temp_next_neu_index;
 
   return;
+}
+#endif
+
+
+// this function is used to compute all the information of the whole network in a smooth subTstep [begin_time,end_time]
+void sub_network_evolve(neuron *tempneu,  double begin_time, double end_time)
+{
+  //copy the information of all the neurons
+  int index_neuron;
+  for (index_neuron = 0; index_neuron<g_num_neu; index_neuron++) {
+    neuron_copy(former_neu[index_neuron],tempneu[index_neuron]);
+  }
+  double subTstep = end_time - begin_time;
+  double t_evolution = time_evolution + begin_time;
+  double firing_time = -1.0;
+//evovle the system from t_evolution+begin
+  runge_kutta(tempneu, subTstep, t_evolution);
+
+//search the spiking time of the index_neuron
+  for (index_neuron = 0; index_neuron<g_num_neu; index_neuron++) {
+    if(former_neu[index_neuron].value[0]<Vot_Threshold && tempneu[index_neuron].value[0] >= Vot_Threshold) {
+      spiking_time(former_neu,tempneu, index_neuron, time_evolution, begin_time,
+                   end_time, firing_time);
+      tempneu[index_neuron].state_neuron = STATE_SPIKING;
+      //insert the spike
+      raster_insert(spike_list,index_neuron,firing_time+time_evolution);
+    }
+    if(former_neu[index_neuron].value[0] >= Vot_Threshold && tempneu[index_neuron].value[0]<Vot_Threshold) {
+      tempneu[index_neuron].state_neuron = STATE_NORMAL;
+    }
+  }
 }
 
 void network_initialization()
 {
-  // record if there is some neuron firing in the middle of the time interval!
-  int i;
-  int jump;
-
-#if POISSON_INPUT_USE
-  int *&tempbegin_poisson_index = g_tempbegin_poisson_index;
-#endif
-
-  double begin_time = 0;
-  double end_time = Tstep;
+  // initialize the spike_list of the current computing time step
   raster_allocate(spike_list, RASTER_SPIKE_SIZE);
 
   //******************** poisson input spikes generation
 #if POISSON_INPUT_USE
-  // last_input is dynamically distributed space outside this function!
+  int i;
   for (i=0; i<g_num_neu; i++) {
     poisson_generator(i, poisson_input[i]);
-  }
-#endif
-
-  //****************************************************************************
-  // construct a temporal neuron variable in case the system needs to be pulled back!
-  neuron *&tempneu = tmp_tempneu2;        // use global temporary variable
-
-  for (i=0; i<g_num_neu; i++) {
-    neuron_copy_raw_static(tempneu[i], neu[i]);
-#if POISSON_INPUT_USE
-    tempbegin_poisson_index[i] = 0;
-#endif
+    if (poisson_input[i].vect_size<0)
+      g_begin_poisson_index[i] = -1;
+    else
+      g_begin_poisson_index[i] = 0;
   }
 
-  //****************************************************************************
-  // get the initial A(spike) list!
-  int sum_spikes = 0;
-
-  for (i=0; i<g_num_neu; i++) {
-    jump = 0;
-#if POISSON_INPUT_USE // start of using poisson input
-    single_neuron_test(tempneu, i, -1, begin_time, end_time,
-                       tempbegin_poisson_index, spike_list, jump);
-#else // not using poisson input
-    single_neuron_test(tempneu, i, -1, begin_time, end_time,
-                       spike_list, jump);
 #endif
-    sum_spikes += jump;
-  }
-  //****************************************************************************
-  // there is no spike in this time interval!
-  if (sum_spikes == 0) {
-    for (i=0; i<g_num_neu; i++) {
-      neuron_copy_raw_static(neu[i],tempneu[i]);
-    }
-    return;
-  } // end for no neuron spiking case!
-  //****************************** release the temporal variables
-  // sort the spike list!
-  raster_quicksort(spike_list);
 }
 
 // evolve the whole neuron system from t(0) to t(0)+Tstep
 void network_evolution()
 {
-  int i;
-  int index_firingneuron;
-  int jump; // record if there is some neuron firing in the middle of the time interval!
+  int j;
   double begin_time = 0;
   double end_time = 0;
 
+
 #if POISSON_INPUT_USE
+
+  int next_neu_index = -1;//initialization
   int *&begin_poisson_index = g_begin_poisson_index;
-  int *&tempbegin_poisson_index = g_tempbegin_poisson_index;
-#else
-  int *tempbegin_poisson_index = NULL;
-#endif
 
-  //****************************************************************************
-  // there is no spike in this time step, evolve system to the next time step!
-  if (spike_list.ras_index <= 0) {
-    raster_destroy(spike_list);
-    return;
-  }
+  do {
+    next_poisson_spike(begin_time,
+                       begin_poisson_index, end_time, next_neu_index);
 
-  // there is some spikes in this time step, set up a temporal neuron variable
-  // to evolve system to a sub-timestep to see if there is any spikes in this sub-timestep
-  neuron *&tempneu = tmp_tempneu2;
-
-  for (i=0; i<g_num_neu; i++) {
-#if POISSON_INPUT_USE
-    begin_poisson_index[i] = 0;
-    tempbegin_poisson_index[i] = 0;
-#endif
-//    neuron_copy_2(tempneu[i], neu[i]);
-    neuron_copy_raw_static(tempneu[i], neu[i]);
-  }
-
-  //****************************************************************************
-  // get the earliest firing time from the A(spike) list!
-  int sum_spikes = 0;
-  do { // big circle!
-    //*******************************************************************
-    // evolve the system to a sub-timestep!
-    if (spike_list.ras_index <=0) {
-      end_time = Tstep;
-      index_firingneuron = -1;
-    } else {
-      end_time = spike_list.array_firingtime[0];
-      index_firingneuron = spike_list.array_index[0];
-    }
-//*******************************************
-    if (end_time > Tstep) {
-      end_time = Tstep;
-      index_firingneuron = -1;
-    }
-//*********************************************
-    if (index_firingneuron>=0 &&
-        tempneu[index_firingneuron].state_neuron == STATE_REFRACTORY) {
-      tempneu[index_firingneuron].value[size_neuronvar-1] = 0;  // fix the Bug 010.
-    }
-    sum_spikes = 0; // record if there is a spike occuring before end_time
-    for (i=0; i<g_num_neu; i++) {
-      jump = 0;
-#if POISSON_INPUT_USE
-      single_neuron_test(tempneu, i, index_firingneuron, begin_time, end_time,
-                         tempbegin_poisson_index, spike_list, jump);
-#else
-      single_neuron_test(tempneu, i, index_firingneuron, begin_time, end_time,
-                         spike_list, jump);
-#endif
-      sum_spikes += jump;
+    if (g_fp_save_poisson_events!=NULL && next_neu_index != -1) {
+      fprintf(g_fp_save_poisson_events, "%d\t%.17e\n", next_neu_index, time_evolution+end_time);
     }
 
-    //*******************************************************************
-    // if there is no spike in this sub-timestep! go to the next sub-timestep!
-    if (sum_spikes == 0) {
-      if(end_time<Tstep || (index_firingneuron!=-1)) {
-        raster_insert(RAS, index_firingneuron, (end_time+time_evolution));
-        //*****************************************************************
-        // release the firing neuron from the A(spike) list
-        raster_erase(spike_list, 0);
-        for (i=0; i<g_num_neu; i++) {
-          // renew the conductance at the end of sub-timestep
+    if(end_time>Tstep) end_time = Tstep;
+
+    //renew the begin index of the poisson spike
+    if (next_neu_index !=-1) {
+      j = begin_poisson_index[next_neu_index];
+      if (j!=-1 && j<poisson_input[next_neu_index].vect_size-1) {
+        begin_poisson_index[next_neu_index]++;
+      } else {
+        begin_poisson_index[next_neu_index] = -1;
+      }
+    }
+    if (begin_time<end_time)
+      // this judgement is used for the case that "end_time = begin_time = 0" which means the next poisson spike
+      // just occur right at the begining of the interval.
+      sub_network_evolve(neu, begin_time, end_time);
+
+    //add the force of poisson spike
+    if (next_neu_index >= 0) {
 #if SMOOTH_CONDUCTANCE_USE
-          force_corticR(tempneu, i, index_firingneuron);
+      force_inputR(neu,next_neu_index);
 #else
-          force_cortic(tempneu, i, index_firingneuron);
+      force_input(neu,next_neu_index);
 #endif
-        }
-        // obtain the next sub-time step
-        begin_time = end_time;
-        next_cortical_spike(tempneu, begin_time, tempbegin_poisson_index);
-      }
-      for (i=0; i<g_num_neu; i++) {
-        neuron_copy_raw_static(neu[i],tempneu[i]);
-#if POISSON_INPUT_USE
-        // renew the start index of poisson input
-        begin_poisson_index[i] = tempbegin_poisson_index[i];
-#endif
-      }
-    } else { // there is some guy firing before the supposed first firing guy!
-      for (i=0; i<g_num_neu; i++) {
-        // revert the value of neuron
-        neuron_copy_raw_static(tempneu[i], neu[i]);
-#if POISSON_INPUT_USE
-        // revert the start index of poisson input
-        tempbegin_poisson_index[i] = begin_poisson_index[i];
-#endif
-      }
-      raster_quicksort(spike_list);
     }
-  } while (sum_spikes!=0 || end_time<Tstep);
+    //calculating the next subTstep
+    begin_time = end_time;
+  } while(end_time<Tstep  && next_neu_index != -1 );
+  //***********finish the evolution from t(0) to t(0)+Tstep
+
+  //copy the spike information of the time interval
+  raster_quicksort(spike_list);
+  if (spike_list.ras_index>0) {
+    for (j=0; j<spike_list.ras_index; j++) {
+      raster_insert(RAS,spike_list.array_index[j],spike_list.array_firingtime[j]);
+    }
+  }
+#else//network with poisson spikes ends
+  begin_time = 0;
+  end_time = Tstep;
+
+  //we evolve the whole system directly from t(0) to t(0) + Tstep
+  //since this time interval is already smooth
+  sub_network_evolve(neu, begin_time, end_time);
+  //***********finish the evolution from t(0) to t(0)+Tstep
+
+  //copy the spike information of the time interval
+  raster_quicksort(spike_list);
+  if (spike_list.ras_index>0) {
+    for (j=0; j<spike_list.ras_index; j++) {
+      raster_insert(RAS,spike_list.array_index[j],spike_list.array_firingtime[j]);
+    }
+  }
+#endif//network with no poisson spikes ends
 
   raster_destroy(spike_list);
+///2013/1/24 16:06
+
 }
 
 void compute_perstep()
 {
   int i;
-
   if (time_evolution >= last_time + g_comp_time) {
     RUN_DONE = 1;                   // program stop signal
     return ;
@@ -964,30 +783,33 @@ void compute_perstep()
   network_evolution();
 
   time_evolution += Tstep;
-
   // only update the data that needed
   int imax, neuron_index = 0, var_index = 0;
   if (g_no_graphic) {
     if (g_cond_out)
-      imax = g_num_neu*2;
+      imax = g_num_neu*(2*Stepsmooth_Con+4);
     else
       imax = g_num_neu;
   } else {
     imax = g_num_neu*size_neuronvar;
   }
+///jyl strobe_veri is written to check the accuracy
+  /*
+  for (i = 0; i<imax;i++){
+      var_index = i/g_num_neu;
+      neuron_index = i%g_num_neu;
+      double v = neu[neuron_index].value[var_index];
+      strobe_veri(GLOBAL_STRA[i],time_evolution,v);
+  }
+*/
   if (g_b_RC_filter) {
-    // smooth the spike
     for (i=0; i<g_num_neu; i++) {
+
       double v = neu[i].value[0];
-#if SMOOTH_CONDUCTANCE_USE
-      if (neu[i].value[5] != 0.0 && neu[i].value[5] < Tstep)
-        v = 1.0 - neu[i].value[5]/Tstep;
-#else
-      if (neu[i].value[3] != 0.0 && neu[i].value[3] < Tstep)
-        v = 1.0 - neu[i].value[3]/Tstep;
-#endif
+
       strobeupdateRCFilter(GLOBAL_STRA[i], time_evolution, Tstep, v);
     }
+
     for (i=g_num_neu; i<imax; i++) {
       neuron_index = i%g_num_neu;
       var_index = i/g_num_neu;
@@ -1001,7 +823,16 @@ void compute_perstep()
 //      strobeupdateRCFilter(GLOBAL_STRA[i], time_evolution, Tstep,
 //                           neu[neuron_index].value[var_index]);
 //    }
-  } else {
+/*
+  } else{
+      for (i=0;i<g_num_neu;i++){
+        strobeupdate(GLOBAL_STRA[i], time_evolution, Tstep,
+                     neu[i].value[2*Stepsmooth_Con+3]);
+      }
+  }
+  */
+    }
+    else {
     for (i=0; i<imax; i++) {
       neuron_index = i%g_num_neu;
       var_index = i/g_num_neu;
@@ -1010,21 +841,33 @@ void compute_perstep()
     }
   }
 
+
+
   ///XYY: output neuron data to text file every SLIGHT_BIN
-  /**
+  /**edited by jyl
     structure of GLOBAL_STRA[] (same as neu)
     without smooth jump
       g_num_neu*[0,1) V   voltage
       g_num_neu*[1,2) GE  Ex_conductance
       g_num_neu*[2,3) GI  In_conductance
-      g_num_neu*[3,4) ref_time
-    with smooth jump
-      g_num_neu*[0,1) voltage data
-      g_num_neu*[1,2) GE
+      g_num_neu*[3,4) m   ion channel conductance
+      g_num_neu*[4,5) h   ion channel conductance
+      g_num_neu*[5,6) n   ion channel conductance
+    with smooth jump e.g. Stepsmooth_Com = 4
+      g_num_neu*[0,1) V   voltage
+      g_num_neu*[1,2) GE  Ex_conductance
       g_num_neu*[2,3) HE  multi-step smoothness
-      g_num_neu*[3,4) GI
-      g_num_neu*[4,5) HI  multi-step smoothness
-      g_num_neu*[5,6) ref_time
+      g_num_neu*[3,4) IE  multi-step smoothness
+      g_num_neu*[4,5) JE  multi-step smoothness
+      g_num_neu*[5,6) KE  multi-step smoothness
+      g_num_neu*[6,7) GI
+      g_num_neu*[7,8) HI  multi-step smoothness
+      g_num_neu*[8,9) II  multi-step smoothness
+      g_num_neu*[9,10) JI  multi-step smoothness
+      g_num_neu*[10,11) KI  multi-step smoothness
+      g_num_neu*[11,12) m   ion channel conductance
+      g_num_neu*[12,13) h   ion channel conductance
+      g_num_neu*[13,14) n   ion channel conductance
   **/
 
   if (g_b_save_while_cal) {
@@ -1040,15 +883,23 @@ void compute_perstep()
         fprintf(g_fout,"\n");
       }
       if (g_cond_out) {                           // save conductance
+       if (g_b_save_use_binary) {                  // save volt in binary format
+        for (i = g_num_neu; i < 2*g_num_neu; i++)
+          fwrite(&(GLOBAL_STRA[i]->data[oldtab]), sizeof(double), 1, g_cond_out);
+        for (i = (Stepsmooth_Con+1)*g_num_neu; i < (Stepsmooth_Con+2)*g_num_neu; i++)
+          fwrite(&(GLOBAL_STRA[i]->data[oldtab]), sizeof(double), 1, g_cond_out);
+      } else {
         for (i = g_num_neu; i < 2*g_num_neu; i++)
           fprintf(g_cond_out, "%19.16f ", GLOBAL_STRA[i]->data[oldtab]);
+        for (i = (Stepsmooth_Con+1)*g_num_neu; i < (Stepsmooth_Con+2)*g_num_neu; i++)
+          fprintf(g_cond_out, "%19.16f ", GLOBAL_STRA[i]->data[oldtab]);
         fprintf(g_cond_out,"\n");
+      }
       }
       oldtab = GLOBAL_STRA[0]->tab;               // position to the last data
     }
   }
 }
-
 /// Save data at the tail of program
 void LastRun()
 {
@@ -1069,6 +920,9 @@ void LastRun()
   }
   if (g_cond_out) {
     fclose(g_cond_out);
+  }
+  if (g_fp_save_poisson_events!=NULL) {
+    fclose(g_fp_save_poisson_events);
   }
 
   /// record firing time
@@ -1129,7 +983,7 @@ void LastRun()
     for (int i=0; i<g_num_neu; i++)
       printf("%7.2f ", time_evolution/frct[i]);
     printf("\n");
-  }
+  }/// print average spiking time
   if (g_spike_interval_path[0]) {
     FILE *fout = fopen(g_spike_interval_path, "w");
     if (fout==NULL) {

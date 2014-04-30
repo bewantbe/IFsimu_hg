@@ -1,3 +1,4 @@
+///mark: modified on 2013/1/20
 #ifndef _RASTER_H_
 #define _RASTER_H_
 

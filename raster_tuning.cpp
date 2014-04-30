@@ -48,18 +48,35 @@ struct raster spike_list;
 struct raster RAS;
 
 #if SMOOTH_CONDUCTANCE_USE
-long initial_pertub_Ex_H;
-long initial_pertub_In_H;
+long initial_pertub_Ex_H = 0;
+long initial_pertub_Ex_I = 0;
+long initial_pertub_Ex_J = 0;
+long initial_pertub_Ex_K = 0;
+long initial_pertub_In_H = 0;
+long initial_pertub_In_I = 0;
+long initial_pertub_In_J = 0;
+long initial_pertub_In_K = 0;
 #endif
 #if CORTICAL_STRENGTH_NONHOMO
 double** cortical_matrix = NULL;
 #endif
 
 struct neuron *neu = NULL;
+struct neuron *former_neu = NULL;
+struct neuron *neuRK = NULL;
+struct neuron *neu_d1 = NULL;
+struct neuron *neu_d2 = NULL;
+struct neuron *neu_d3 = NULL;
+struct neuron *neu_d4 = NULL;
+
 struct vector *poisson_input = NULL;
 long *initialseed_neuron = NULL;
 double *last_input = NULL;
+double *vol = NULL;
 long initial_pertub_Vot = 0;
+long initial_pertub_m = 0;
+long initial_pertub_h = 0;
+long initial_pertub_n = 0;
 long initial_pertub_Ex = 0;
 long initial_pertub_In = 0;
 unsigned int initial_seed = 0;
@@ -67,14 +84,15 @@ long* ran_iy = NULL;
 long** ran_iv = NULL;
 
 bool g_no_graphic         = false;
-bool g_b_verbose          = false;
-bool g_b_verbose_debug    = false;
+bool g_b_verbose          = true;
+bool g_b_verbose_debug    = true;
 bool g_b_quiet            = false;
 bool g_b_save_while_cal   = true;
 bool g_b_save_use_binary  = false;
 bool g_b_RC_filter        = false;
-bool g_b_auto_seed        = true;
+bool g_b_auto_seed        = false;
 bool g_b_RC_filter_coef_auto = true;
+FILE *g_fp_save_poisson_events = NULL;
 
 int g_num_neu_ex = Number_Exneuron;
 int g_num_neu_in = Number_Inneuron;
@@ -112,6 +130,7 @@ char g_staffsave_path[file_path_size] = "data/staffsave.txt";
 char g_ras_path[file_path_size] = "";
 char g_conductance_path[file_path_size] = "";
 char g_spike_interval_path[file_path_size] = "";
+char g_save_poisson_events_path[file_path_size] = "";
 #if POISSON_INPUT_USE
 char ps_file[file_path_size] = "";
 char pr_file[file_path_size] = "";
@@ -152,6 +171,8 @@ void ShowCLIHelp()
   printf("  --save-spike-interval FILE\n");
   printf("                save average spike interval of each neuron to FILE\n");
 #if POISSON_INPUT_USE
+  printf("  --save-poisson-events FILE\n");
+  printf("                save all poisson input events to FILE\n");
   printf("  --read-pr FILE\n");
   printf("                read relative poisson input rate of each neuron from FILE\n");
   printf("  --read-ps FILE\n");
@@ -411,6 +432,11 @@ int main(int argc, char *argv[])
       continue;
     }
 #if POISSON_INPUT_USE
+    if (strcmp(argv[pp], "--save-poisson-events")==0) {
+      if (++pp >= argc) break;
+      strcpy(g_save_poisson_events_path, argv[pp]);
+      continue;
+    }
     if (strcmp(argv[pp], "--read-pr")==0) {
       if (++pp >= argc) break;
       strcpy(pr_file, argv[pp]);
@@ -691,8 +717,8 @@ int main(int argc, char *argv[])
     g_arr_poisson_strength_E[j] *= Strength_Exinput;
     g_arr_poisson_strength_I[j] *= Strength_Ininput;
 #else
-    g_arr_poisson_strength_E[j] *= Strength_Exinput*2.0/(Time_ExCon);
-    g_arr_poisson_strength_I[j] *= Strength_Ininput*5.0/(Time_InCon);
+    g_arr_poisson_strength_E[j] *= Strength_Exinput;//*2.0/(Time_ExCon);
+    g_arr_poisson_strength_I[j] *= Strength_Ininput;//*5.0/(Time_InCon);
 #endif
     if (g_arr_poisson_rate[j]<0 || g_arr_poisson_strength_E[j]<0 ||
         g_arr_poisson_strength_I[j]<0) {
@@ -705,8 +731,8 @@ int main(int argc, char *argv[])
   Strength_Exinput = g_arr_poisson_strength_E[0];
   Strength_Ininput = g_arr_poisson_strength_I[0];
 #else
-  Strength_Exinput = g_arr_poisson_strength_E[0]/(2.0/(Time_ExCon));
-  Strength_Ininput = g_arr_poisson_strength_I[0]/(2.0/(Time_ExCon));
+  Strength_Exinput = g_arr_poisson_strength_E[0];// /(2.0/(Time_ExCon));
+  Strength_Ininput = g_arr_poisson_strength_I[0];// /(2.0/(Time_ExCon));
 #endif
 #endif
 
@@ -749,7 +775,15 @@ int main(int argc, char *argv[])
       return 1;
     }
   }
-
+#if POISSON_INPUT_USE
+  if (g_save_poisson_events_path[0]) {
+    g_fp_save_poisson_events = fopen(g_save_poisson_events_path, "w");
+    if (g_fp_save_poisson_events == NULL) {
+      printf("Error: Fail to open \"%s\" for poisson events output\n", g_save_poisson_events_path);
+      return 1;
+    }
+  }
+#endif
   if (!g_b_quiet) {
     printf("Number of neurons: %d Ex. + %d In.\n", g_num_neu_ex, g_num_neu_in);
 #if POISSON_INPUT_USE
@@ -894,6 +928,7 @@ int main(int argc, char *argv[])
     if (g_b_verbose_debug) { printf(" Passing to main loop\n"); fflush(stdout); }
     glutMainLoop();
   }
+  //system("pause");
 
   return 0;
 }
