@@ -1,0 +1,10 @@
+syntax:glob
+*~
+.*.swp
+\#*\#
+tags
+*.o
+raster_tuning.layout
+.ycm_extra_conf.pyc
+*.layout
+bin/Release/raster_tuning_HH
