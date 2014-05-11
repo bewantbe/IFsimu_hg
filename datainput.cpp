@@ -559,14 +559,14 @@ void input_initialization()
     neu[i].value[Stepsmooth_Con+4] = (1 - NONE_INHIBITORY)*ran0(&initial_pertub_In_J);
     neu[i].value[2*Stepsmooth_Con] = (1 - NONE_INHIBITORY)*ran0(&initial_pertub_In_K);
     //xyy: for test
-    neu[i].value[0] = 0;
+    neu[i].value[0] = 0.000027756626542950875;
     neu[i].value[1] = 0;  // gE
     neu[i].value[2] = 0;  // hE
     neu[i].value[3] = 0;  // gI
     neu[i].value[4] = 0;  // hI
-    neu[i].value[5] = 0.05293248525724958;  // m
-    neu[i].value[6] = 0.5961207535084603;  // h
-    neu[i].value[7] = 0.3176769140606974;  // n
+    neu[i].value[5] = 0.052934217620863984;  // m
+    neu[i].value[6] = 0.5961110463468279;  // h
+    neu[i].value[7] = 0.31768116757978115;  // n
 #endif
   }
 #if POISSON_INPUT_USE
