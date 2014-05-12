@@ -212,6 +212,7 @@ void ShowCLIHelp()
   printf("                y[t] = co * y[t-dt] + ci * x[t] (x is input, y is output)\n");
   printf("                final output data is y[stv], y[2*stv], ... , y[k*stv]\n");
   printf("                stv means save time interval, see --save-interval\n");
+  printf("  --RC-filter-off  use moving average filter (with width stv) before sampling\n");
   printf("  -v, --verbose show more information while executing\n");
   printf("  -vv           like -v, and in addition shows also debug infomation\n");
   printf("  -q, --quiet   show only errors\n");
@@ -564,6 +565,10 @@ int main(int argc, char *argv[])
       } else {
         g_b_RC_filter_coef_auto = true;
       }
+      continue;
+    }
+    if (strcmp(argv[pp], "--RC-filter-off")==0) {
+      g_b_RC_filter = false;
       continue;
     }
     if (strcmp(argv[pp], "-v")==0 || strcmp(argv[pp], "--verbose")==0) {
