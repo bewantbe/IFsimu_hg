@@ -27,7 +27,7 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-ng -n 3 -t 1000000 -inf test2_test.txt -mat - -seed 0" />
+				<Option parameters="-inf - -mat - -v" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>

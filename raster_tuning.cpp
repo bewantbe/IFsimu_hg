@@ -33,8 +33,8 @@ struct strobe **GLOBAL_STRA = NULL;
 
 double Tstep = 1.0/32.0;
 double g_comp_time = COMP_TIME;
-double Rate_input = 0.0;
-double Strength_Exinput = 0.0;
+double Rate_input = 1.0;
+double Strength_Exinput = 0.04;
 double Strength_Ininput = 0.0;
 double Strength_CorEE = 0.0;
 double Strength_CorIE = 0.0;
@@ -48,14 +48,14 @@ struct raster spike_list;
 struct raster RAS;
 
 #if SMOOTH_CONDUCTANCE_USE
-long initial_pertub_Ex_H = 0;
-long initial_pertub_Ex_I = 0;
-long initial_pertub_Ex_J = 0;
-long initial_pertub_Ex_K = 0;
-long initial_pertub_In_H = 0;
-long initial_pertub_In_I = 0;
-long initial_pertub_In_J = 0;
-long initial_pertub_In_K = 0;
+long initial_pertub_Ex_H = -3298;
+long initial_pertub_Ex_I = -2258;
+long initial_pertub_Ex_J = -1258;
+long initial_pertub_Ex_K = -5298;
+long initial_pertub_In_H = -7246;
+long initial_pertub_In_I = -5216;
+long initial_pertub_In_J = -4276;
+long initial_pertub_In_K = -2248;
 #endif
 #if CORTICAL_STRENGTH_NONHOMO
 double** cortical_matrix = NULL;
@@ -73,13 +73,13 @@ struct vector *poisson_input = NULL;
 long *initialseed_neuron = NULL;
 double *last_input = NULL;
 double *vol = NULL;
-long initial_pertub_Vot = 0;
-long initial_pertub_m = 0;
-long initial_pertub_h = 0;
-long initial_pertub_n = 0;
-long initial_pertub_Ex = 0;
-long initial_pertub_In = 0;
-unsigned int initial_seed = 0;
+long initial_pertub_Vot = 2005;
+long initial_pertub_m = -3928;
+long initial_pertub_h = -2819;
+long initial_pertub_n = -9201;
+long initial_pertub_Ex = -2010;
+long initial_pertub_In = -2046;
+unsigned int initial_seed = 20072007;
 long* ran_iy = NULL;
 long** ran_iv = NULL;
 
@@ -90,7 +90,7 @@ bool g_b_quiet            = false;
 bool g_b_save_while_cal   = true;
 bool g_b_save_use_binary  = false;
 bool g_b_RC_filter        = false;
-bool g_b_auto_seed        = false;
+bool g_b_auto_seed        = true;
 bool g_b_RC_filter_coef_auto = true;
 FILE *g_fp_save_poisson_events = NULL;
 

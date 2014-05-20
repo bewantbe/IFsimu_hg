@@ -1014,3 +1014,96 @@
 	<err.h>
 	<sys/time.h>
 
+1400592793 source:/homeData/xyy/code/IFsimu/datahandling.cpp
+	"stdafx.h"
+	"datahandling.h"
+
+1400597569 /homeData/xyy/code/IFsimu/stdafx.h
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<math.h>
+	<string.h>
+	<windows.h>
+	<unistd.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	"raster.h"
+	"neuron.h"
+	"loop.h"
+
+1400592793 /homeData/xyy/code/IFsimu/raster.h
+
+1400592793 /homeData/xyy/code/IFsimu/neuron.h
+
+1400592793 /homeData/xyy/code/IFsimu/loop.h
+
+1400592793 /homeData/xyy/code/IFsimu/datahandling.h
+
+1400592828 source:/homeData/xyy/code/IFsimu/datainput.cpp
+	"stdafx.h"
+	"random.h"
+	"datainput.h"
+	"datahandling.h"
+	<iomanip>
+	<iostream>
+	<fstream>
+	<sstream>
+
+1399799160 /homeData/xyy/code/IFsimu/random.h
+
+1400592793 /homeData/xyy/code/IFsimu/datainput.h
+
+1399799160 source:/homeData/xyy/code/IFsimu/loop.cpp
+	"stdafx.h"
+	"loop.h"
+
+1400592793 source:/homeData/xyy/code/IFsimu/myopengl.cpp
+	"stdafx.h"
+	"myopengl.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+	<iomanip>
+	<iostream>
+	<sstream>
+
+1399799160 /homeData/xyy/code/IFsimu/myopengl.h
+
+1400592793 /homeData/xyy/code/IFsimu/poisson_input.h
+
+1400592793 source:/homeData/xyy/code/IFsimu/neuron.cpp
+	"stdafx.h"
+	"neuron.h"
+
+1400592793 source:/homeData/xyy/code/IFsimu/poisson_input.cpp
+	"stdafx.h"
+	"loop.h"
+	"neuron.h"
+	"raster.h"
+	"datainput.h"
+	"datahandling.h"
+	"poisson_input.h"
+
+1399799160 source:/homeData/xyy/code/IFsimu/random.cpp
+	"stdafx.h"
+	"random.h"
+
+1399799160 source:/homeData/xyy/code/IFsimu/raster.cpp
+	"stdafx.h"
+	"raster.h"
+
+1400597604 source:/homeData/xyy/code/IFsimu/raster_tuning.cpp
+	"stdafx.h"
+	<sys/types.h>
+	<sys/stat.h>
+	<time.h>
+	"datainput.h"
+	"poisson_input.h"
+	"myopengl.h"
+	<sys/file.h>
+	<errno.h>
+	<err.h>
+	<sys/time.h>
+
