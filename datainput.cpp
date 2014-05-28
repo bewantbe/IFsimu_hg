@@ -46,7 +46,7 @@ int readinput(char *filename)
     if (strcmp(varname,"Strength_Exinput")==0) {
       data_readin>>Strength_Exinput;
       if (verbose) {
-        cout<<"Poisson input strength to Ex. neurons read to be: "
+        cout<<"Poisson input strength of Ex. type to all neurons read to be: "
             <<Strength_Exinput<<endl;
       }
       continue;
@@ -54,7 +54,7 @@ int readinput(char *filename)
     if (strcmp(varname,"Strength_Ininput")==0) {
       data_readin>>Strength_Ininput;
       if (verbose) {
-        cout<<"Poisson input strength to In. neurons read to be: "
+        cout<<"Poisson input strength of In. type to all neurons read to be: "
             <<Strength_Ininput<<endl;
       }
       continue;

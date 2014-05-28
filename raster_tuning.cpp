@@ -793,9 +793,9 @@ int main(int argc, char *argv[])
 #if POISSON_INPUT_USE
     printf("Poisson input rate = %g\n", Rate_input);
     if (g_num_neu_in) {
-    printf("Poisson input strength to In. neurons = %g\n", Strength_Ininput);
+    printf("Poisson input strength of In. type to all neurons = %g\n", Strength_Ininput);
     }
-    printf("Poisson input strength to Ex. neurons = %g\n", Strength_Exinput);
+    printf("Poisson input strength of Ex. type to all neurons = %g\n", Strength_Exinput);
     {
       int nn = g_num_neu;
       if (nn>16) {

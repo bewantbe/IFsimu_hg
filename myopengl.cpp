@@ -83,13 +83,13 @@ GLvoid Drawmenu(double side,double xoffset,double yoffset)
   menupos=menu_top-6;
   tcolor = b+(1-b)*(FIDDLE_PARAMETER==menupos);
   glColor3f(tcolor,tcolor,tcolor);
-  sprintf(text,"Poisson input strength to Ex. neurons = %f",Strength_Exinput);
+  sprintf(text,"Poisson input strength of Ex. type to all neurons = %f",Strength_Exinput);
   ftexto(0*side+xoffset,menupos*side+yoffset,0,text);
 
   menupos=menu_top-5;
   tcolor = b+(1-b)*(FIDDLE_PARAMETER==menupos);
   glColor3f(tcolor,tcolor,tcolor);
-  sprintf(text,"Poisson input strength to In. neurons = %f",Strength_Ininput);
+  sprintf(text,"Poisson input strength of In. type to all neurons = %f",Strength_Ininput);
   ftexto(0*side+xoffset,menupos*side+yoffset,0,text);
 #else
   // use sinusoidal current input ***************************
