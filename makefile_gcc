@@ -1,27 +1,29 @@
 # Project: cleanIFcode
 # make -f makefile_gcc
 
-CPP  = g++ -O2
+# CPP  = icpc -O2
+
+CPP  = icpc -O2
 C    = gcc -O2
 OBJ  = datahandling.o datainput.o loop.o myopengl.o neuron.o poisson_input.o random.o raster.o raster_tuning.o
 LINKOBJ  = datahandling.o datainput.o loop.o myopengl.o neuron.o poisson_input.o random.o raster.o raster_tuning.o
 LIBS =  -L"/usr/lib" -lGL -lGLU -lglut
 INCS =  -I"/usr/include"
 CXXINCS = 
-BIN  = cleanIFcode
+BIN  = raster_tuning
 CXXFLAGS = $(CXXINCS)
 CFLAGS = $(INCS)
 
 .PHONY: all all-before all-after clean clean-custom
 
-all: all-before cleanIFcode all-after
+all: all-before raster_tuning all-after
 
 
 clean: clean-custom
 	rm -f $(OBJ) $(BIN)
 
 $(BIN): $(OBJ)
-	$(CPP) $(LINKOBJ) -o "cleanIFcode" $(LIBS)
+	$(CPP) $(LINKOBJ) -o "raster_tuning" $(LIBS)
 
 datahandling.o: datahandling.cpp
 	$(CPP) -c datahandling.cpp -o datahandling.o $(CXXFLAGS)
