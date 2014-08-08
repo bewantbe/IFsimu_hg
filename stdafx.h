@@ -89,7 +89,7 @@ static inline int isnan(double x) { return x != x; }
 #define CORTICAL_STRENGTH_NONHOMO 1      /// modify this
 
 // check if using exponential I&F model!
-#define EXPONENTIAL_IF_USE 1
+#define EXPONENTIAL_IF_USE 0
 #if EXPONENTIAL_IF_USE
 #  define EIF_CUBIC_INTERPOLATION 1
 #else
