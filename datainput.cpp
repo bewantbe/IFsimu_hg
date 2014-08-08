@@ -289,6 +289,14 @@ int read_cortical_matrix(const char *filepath, double **cor_mat)
   }
   fin.close();
 
+  // delete diagonal part
+  for (i=0; i<g_num_neu; i++) {
+    cor_mat[i][i] = 0;
+  }
+
+  // Convert to sparse representation
+  // May save several few percent computation time (say ~5%)
+
   return 0;
 }
 #endif

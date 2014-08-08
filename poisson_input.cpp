@@ -175,8 +175,6 @@ for (index_firing = 0;index_firing<g_num_neu;index_firing++) {
 void whole_dt_single(const double * const &neu_i_val, double *&neu_i_dy, double t)
 {
   //dv_dt
-//  const double * const &neu_i_val = neu_val[index_neuron].value;
-//  double *&neu_i_dy = neu_dy[index_neuron].value;
   double v  = neu_i_val[0];
   double gE = neu_i_val[1];
   double gI = neu_i_val[Stepsmooth_Con+1];
@@ -184,8 +182,8 @@ void whole_dt_single(const double * const &neu_i_val, double *&neu_i_dy, double 
   double h  = neu_i_val[2*Stepsmooth_Con+2];
   double n  = neu_i_val[2*Stepsmooth_Con+3];
 
-  neu_i_dy[0] = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
-          - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory);
+  neu_i_dy[0] = - Con_Leakage*(v-Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v-Vot_potassium)
+                - gE*(v-Vot_Excitatory) - gI*(v-Vot_Inhibitory);
 
 //mhn_dt
   {
@@ -214,6 +212,7 @@ void whole_dt_vector(const neuron * const neu_val, neuron *neu_dy, double *volt,
     whole_dt_single(neu_val[i].value, neu_dy[i].value, t);
   }
 
+  // Compute influence from the network (H^E and H^I)
   for (int i = 0; i < g_num_neu_ex; i++) {
     if(volt[i] == 0) continue;
     for (int j = 0; j < g_num_neu_ex; j++) {
