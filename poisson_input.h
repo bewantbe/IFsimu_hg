@@ -15,7 +15,7 @@ void force_input( neuron *tempneu, int index_neuron);
 #endif
 
 // this function is used to compute the derivative of all the variables in neuron
-void whole_dt(const neuron *neu_val, neuron *neu_dt, double *volt, int index_neuron, double t);
+void whole_dt(const neuron * const neu_val, neuron *neu_dt, double *volt, int index_neuron, double t);
 
 //this is used to search the immediate next poisson spike of the whole network
 void next_poisson_spike(neuron *tempneu, double begin_time,

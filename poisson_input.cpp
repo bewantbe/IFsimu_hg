@@ -45,20 +45,23 @@ void voltage_dt(int index_neuron,double t,double m,double h,double n,double gE,d
 # endif
 }
 
-void whole_dt(const neuron *neu_val, neuron *neu_dt, double *volt, int index_neuron, double t)
+void whole_dt(const neuron * const neu_val, neuron *neu_dt, double *volt, int index_neuron, double t)
 {
   //dv_dt
-double v = neu_val[index_neuron].value[0];
-double gE = neu_val[index_neuron].value[1];
-double gI = neu_val[index_neuron].value[Stepsmooth_Con+1];
-double m = neu_val[index_neuron].value[2*Stepsmooth_Con+1];
-double h = neu_val[index_neuron].value[2*Stepsmooth_Con+2];
-double n = neu_val[index_neuron].value[2*Stepsmooth_Con+3];
+  const double * const &neu_i_val = neu_val[index_neuron].value;
+  double *&neu_i_dt = neu_dt[index_neuron].value;
+  double v  = neu_i_val[0];
+  double gE = neu_i_val[1];
+  double gI = neu_i_val[Stepsmooth_Con+1];
+  double m  = neu_i_val[2*Stepsmooth_Con+1];
+  double h  = neu_i_val[2*Stepsmooth_Con+2];
+  double n  = neu_i_val[2*Stepsmooth_Con+3];
+
 # if EXPONENTIAL_IF_USE
-  neu_dt[index_neuron].value[0] = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
+  neu_i_dt[0] = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
           - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory) + Con_Leakage*VOT_DELTAT*exp((v-VOT_TAKEOFF)/VOT_DELTAT);
 # else
-  neu_dt[index_neuron].value[0] = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
+  neu_i_dt[0] = - Con_Leakage*(v - Vot_Leakage) - Con_sodium*m*m*m*h*(v-Vot_sodium) - Con_potassium*n*n*n*n*(v - Vot_potassium)
           - gE*(v - Vot_Excitatory) - gI*(v - Vot_Inhibitory);
 # endif
 
@@ -66,34 +69,34 @@ double n = neu_val[index_neuron].value[2*Stepsmooth_Con+3];
   {
     double e1 = exp(-v+2.5);
     double e2 = sqrt(e1*exp(-2.5));
-    neu_dt[index_neuron].value[2*Stepsmooth_Con+1] = (v-2.5)/(1-e1)*(1-m) - 4*exp(-v/1.8)*m;
-    neu_dt[index_neuron].value[2*Stepsmooth_Con+2] = 0.07*e2*(1-h) - 1/(1+e1*exp(0.5))*h;
-    neu_dt[index_neuron].value[2*Stepsmooth_Con+3] = 0.1*(v-1.0)/(1-e1*exp(-1.5))*(1-n) - 0.125*sqrt(sqrt((e2)))*n;
+    neu_i_dt[2*Stepsmooth_Con+1] = (v-2.5)/(1-e1)*(1-m) - 4*exp(-v/1.8)*m;
+    neu_i_dt[2*Stepsmooth_Con+2] = 0.07*e2*(1-h) - 1/(1+e1*exp(0.5))*h;
+    neu_i_dt[2*Stepsmooth_Con+3] = 0.1*(v-1.0)/(1-e1*exp(-1.5))*(1-n) - 0.125*sqrt(sqrt((e2)))*n;
   }
 
 //conductance_dt
 int index_firing = -1;
 # if SMOOTH_CONDUCTANCE_USE
 //smooth_dt
-    for (int con_index = 1;con_index<Stepsmooth_Con;con_index++){
-        neu_dt[index_neuron].value[con_index] = -neu_val[index_neuron].value[con_index]/Time_ExCon + neu_val[index_neuron].value[con_index+1];
-        neu_dt[index_neuron].value[Stepsmooth_Con+con_index] = -neu_val[index_neuron].value[Stepsmooth_Con+con_index]/Time_InCon + neu_val[index_neuron].value[Stepsmooth_Con+con_index+1];
+    for (int con_index = 1; con_index<Stepsmooth_Con; con_index++){
+        neu_i_dt[con_index] = -neu_i_val[con_index]/Time_ExCon + neu_i_val[con_index+1];
+        neu_i_dt[Stepsmooth_Con+con_index] = -neu_i_val[Stepsmooth_Con+con_index]/Time_InCon + neu_i_val[Stepsmooth_Con+con_index+1];
     }
-  neu_dt[index_neuron].value[Stepsmooth_Con] = -neu_val[index_neuron].value[Stepsmooth_Con]/Time_ExConR ;
-  neu_dt[index_neuron].value[2*Stepsmooth_Con] = -neu_val[index_neuron].value[2*Stepsmooth_Con]/Time_InConR ;
+  neu_i_dt[Stepsmooth_Con] = -neu_i_val[Stepsmooth_Con]/Time_ExConR ;
+  neu_i_dt[2*Stepsmooth_Con] = -neu_i_val[2*Stepsmooth_Con]/Time_InConR ;
 
 #if CORTICAL_STRENGTH_NONHOMO
   for (index_firing = 0; index_firing<g_num_neu; index_firing++) {
     if (index_firing != index_neuron) {
       if(volt[index_firing]== 0) continue;
-      neu_dt[index_neuron].value[Stepsmooth_Con] +=
+      neu_i_dt[Stepsmooth_Con] +=
         (neuRK[index_neuron].type * Strength_CorEE
          + (1-neuRK[index_neuron].type) * Strength_CorIE)
         * neuRK[index_firing].type
         * cortical_matrix[index_neuron][index_firing]
         * volt[index_firing];
 
-      neu_dt[index_neuron].value[2*Stepsmooth_Con] +=
+      neu_i_dt[2*Stepsmooth_Con] +=
         (neuRK[index_neuron].type * Strength_CorEI
          + (1-neuRK[index_neuron].type) * Strength_CorII)
         * (1-neuRK[index_firing].type)
@@ -105,13 +108,13 @@ int index_firing = -1;
   for (index_firing = 0; index_firing<g_num_neu; index_firing++) {
     if (index_firing != index_neuron) {
       if(volt[index_firing]== 0) continue;
-      neu_dt[index_neuron].value[Stepsmooth_Con] +=
+      neu_i_dt[Stepsmooth_Con] +=
         neuRK[index_firing].type * neuRK[index_neuron].type    * Strength_CorEE
         *volt[index_firing]
         + neuRK[index_firing].type * (1-neuRK[index_neuron].type)* Strength_CorIE
         *volt[index_firing];
 
-      neu_dt[index_neuron].value[2*Stepsmooth_Con] +=
+      neu_i_dt[2*Stepsmooth_Con] +=
         (1-neuRK[index_firing].type) * neuRK[index_neuron].type    * Strength_CorEI
         *volt[index_firing]
         + (1-neuRK[index_firing].type) * (1-neuRK[index_neuron].type)* Strength_CorII
@@ -121,14 +124,14 @@ int index_firing = -1;
 #endif
 
 #else//non_smooth conductance
-  neu_dt[index_neuron].value[1] = -neu_val[index_neuron].value[1]/Time_ExConR;
-  neu_dt[index_neuron].value[Stepsmooth_Con+1] = -neu_val[index_neuron].value[Stepsmooth_Con+1]/Time_InConR;
+  neu_i_dt[1] = -neu_i_val[1]/Time_ExConR;
+  neu_i_dt[Stepsmooth_Con+1] = -neu_i_val[Stepsmooth_Con+1]/Time_InConR;
 
 #if CORTICAL_STRENGTH_NONHOMO
   for (index_firing = 0;index_firing<g_num_neu;index_firing++) {
     if (index_firing != index_neuron) {
       if(volt[index_firing]== 0) continue;
-      neu_dt[index_neuron].value[1] +=
+      neu_i_dt[1] +=
         neu_val[index_firing].type    * neu_val[index_neuron].type
         *Strength_CorEE * cortical_matrix[index_neuron][index_firing]
         *volt[index_firing]
@@ -136,7 +139,7 @@ int index_firing = -1;
         *Strength_CorIE * cortical_matrix[index_neuron][index_firing]
         *volt[index_firing];
 
-      neu_dt[index_neuron].value[Stepsmooth_Con+1] +=
+      neu_i_dt[Stepsmooth_Con+1] +=
         (1-neu_val[index_firing].type)    * neu_val[index_neuron].type
         *Strength_CorEI * cortical_matrix[index_neuron][index_firing]
         *volt[index_firing]
@@ -149,13 +152,13 @@ int index_firing = -1;
 for (index_firing = 0;index_firing<g_num_neu;index_firing++) {
   if (index_firing != index_neuron) {
     if(volt[index_firing]== 0) continue;
-    neu_dt[index_neuron].value[1] +=
+    neu_i_dt[1] +=
       neu_val[index_firing].type * neu_val[index_neuron].type    * Strength_CorEE
       *volt[index_firing]
       + neu_val[index_firing].type * (1-neu_val[index_neuron].type)* Strength_CorIE
       *volt[index_firing];
 
-    neu_dt[index_neuron].value[Stepsmooth_Con+1] +=
+    neu_i_dt[Stepsmooth_Con+1] +=
       (1-neu_val[index_firing].type) * neu_val[index_neuron].type    * Strength_CorEI
       *volt[index_firing]
       + (1-neu_val[index_firing].type) * (1-neu_val[index_neuron].type)* Strength_CorII
@@ -464,26 +467,29 @@ void runge_kutta4(neuron *tempneu, double subTstep, double t_evolution)
     for (j = 0; j<2*Stepsmooth_Con+4; j++) {
       neuRK[i].value[j]  = tempneu[i].value[j];
     }
-    vol[i]=(neuRK[i].value[0]>4?(1/(1+exp(-5*(tempneu[i].value[0]-8.5)))):0.0);
+    vol[i]=(neuRK[i].value[0]>4?(1/(1+exp(-5*(tempneu[i].value[0]-8.5)))) : 0.0);
   }
 
   //compute the dy1 = f(t(n), y(n)), here y,f,dy1 are 2*stepsmooth+4-dimension vectors
   for (i = 0; i<g_num_neu; i++) {
     whole_dt(neuRK, neu_d1, vol, i, ini_time);
     //update the information of the network at midtime, which will be used in the following RK2 method
-    for (j = 0; j<2*Stepsmooth_Con+4; j++)
+    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
       neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d1[i].value[j]  * subTstep/2;
+    }
   }
-  for (i = 0; i<g_num_neu; i++)
+  for (i = 0; i<g_num_neu; i++) {
     vol[i]=(neuRK[i].value[0]>4 ? 1/(1+exp(-5*(tempneu[i].value[0] + neu_d1[i].value[0]  * subTstep/2-8.5))) : 0.0);
+  }
 
 
   // dy2 = f(t(n)+h/2, y(n)+dy1*h/2)
   for (i = 0; i<g_num_neu; i++) {
     whole_dt(neuRK, neu_d2, vol, i, two_fourth_time);
     //update the information of the network at midtime, which will be used in the following RK4 method
-    for (j = 0; j<2*Stepsmooth_Con+4; j++)
+    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
       neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d2[i].value[j]  * subTstep/2;
+    }
   }
   for (i = 0; i<g_num_neu; i++){
     vol[i]=(neuRK[i].value[0]>4 ? 1/(1+exp(-5*(tempneu[i].value[0] + neu_d2[i].value[0]  * subTstep/2-8.5))) : 0.0);
@@ -493,16 +499,19 @@ void runge_kutta4(neuron *tempneu, double subTstep, double t_evolution)
 //dy3 = f(t(n)+h/2, y(n)+dy2*h/2)
   for (i = 0; i<g_num_neu; i++) {
     whole_dt(neuRK, neu_d3, vol, i, two_fourth_time);
-    for (j = 0; j<2*Stepsmooth_Con+4; j++)
+    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
       neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d3[i].value[j]  * subTstep;
+    }
   }
-  for (i = 0; i<g_num_neu; i++)
+  for (i = 0; i<g_num_neu; i++) {
     vol[i]=(neuRK[i].value[0]>4? 1/(1+exp(-5*(tempneu[i].value[0] + neu_d3[i].value[0]  * subTstep-8.5))) : 0.0);
+  }
 
 
 //dy4 = f(t(n)+h, y(n)+dy3*h)
-  for (i = 0; i<g_num_neu; i++)
+  for (i = 0; i<g_num_neu; i++) {
     whole_dt(neuRK, neu_d4, vol, i, end_time);
+  }
 
 //update the final data
 //dy = (dy1+2*dy2+2*dy3+dy4)/6
