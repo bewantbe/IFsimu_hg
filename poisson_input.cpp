@@ -78,10 +78,10 @@ void whole_dt(const neuron * const neu_val, neuron *neu_dt, double *volt, int in
 int index_firing = -1;
 # if SMOOTH_CONDUCTANCE_USE
 //smooth_dt
-    for (int con_index = 1; con_index<Stepsmooth_Con; con_index++){
-        neu_i_dt[con_index] = -neu_i_val[con_index]/Time_ExCon + neu_i_val[con_index+1];
-        neu_i_dt[Stepsmooth_Con+con_index] = -neu_i_val[Stepsmooth_Con+con_index]/Time_InCon + neu_i_val[Stepsmooth_Con+con_index+1];
-    }
+  for (int con_index = 1; con_index<Stepsmooth_Con; con_index++){
+    neu_i_dt[con_index] = -neu_i_val[con_index]/Time_ExCon + neu_i_val[con_index+1];
+    neu_i_dt[Stepsmooth_Con+con_index] = -neu_i_val[Stepsmooth_Con+con_index]/Time_InCon + neu_i_val[Stepsmooth_Con+con_index+1];
+  }
   neu_i_dt[Stepsmooth_Con] = -neu_i_val[Stepsmooth_Con]/Time_ExConR ;
   neu_i_dt[2*Stepsmooth_Con] = -neu_i_val[2*Stepsmooth_Con]/Time_InConR ;
 
@@ -90,16 +90,16 @@ int index_firing = -1;
     if (index_firing != index_neuron) {
       if(volt[index_firing]== 0) continue;
       neu_i_dt[Stepsmooth_Con] +=
-        (neuRK[index_neuron].type * Strength_CorEE
-         + (1-neuRK[index_neuron].type) * Strength_CorIE)
-        * neuRK[index_firing].type
+        (neu_val[index_neuron].type * Strength_CorEE
+         + (1-neu_val[index_neuron].type) * Strength_CorIE)
+        * neu_val[index_firing].type
         * cortical_matrix[index_neuron][index_firing]
         * volt[index_firing];
 
       neu_i_dt[2*Stepsmooth_Con] +=
-        (neuRK[index_neuron].type * Strength_CorEI
-         + (1-neuRK[index_neuron].type) * Strength_CorII)
-        * (1-neuRK[index_firing].type)
+        (neu_val[index_neuron].type * Strength_CorEI
+         + (1-neu_val[index_neuron].type) * Strength_CorII)
+        * (1-neu_val[index_firing].type)
         * cortical_matrix[index_neuron][index_firing]
         *volt[index_firing];
     }
@@ -109,15 +109,15 @@ int index_firing = -1;
     if (index_firing != index_neuron) {
       if(volt[index_firing]== 0) continue;
       neu_i_dt[Stepsmooth_Con] +=
-        neuRK[index_firing].type * neuRK[index_neuron].type    * Strength_CorEE
+        neu_val[index_firing].type * neu_val[index_neuron].type    * Strength_CorEE
         *volt[index_firing]
-        + neuRK[index_firing].type * (1-neuRK[index_neuron].type)* Strength_CorIE
+        + neu_val[index_firing].type * (1-neu_val[index_neuron].type)* Strength_CorIE
         *volt[index_firing];
 
       neu_i_dt[2*Stepsmooth_Con] +=
-        (1-neuRK[index_firing].type) * neuRK[index_neuron].type    * Strength_CorEI
+        (1-neu_val[index_firing].type) * neu_val[index_neuron].type    * Strength_CorEI
         *volt[index_firing]
-        + (1-neuRK[index_firing].type) * (1-neuRK[index_neuron].type)* Strength_CorII
+        + (1-neu_val[index_firing].type) * (1-neu_val[index_neuron].type)* Strength_CorII
         *volt[index_firing];
     }
   }
@@ -459,62 +459,54 @@ void runge_kutta4(neuron *tempneu, double subTstep, double t_evolution)
   double ini_time = t_evolution;
   double two_fourth_time = t_evolution + subTstep/2;
   double end_time = t_evolution + subTstep;
+  int i, j;
 
-  int i = -1;
-  int j = -1;
-  //initialize the information of the network
+  // dy1 = f(t(n), y(n)), here y,f,dy1 are 2*stepsmooth+4-dimension vectors
   for (i = 0; i<g_num_neu; i++) {
     for (j = 0; j<2*Stepsmooth_Con+4; j++) {
       neuRK[i].value[j]  = tempneu[i].value[j];
     }
-    vol[i]=(neuRK[i].value[0]>4?(1/(1+exp(-5*(tempneu[i].value[0]-8.5)))) : 0.0);
+    vol[i]=(neuRK[i].value[0]>4 ? 1/(1+exp(-5*(neuRK[i].value[0] - 8.5))) : 0.0);
   }
-
-  //compute the dy1 = f(t(n), y(n)), here y,f,dy1 are 2*stepsmooth+4-dimension vectors
   for (i = 0; i<g_num_neu; i++) {
     whole_dt(neuRK, neu_d1, vol, i, ini_time);
-    //update the information of the network at midtime, which will be used in the following RK2 method
-    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
-      neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d1[i].value[j]  * subTstep/2;
-    }
   }
-  for (i = 0; i<g_num_neu; i++) {
-    vol[i]=(neuRK[i].value[0]>4 ? 1/(1+exp(-5*(tempneu[i].value[0] + neu_d1[i].value[0]  * subTstep/2-8.5))) : 0.0);
-  }
-
 
   // dy2 = f(t(n)+h/2, y(n)+dy1*h/2)
   for (i = 0; i<g_num_neu; i++) {
-    whole_dt(neuRK, neu_d2, vol, i, two_fourth_time);
-    //update the information of the network at midtime, which will be used in the following RK4 method
     for (j = 0; j<2*Stepsmooth_Con+4; j++) {
-      neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d2[i].value[j]  * subTstep/2;
+      neuRK[i].value[j]  = tempneu[i].value[j] + neu_d1[i].value[j] * subTstep/2;
     }
+    vol[i]=(neuRK[i].value[0]>4 ? 1/(1+exp(-5*(neuRK[i].value[0] - 8.5))) : 0.0);
   }
+  for (i = 0; i<g_num_neu; i++) {
+    whole_dt(neuRK, neu_d2, vol, i, two_fourth_time);
+  }
+
+  // dy3 = f(t(n)+h/2, y(n)+dy2*h/2)
   for (i = 0; i<g_num_neu; i++){
-    vol[i]=(neuRK[i].value[0]>4 ? 1/(1+exp(-5*(tempneu[i].value[0] + neu_d2[i].value[0]  * subTstep/2-8.5))) : 0.0);
+    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
+      neuRK[i].value[j]  = tempneu[i].value[j] + neu_d2[i].value[j] * subTstep/2;
+    }
+    vol[i]=(neuRK[i].value[0]>4 ? 1/(1+exp(-5*(neuRK[i].value[0] - 8.5))) : 0.0);
   }
-
-
-//dy3 = f(t(n)+h/2, y(n)+dy2*h/2)
   for (i = 0; i<g_num_neu; i++) {
     whole_dt(neuRK, neu_d3, vol, i, two_fourth_time);
-    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
-      neuRK[i].value[j]  = tempneu[i].value[j]  + neu_d3[i].value[j]  * subTstep;
-    }
   }
+
+  // dy4 = f(t(n)+h, y(n)+dy3*h)
   for (i = 0; i<g_num_neu; i++) {
-    vol[i]=(neuRK[i].value[0]>4? 1/(1+exp(-5*(tempneu[i].value[0] + neu_d3[i].value[0]  * subTstep-8.5))) : 0.0);
+    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
+      neuRK[i].value[j]  = tempneu[i].value[j] + neu_d3[i].value[j] * subTstep;
+    }
+    vol[i]=(neuRK[i].value[0]>4 ? 1/(1+exp(-5*(neuRK[i].value[0] - 8.5))) : 0.0);
   }
-
-
-//dy4 = f(t(n)+h, y(n)+dy3*h)
   for (i = 0; i<g_num_neu; i++) {
     whole_dt(neuRK, neu_d4, vol, i, end_time);
   }
 
-//update the final data
-//dy = (dy1+2*dy2+2*dy3+dy4)/6
+  // update the final data
+  // dy = (dy1+2*dy2+2*dy3+dy4)/6
   for (i = 0; i<g_num_neu; i++) {
     for (j=0; j<2*Stepsmooth_Con+4; j++) {
       tempneu[i].value[j] = tempneu[i].value[j] + (neu_d1[i].value[j] + 2*neu_d2[i].value[j] + 2*neu_d3[i].value[j] + neu_d4[i].value[j]) *subTstep/6;
