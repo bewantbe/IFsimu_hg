@@ -272,7 +272,7 @@ int read_cortical_matrix(const char *filepath, double **cor_mat)
     int j;
     for (j=0; j<g_num_neu; j++) {
       sin>>cor_mat[i][j];
-      if (isnan(cor_mat[i][j])) break;
+      if (myisnan(cor_mat[i][j])) break;
     }
     if (j!=g_num_neu) break;
   }

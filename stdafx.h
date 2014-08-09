@@ -66,8 +66,8 @@
 // usually B<C, keep B<=A< C using periodization, i.e. A mod (C-B) + B, but only one period
 #define periodize(A,B,C) ((A) < (B) ? (A) + (C) - (B) : ((A) >= (C) ? (A) - (C) + (B) : (A)))
 
-#ifndef isnan
-static inline int isnan(double x) { return x != x; }
+#ifndef myisnan
+static inline int myisnan(double x) { return x != x; }
 #endif
 
 // #ifdef DEBUG
@@ -355,9 +355,6 @@ extern FILE *g_fp_save_poisson_events;
 // initial estimate data length for raster structure (for saving spike events in
 // each time step)
 #define RASTER_SPIKE_SIZE 20
-
-// this uses different orders of Runge-Kutta algorithm
-#define runge_kutta runge_kutta4
 
 // macro definition for random number generating functions
 #define RANDOM ran1

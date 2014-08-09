@@ -6,6 +6,16 @@
 #include "datahandling.h"
 #include "poisson_input.h"
 
+// Seems that icc is not good at compiling template library (such as Eigen)
+// Here need Eigen version >= 3.1, and better 3.2
+#if defined(__ICC) || defined(__INTEL_COMPILER)
+#  define EIGEN_USE_MKL_ALL
+#endif
+#define NDEBUG
+#include <Eigen/Dense>
+
+void (*ode_solver)(neuron*, double, double);
+
 #if POISSON_INPUT_USE
 #if SMOOTH_CONDUCTANCE_USE
 // use smooth conductance HE and HI
@@ -171,7 +181,6 @@ for (index_firing = 0;index_firing<g_num_neu;index_firing++) {
 }
 
 #if SMOOTH_CONDUCTANCE_USE && CORTICAL_STRENGTH_NONHOMO && !EXPONENTIAL_IF_USE
-//void whole_dt_single(const neuron * const neu_val, neuron *neu_dy, double *volt, int index_neuron, double t)
 void whole_dt_single(const double * const &neu_i_val, double *&neu_i_dy, double t)
 {
   //dv_dt
@@ -233,6 +242,70 @@ void whole_dt_vector(const neuron * const neu_val, neuron *neu_dy, double *volt,
     for (int j = g_num_neu_ex; j < g_num_neu; j++) {
       neu_dy[j].value[2*Stepsmooth_Con] +=
         Strength_CorII * cortical_matrix[j][i] * volt[i];
+    }
+  }
+}
+
+void get_dy(Eigen::ArrayXXd &dx, const Eigen::ArrayXXd &xm, double t)
+{
+  const Eigen::ArrayXd &v  = xm.col(0);
+  const Eigen::ArrayXd &gE = xm.col(1);
+  const Eigen::ArrayXd &hE = xm.col(2);
+  const Eigen::ArrayXd &gI = xm.col(3);
+  const Eigen::ArrayXd &hI = xm.col(4);
+  const Eigen::ArrayXd &m  = xm.col(5);
+  const Eigen::ArrayXd &h  = xm.col(6);
+  const Eigen::ArrayXd &n  = xm.col(7);
+
+  // cost 12%
+  dx.col(0) = -Con_Leakage * (v - Vot_Leakage)
+              -Con_sodium * m*m*m*h * (v-Vot_sodium)
+              -Con_potassium * n*n*n*n * (v-Vot_potassium)
+              -gE * (v-Vot_Excitatory) - gI * (v-Vot_Inhibitory);
+
+  // cost 42%
+  // mhn
+  Eigen::ArrayXd e1(g_num_neu);
+  Eigen::ArrayXd e2(g_num_neu);
+  e1 = 2.5-v;
+  e1 = exp(e1);
+  e2 = v*(-1/1.8);
+  e2 = exp(e2);
+  dx.col(5) = (v-2.5)/(1-e1)*(1-m) - 4*e2*m;
+  e2 = e1*exp(-2.5);
+  e2 = sqrt(e2);
+  dx.col(6) = 0.07*e2*(1-h) - h/(1+e1*exp(0.5));
+  e2 = sqrt(e2);
+  e2 = sqrt(e2);
+  dx.col(7) = 0.1*(v-1.0)/(1-e1*exp(-1.5))*(1-n) - 0.125*e2*n;
+
+  //conductance_dt
+  dx.col(1) = -gE * (1.0/Time_ExCon) + hE;
+  dx.col(3) = -gI * (1.0/Time_InCon) + hI;
+  dx.col(2) = -hE * (1.0/Time_ExConR);
+  dx.col(4) = -hI * (1.0/Time_InConR);
+
+  // cost 7%
+  // Compute influence from the network (H^E and H^I)
+  double synaptic_volt;
+  for (int i = 0; i < g_num_neu_ex; i++) {
+    synaptic_volt = xm(i,0)>4 ? 1/(1+exp(-5*(xm(i,0) - 8.5))) : 0.0;
+    if(synaptic_volt == 0) continue;
+    for (int j = 0; j < g_num_neu_ex; j++) {
+      dx(j, 2) += Strength_CorEE * cortical_matrix[j][i] * synaptic_volt;
+    }
+    for (int j = g_num_neu_ex; j < g_num_neu; j++) {
+      dx(j, 2) += Strength_CorIE * cortical_matrix[j][i] * synaptic_volt;
+    }
+  }
+  for (int i = g_num_neu_ex; i < g_num_neu; i++) {
+    synaptic_volt = xm(i,0)>4 ? 1/(1+exp(-5*(xm(i,0) - 8.5))) : 0.0;
+    if(synaptic_volt == 0) continue;
+    for (int j = 0; j < g_num_neu_ex; j++) {
+      dx(j, 4) += Strength_CorEI * cortical_matrix[j][i] * synaptic_volt;
+    }
+    for (int j = g_num_neu_ex; j < g_num_neu; j++) {
+      dx(j, 4) += Strength_CorII * cortical_matrix[j][i] * synaptic_volt;
     }
   }
 }
@@ -519,7 +592,6 @@ void runge_kutta3(neuron *tempneu, double subTstep, double t_evolution)
 }
 #endif
 
-#if runge_kutta == runge_kutta4
 void runge_kutta4(neuron *tempneu, double subTstep, double t_evolution)
 {
   int i, j;
@@ -564,7 +636,38 @@ void runge_kutta4(neuron *tempneu, double subTstep, double t_evolution)
     }
   }
 }
-#endif
+
+void runge_kutta4_vec(neuron *tempneu, double subTstep, double t_evolution)
+{
+  int i, j;
+  Eigen::ArrayXXd xt(g_num_neu, 2*Stepsmooth_Con+4);  // all variables of all neurons
+  Eigen::ArrayXXd k1(g_num_neu, 2*Stepsmooth_Con+4);
+  Eigen::ArrayXXd k2(g_num_neu, 2*Stepsmooth_Con+4);
+  Eigen::ArrayXXd k3(g_num_neu, 2*Stepsmooth_Con+4);
+  Eigen::ArrayXXd k4(g_num_neu, 2*Stepsmooth_Con+4);
+
+  for (i = 0; i<g_num_neu; i++) {
+    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
+      xt(i,j) = tempneu[i].value[j];
+    }
+  }
+
+  get_dy(k1, xt, t_evolution);
+
+  get_dy(k2, xt + k1 * (subTstep/2), t_evolution + subTstep/2);
+
+  get_dy(k3, xt + k2 * (subTstep/2), t_evolution + subTstep/2);
+
+  get_dy(k4, xt + k3 * subTstep, t_evolution + subTstep);
+
+  xt += (k1 + 2*k2 + 2*k3 + k4) * (subTstep/6);
+
+  for (i = 0; i<g_num_neu; i++) {
+    for (j = 0; j<2*Stepsmooth_Con+4; j++) {
+      tempneu[i].value[j] = xt(i,j);
+    }
+  }
+}
 
 
 ///modified 2013/1/13 12:51
@@ -706,7 +809,7 @@ void sub_network_evolve(neuron *tempneu,  double begin_time, double end_time)
   double t_evolution = time_evolution + begin_time;
   double firing_time = -1.0;
 //evovle the system from t_evolution+begin
-  runge_kutta(tempneu, subTstep, t_evolution);
+  ode_solver(tempneu, subTstep, t_evolution);
 
 //search the spiking time of the index_neuron
   for (index_neuron = 0; index_neuron<g_num_neu; index_neuron++) {
@@ -828,6 +931,11 @@ void compute_perstep()
   if (time_evolution >= last_time + g_comp_time) {
     RUN_DONE = 1;                   // program stop signal
     return ;
+  }
+  if (g_num_neu >= 12) {  // choose one faster
+    ode_solver = runge_kutta4_vec;
+  } else {
+    ode_solver = runge_kutta4;
   }
 
   network_initialization();
