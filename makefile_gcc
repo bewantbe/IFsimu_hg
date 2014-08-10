@@ -1,18 +1,13 @@
 # Project: cleanIFcode
 # make -f makefile_gcc
 
-#CPP  = icpc -O2 -fp-model precise
-#C    = icc -O2
-CPP  = g++ -O2
-C    = gcc -O2
+CPP  = g++ -O2 -march=native
 OBJ  = datahandling.o datainput.o loop.o myopengl.o neuron.o poisson_input.o random.o raster.o raster_tuning.o
-LINKOBJ  = datahandling.o datainput.o loop.o myopengl.o neuron.o poisson_input.o random.o raster.o raster_tuning.o
-LIBS =  -L"/usr/lib" -lGL -lGLU -lglut
-INCS =  -I"/usr/include"
-CXXINCS = 
-BIN  = raster_tuning
+LINKOBJ = datahandling.o datainput.o loop.o myopengl.o neuron.o poisson_input.o random.o raster.o raster_tuning.o
+LIBS    = -lGL -lGLU -lglut -s
+CXXINCS = -I"/usr/include/eigen3"
+BIN     = raster_tuning
 CXXFLAGS = $(CXXINCS)
-CFLAGS = $(INCS)
 
 .PHONY: all all-before all-after clean clean-custom
 
@@ -23,7 +18,7 @@ clean: clean-custom
 	rm -f $(OBJ) $(BIN)
 
 $(BIN): $(OBJ)
-	$(CPP) $(LINKOBJ) -o "bin/Release/raster_tuning_HH_gcc" $(LIBS)
+	$(CPP) $(LINKOBJ) -o "bin/Release/raster_tuning_HH3_gcc" $(LIBS)
 
 datahandling.o: datahandling.cpp
 	$(CPP) -c datahandling.cpp -o datahandling.o $(CXXFLAGS)

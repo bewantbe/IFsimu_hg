@@ -6,12 +6,13 @@
 #include "datahandling.h"
 #include "poisson_input.h"
 
-// Seems that icc is not good at compiling template library (such as Eigen)
-// Here need Eigen version >= 3.1, and better 3.2
+// Force Eigen3 to use MKL when icc is detected
 #if defined(__ICC) || defined(__INTEL_COMPILER)
 #  define EIGEN_USE_MKL_ALL
 #endif
-#define NDEBUG
+#define NDEBUG  // Turn off debug in Eigen3
+// Seems that icc is not good at compiling template library (such as Eigen3)
+// To have a good performance, you need to have Eigen version >= 3.2
 #include <Eigen/Dense>
 
 void (*ode_solver)(neuron*, double, double);
@@ -199,17 +200,17 @@ void whole_dt_single(const double * const &neu_i_val, double *&neu_i_dy, double 
     double e1 = exp(-v+2.5);
     double e2 = sqrt(e1*exp(-2.5));
     neu_i_dy[2*Stepsmooth_Con+1] = (v-2.5)/(1-e1)*(1-m) - 4*exp(-v/1.8)*m;
-    neu_i_dy[2*Stepsmooth_Con+2] = 0.07*e2*(1-h) - 1/(1+e1*exp(0.5))*h;
+    neu_i_dy[2*Stepsmooth_Con+2] = 0.07*e2*(1-h) - h/(1+e1*exp(0.5));
     neu_i_dy[2*Stepsmooth_Con+3] = 0.1*(v-1.0)/(1-e1*exp(-1.5))*(1-n) - 0.125*sqrt(sqrt((e2)))*n;
   }
 
   //conductance_dt
   for (int con_index = 1; con_index<Stepsmooth_Con; con_index++){
-    neu_i_dy[con_index] = -neu_i_val[con_index]/Time_ExCon + neu_i_val[con_index+1];
-    neu_i_dy[Stepsmooth_Con+con_index] = -neu_i_val[Stepsmooth_Con+con_index]/Time_InCon + neu_i_val[Stepsmooth_Con+con_index+1];
+    neu_i_dy[               con_index] = -neu_i_val[               con_index]*(1.0/Time_ExCon) + neu_i_val[con_index+1];
+    neu_i_dy[Stepsmooth_Con+con_index] = -neu_i_val[Stepsmooth_Con+con_index]*(1.0/Time_InCon) + neu_i_val[Stepsmooth_Con+con_index+1];
   }
-  neu_i_dy[  Stepsmooth_Con] = -neu_i_val[  Stepsmooth_Con]/Time_ExConR;
-  neu_i_dy[2*Stepsmooth_Con] = -neu_i_val[2*Stepsmooth_Con]/Time_InConR;
+  neu_i_dy[  Stepsmooth_Con] = -neu_i_val[  Stepsmooth_Con]*(1.0/Time_ExConR);
+  neu_i_dy[2*Stepsmooth_Con] = -neu_i_val[2*Stepsmooth_Con]*(1.0/Time_InConR);
 }
 
 void whole_dt_vector(const neuron * const neu_val, neuron *neu_dy, double *volt, double t)
@@ -246,7 +247,7 @@ void whole_dt_vector(const neuron * const neu_val, neuron *neu_dy, double *volt,
   }
 }
 
-void get_dy(Eigen::ArrayXXd &dx, const Eigen::ArrayXXd &xm, double t)
+void get_dx(Eigen::ArrayXXd &dx, const Eigen::ArrayXXd &xm, double t)
 {
   const Eigen::ArrayXd &v  = xm.col(0);
   const Eigen::ArrayXd &gE = xm.col(1);
@@ -607,7 +608,7 @@ void runge_kutta4(neuron *tempneu, double subTstep, double t_evolution)
   // dy2 = f(t(n)+h/2, y(n)+dy1*h/2)
   for (i = 0; i<g_num_neu; i++) {
     for (j = 0; j<2*Stepsmooth_Con+4; j++) {
-      neuRK[i].value[j]  = tempneu[i].value[j] + neu_d1[i].value[j] * subTstep/2;
+      neuRK[i].value[j]  = tempneu[i].value[j] + neu_d1[i].value[j] * (subTstep/2);
     }
   }
   whole_dt_vector(neuRK, neu_d2, vol, t_evolution + subTstep/2);
@@ -615,7 +616,7 @@ void runge_kutta4(neuron *tempneu, double subTstep, double t_evolution)
   // dy3 = f(t(n)+h/2, y(n)+dy2*h/2)
   for (i = 0; i<g_num_neu; i++){
     for (j = 0; j<2*Stepsmooth_Con+4; j++) {
-      neuRK[i].value[j]  = tempneu[i].value[j] + neu_d2[i].value[j] * subTstep/2;
+      neuRK[i].value[j]  = tempneu[i].value[j] + neu_d2[i].value[j] * (subTstep/2);
     }
   }
   whole_dt_vector(neuRK, neu_d3, vol, t_evolution + subTstep/2);
@@ -652,13 +653,13 @@ void runge_kutta4_vec(neuron *tempneu, double subTstep, double t_evolution)
     }
   }
 
-  get_dy(k1, xt, t_evolution);
+  get_dx(k1, xt, t_evolution);
 
-  get_dy(k2, xt + k1 * (subTstep/2), t_evolution + subTstep/2);
+  get_dx(k2, xt + k1 * (subTstep/2), t_evolution + subTstep/2);
 
-  get_dy(k3, xt + k2 * (subTstep/2), t_evolution + subTstep/2);
+  get_dx(k3, xt + k2 * (subTstep/2), t_evolution + subTstep/2);
 
-  get_dy(k4, xt + k3 * subTstep, t_evolution + subTstep);
+  get_dx(k4, xt + k3 * subTstep, t_evolution + subTstep);
 
   xt += (k1 + 2*k2 + 2*k3 + k4) * (subTstep/6);
 
