@@ -82,7 +82,7 @@ static inline int isnan(double x) { return x != x; }
 #define POISSON_INPUT_USE 1              ///XYY: modify this
 // whether use the smoothed conductance (meaning that we use more than one ODE to
 // describe the rising and decay time scale of conductance)
-#define SMOOTH_CONDUCTANCE_USE 0         /// modify this
+#define SMOOTH_CONDUCTANCE_USE 1         /// modify this
 // whether consider the homogeneous cortical strength (a scalar independent of
 // neuron index) or not! It is useful when using a N-by-N matrix to indicate the
 // strength between neurons

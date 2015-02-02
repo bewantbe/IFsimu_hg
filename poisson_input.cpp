@@ -322,52 +322,73 @@ void runge_kutta4(neuron *tempneu, int index_neuron, double subTstep,
   // dy/dt = f(t,y) t = t(n), y = y(n)
   double m1, m2, m3, m4;
   double newstep = subTstep; // time step needs to be changed for awaken neuron
+  double * const neu_val = tempneu[index_neuron].value;
 
   // the neuron is in refractory period
-  tempneu[index_neuron].value[size_neuronvar-1] +=
+  neu_val[size_neuronvar-1] +=
     (1 - tempneu[index_neuron].state_neuron)*newstep;
 
+  double e1,e2,e3,e4;
   // the neuron is in refractory period but will be awaken in this time!
-  if (tempneu[index_neuron].value[size_neuronvar-1] >= TIME_REFRACTORY) {
-    newstep = tempneu[index_neuron].value[size_neuronvar-1] - TIME_REFRACTORY;
+  if (neu_val[size_neuronvar-1] >= TIME_REFRACTORY) {
+    newstep = neu_val[size_neuronvar-1] - TIME_REFRACTORY;
     tempneu[index_neuron].state_neuron = STATE_ACTIVE;
-    tempneu[index_neuron].value[size_neuronvar-1] = 0;
+    neu_val[size_neuronvar-1] = 0;
 
+    e1  = exp((newstep-subTstep)/Time_ExCon);
+    e2  = exp((newstep-subTstep)/Time_ExConR);
+    e3  = exp((newstep-subTstep)/Time_InCon);
+    e4  = exp((newstep-subTstep)/Time_InConR);
+  } else {
+    e1 = e2 = e3 = e4 = 1;
   }
 
   if (tempneu[index_neuron].state_neuron == STATE_ACTIVE) {
-    double v0 = tempneu[index_neuron].value[0];
+    double v0 = neu_val[0];
 // if the neuron is awaken in this time step, the value of conductance should be used
 // with the value of the awaking point******************************************
 #if SMOOTH_CONDUCTANCE_USE
-    double g_E0 = tempneu[index_neuron].value[1]*exp((newstep-subTstep)/Time_ExCon)
-                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp((newstep-subTstep)/Time_ExConR) - exp((newstep-subTstep)/Time_ExCon))
-                  *tempneu[index_neuron].value[Stepsmooth_Con];
-    double H_E0 = tempneu[index_neuron].value[Stepsmooth_Con]*exp((newstep-subTstep)/Time_ExConR);
+    //double e1  = exp((newstep-subTstep)/Time_ExCon);
+    //double e2  = exp((newstep-subTstep)/Time_ExConR);
+    //double e3  = exp((newstep-subTstep)/Time_InCon);
+    //double e4  = exp((newstep-subTstep)/Time_InConR);
+    double e5  = exp(-newstep/Time_ExCon);
+    double e6  = exp(-newstep/Time_ExConR);
+    double e7  = exp(-newstep/Time_InCon);
+    double e8  = exp(-newstep/Time_InConR);
+    double e9  = sqrt(e5);
+    double e10 = sqrt(e6);
+    double e11 = sqrt(e7);
+    double e12 = sqrt(e8);
 
-    double g_I0 = tempneu[index_neuron].value[Stepsmooth_Con+1]*exp((newstep-subTstep)/Time_InCon)
-                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp((newstep-subTstep)/Time_InConR) - exp((newstep-subTstep)/Time_InCon))
-                  *tempneu[index_neuron].value[2*Stepsmooth_Con];
-    double H_I0 = tempneu[index_neuron].value[2*Stepsmooth_Con]*exp((newstep-subTstep)/Time_InConR);
-
-    double g_E1 = g_E0*exp(-newstep/2/Time_ExCon)
+    double g_E0 = neu_val[1]*e1
                   + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp(-newstep/2/Time_ExConR) - exp(-newstep/2/Time_ExCon))*H_E0;
-    double g_I1 = g_I0*exp(-newstep/2/Time_InCon)
-                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp(-newstep/2/Time_InConR) - exp(-newstep/2/Time_InCon))*H_I0;
+                  *(e2 - e1)
+                  *neu_val[Stepsmooth_Con];
+    double H_E0 = neu_val[Stepsmooth_Con]*e2;
 
-    double g_E2 = g_E0*exp(-newstep/Time_ExCon)
-                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
-                  *(exp(-newstep/Time_ExConR) - exp(-newstep/Time_ExCon))*H_E0;
-    double g_I2 = g_I0*exp(-newstep/Time_InCon)
+    double g_I0 = neu_val[Stepsmooth_Con+1]*e3
                   + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
-                  *(exp(-newstep/Time_InConR) - exp(-newstep/Time_InCon))*H_I0;
+                  *(e4 - e3)
+                  *neu_val[2*Stepsmooth_Con];
+    double H_I0 = neu_val[2*Stepsmooth_Con]*e4;
+
+    double g_E1 = g_E0*e9
+                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
+                  *(e10 - e9)*H_E0;
+    double g_I1 = g_I0*e11
+                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
+                  *(e12 - e11)*H_I0;
+
+    double g_E2 = g_E0*e5
+                  + 1.0*Time_ExCon*Time_ExConR/(Time_ExConR-Time_ExCon)
+                  *(e6 - e5)*H_E0;
+    double g_I2 = g_I0*e7
+                  + 1.0*Time_InCon*Time_InConR/(Time_InConR-Time_InCon)
+                  *(e8 - e7)*H_I0;
 #else
-    double g_E0 = tempneu[index_neuron].value[1]*exp((newstep-subTstep)/Time_ExCon);
-    double g_I0 = tempneu[index_neuron].value[Stepsmooth_Con+1]*exp((newstep-subTstep)/Time_InCon);
+    double g_E0 = neu_val[1]*exp((newstep-subTstep)/Time_ExCon);
+    double g_I0 = neu_val[Stepsmooth_Con+1]*exp((newstep-subTstep)/Time_InCon);
     double g_E1 = g_E0*exp(-newstep/2/Time_ExCon);
     double g_I1 = g_I0*exp(-newstep/2/Time_InCon);
     double g_E2 = g_E0*exp(-newstep/Time_ExCon);

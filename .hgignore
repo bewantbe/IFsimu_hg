@@ -6,3 +6,4 @@ tags
 *.o
 raster_tuning.layout
 .ycm_extra_conf.pyc
+eigen3/
