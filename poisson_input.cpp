@@ -1000,13 +1000,15 @@ void compute_perstep()
     // smooth the spike
     for (i=0; i<g_num_neu; i++) {
       double v = neu[i].value[0];
+      if (g_RC_filter_co != 0) {
 #if SMOOTH_CONDUCTANCE_USE
-      if (neu[i].value[5] != 0.0 && neu[i].value[5] < Tstep)
-        v = 1.0 - neu[i].value[5]/Tstep;
+        if (neu[i].value[5] != 0.0 && neu[i].value[5] < Tstep)
+          v = 1.0 - neu[i].value[5]/Tstep;
 #else
-      if (neu[i].value[3] != 0.0 && neu[i].value[3] < Tstep)
-        v = 1.0 - neu[i].value[3]/Tstep;
+        if (neu[i].value[3] != 0.0 && neu[i].value[3] < Tstep)
+          v = 1.0 - neu[i].value[3]/Tstep;
 #endif
+      }
       strobeupdateRCFilter(GLOBAL_STRA[i], time_evolution, Tstep, v);
     }
     for (i=g_num_neu; i<imax; i++) {

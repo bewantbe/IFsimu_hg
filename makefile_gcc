@@ -3,7 +3,7 @@
 
 # CPP  = icpc -O2
 
-CPP  = icpc -O2
+CPP  = gcc -O2
 C    = gcc -O2
 OBJ  = datahandling.o datainput.o loop.o myopengl.o neuron.o poisson_input.o random.o raster.o raster_tuning.o
 LINKOBJ  = datahandling.o datainput.o loop.o myopengl.o neuron.o poisson_input.o random.o raster.o raster_tuning.o
